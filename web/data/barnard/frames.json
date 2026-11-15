@@ -1,0 +1,251 @@
+{
+  "objeto": "Barnard's Star",
+  "ra": 269.446288,
+  "dec": 4.767943,
+  "orientacion": "norte arriba, este a la izquierda",
+  "campo_arcmin": 1.68,
+  "escala_arcsec_px": 3.0,
+  "estiramiento": "fondo restado; asinh(0.1); corte comun por detector",
+  "frames": [
+    {
+      "fecha": "2025-08-28",
+      "detector": "D1",
+      "png": "2025-08-28_D1_v27-2026-230.png",
+      "calidad": "buena",
+      "cobertura": 0.984,
+      "ruido": 0.5736
+    },
+    {
+      "fecha": "2025-08-30",
+      "detector": "D1",
+      "png": "2025-08-30_D1_v27-2026-231.png",
+      "calidad": "buena",
+      "cobertura": 0.979,
+      "ruido": 1.1142
+    },
+    {
+      "fecha": "2025-08-31",
+      "detector": "D1",
+      "png": "2025-08-31_D1_v27-2026-231.png",
+      "calidad": "buena",
+      "cobertura": 0.979,
+      "ruido": 1.7411
+    },
+    {
+      "fecha": "2026-03-11",
+      "detector": "D1",
+      "png": "2026-03-11_D1_v27-2026-232.png",
+      "calidad": "buena",
+      "cobertura": 0.984,
+      "ruido": 0.5983
+    },
+    {
+      "fecha": "2026-08-29",
+      "detector": "D1",
+      "png": "2026-08-29_D1_v27-2026-246.png",
+      "calidad": "buena",
+      "cobertura": 0.979,
+      "ruido": 1.9795
+    },
+    {
+      "fecha": "2025-08-24",
+      "detector": "D2",
+      "png": "2025-08-24_D2_v27-2026-229.png",
+      "calidad": "buena",
+      "cobertura": 0.969,
+      "ruido": 1.8428
+    },
+    {
+      "fecha": "2025-08-27",
+      "detector": "D2",
+      "png": "2025-08-27_D2_v27-2026-230.png",
+      "calidad": "buena",
+      "cobertura": 0.962,
+      "ruido": 2.4034
+    },
+    {
+      "fecha": "2025-08-29",
+      "detector": "D2",
+      "png": "2025-08-29_D2_v27-2026-231.png",
+      "calidad": "buena",
+      "cobertura": 0.972,
+      "ruido": 1.0753
+    },
+    {
+      "fecha": "2026-08-24",
+      "detector": "D2",
+      "png": "2026-08-24_D2_v27-2026-243.png",
+      "calidad": "buena",
+      "cobertura": 0.972,
+      "ruido": 2.8233
+    },
+    {
+      "fecha": "2026-09-22",
+      "detector": "D2",
+      "png": "2026-09-22_D2_v27-2026-268.png",
+      "calidad": "buena",
+      "cobertura": 0.971,
+      "ruido": 1.9394
+    },
+    {
+      "fecha": "2025-08-21",
+      "detector": "D3",
+      "png": "2025-08-21_D3_v27-2026-229.png",
+      "calidad": "buena",
+      "cobertura": 0.975,
+      "ruido": 1.5828
+    },
+    {
+      "fecha": "2026-03-21",
+      "detector": "D3",
+      "png": "2026-03-21_D3_v27-2026-235.png",
+      "calidad": "buena",
+      "cobertura": 0.986,
+      "ruido": 1.4152
+    },
+    {
+      "fecha": "2026-04-10",
+      "detector": "D3",
+      "png": "2026-04-10_D3_v27-2026-240.png",
+      "calidad": "buena",
+      "cobertura": 0.972,
+      "ruido": 1.1896
+    },
+    {
+      "fecha": "2026-05-05",
+      "detector": "D3",
+      "png": "2026-05-05_D3_v27-2026-245.png",
+      "calidad": "buena",
+      "cobertura": 0.969,
+      "ruido": 1.7874
+    },
+    {
+      "fecha": "2026-08-18",
+      "detector": "D3",
+      "png": "2026-08-18_D3_v27-2026-243.png",
+      "calidad": "buena",
+      "cobertura": 0.971,
+      "ruido": 1.7833
+    },
+    {
+      "fecha": "2026-03-11",
+      "detector": "D4",
+      "png": "2026-03-11_D4_v27-2026-232.png",
+      "calidad": "buena",
+      "cobertura": 0.978,
+      "ruido": 1.9855
+    },
+    {
+      "fecha": "2026-08-24",
+      "detector": "D4",
+      "png": "2026-08-24_D4_v27-2026-243.png",
+      "calidad": "buena",
+      "cobertura": 0.972,
+      "ruido": 1.6551
+    },
+    {
+      "fecha": "2026-08-25",
+      "detector": "D4",
+      "png": "2026-08-25_D4_v27-2026-243.png",
+      "calidad": "buena",
+      "cobertura": 0.968,
+      "ruido": 2.0049
+    },
+    {
+      "fecha": "2025-08-25",
+      "detector": "D5",
+      "png": "2025-08-25_D5_v27-2026-230.png",
+      "calidad": "buena",
+      "cobertura": 1.0,
+      "ruido": 0.968
+    },
+    {
+      "fecha": "2026-03-15",
+      "detector": "D5",
+      "png": "2026-03-15_D5_v27-2026-234.png",
+      "calidad": "buena",
+      "cobertura": 0.997,
+      "ruido": 1.0681
+    },
+    {
+      "fecha": "2026-03-17",
+      "detector": "D5",
+      "png": "2026-03-17_D5_v27-2026-235.png",
+      "calidad": "buena",
+      "cobertura": 1.0,
+      "ruido": 1.1373
+    },
+    {
+      "fecha": "2026-08-18",
+      "detector": "D5",
+      "png": "2026-08-18_D5_v27-2026-243.png",
+      "calidad": "buena",
+      "cobertura": 1.0,
+      "ruido": 1.2161
+    },
+    {
+      "fecha": "2026-08-21",
+      "detector": "D5",
+      "png": "2026-08-21_D5_v27-2026-243.png",
+      "calidad": "buena",
+      "cobertura": 1.0,
+      "ruido": 0.9616
+    },
+    {
+      "fecha": "2025-08-15",
+      "detector": "D6",
+      "png": "2025-08-15_D6_v27-2026-228.png",
+      "calidad": "buena",
+      "cobertura": 1.0,
+      "ruido": 0.7688
+    },
+    {
+      "fecha": "2025-08-16",
+      "detector": "D6",
+      "png": "2025-08-16_D6_v27-2026-228.png",
+      "calidad": "buena",
+      "cobertura": 1.0,
+      "ruido": 0.9288
+    },
+    {
+      "fecha": "2026-03-19",
+      "detector": "D6",
+      "png": "2026-03-19_D6_v27-2026-235.png",
+      "calidad": "buena",
+      "cobertura": 1.0,
+      "ruido": 0.7772
+    },
+    {
+      "fecha": "2026-03-22",
+      "detector": "D6",
+      "png": "2026-03-22_D6_v27-2026-235.png",
+      "calidad": "buena",
+      "cobertura": 1.0,
+      "ruido": 0.7208
+    },
+    {
+      "fecha": "2026-03-23",
+      "detector": "D6",
+      "png": "2026-03-23_D6_v27-2026-236.png",
+      "calidad": "buena",
+      "cobertura": 1.0,
+      "ruido": 0.9541
+    },
+    {
+      "fecha": "2026-08-17",
+      "detector": "D6",
+      "png": "2026-08-17_D6_v27-2026-243.png",
+      "calidad": "buena",
+      "cobertura": 1.0,
+      "ruido": 0.7772
+    },
+    {
+      "fecha": "2026-08-19",
+      "detector": "D6",
+      "png": "2026-08-19_D6_v27-2026-243.png",
+      "calidad": "buena",
+      "cobertura": 1.0,
+      "ruido": 0.864
+    }
+  ]
+}

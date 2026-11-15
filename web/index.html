@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cielo en Movimiento · NASA Space Apps 2026</title>
+<style>
+:root{--bg:#050a1a;--pan:#0c1736;--pan2:#13224d;--nasa:#0b3d91;--red:#fc3d21;--org:#f97316;--tq:#2dd4bf;--vio:#a78bfa;--ok:#22c55e;--warn:#facc15;--txt:#eaf0ff;--mut:#9fb0d6;--line:#25397a;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#050a1a}}
+:root[data-theme="dark"]{--bg:#050a1a}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*{box-sizing:border-box}
+body{margin:0;height:100%;background:var(--bg);color:var(--txt);font:16px/1.55 "Trebuchet MS","Segoe UI",system-ui,sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;font-weight:700;line-height:1.15;margin:0}
+.hide{display:none!important}
+#landing{min-height:100%;padding:28px 20px 40px;background:radial-gradient(ellipse at 80% -10%,#1b3a8a 0,transparent 55%),radial-gradient(ellipse at 0 100%,#3a1550 0,transparent 50%),var(--bg);overflow:auto;height:100%}
+.wrap{max-width:1000px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;color:var(--mut);font-size:14px}
+.logo{width:34px;height:34px;border-radius:50%;background:var(--nasa);border:2px solid #fff;position:relative;flex:none}
+.logo:after{content:"";position:absolute;left:-6px;top:15px;width:48px;height:3px;background:var(--red);transform:rotate(-24deg);border-radius:2px}
+.hero{padding:48px 0 30px}
+.hero h1{font-size:clamp(38px,7vw,72px);max-width:12ch}
+.hero p{max-width:56ch;color:var(--mut);font-size:18px;margin:18px 0 0}
+.lv{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:10px}
+.card{background:var(--pan);border:2px solid var(--line);border-radius:18px;padding:22px;text-align:left;transition:transform .15s,border-color .15s;display:flex;flex-direction:column;gap:10px}
+.card:hover{transform:translateY(-3px);border-color:var(--tq)}
+.card h3{font-size:24px}.card ul{margin:0;padding-left:18px;color:var(--mut);font-size:15px}
+.card .go{margin-top:auto;background:var(--nasa);border-radius:999px;padding:10px 16px;text-align:center;font-weight:700;border:1px solid #5b86e0}
+.card:nth-child(1) .go{background:#0e7a6e;border-color:var(--tq)}.card:nth-child(3) .go{background:#5b36b8;border-color:var(--vio)}
+.tag{font-size:13px;color:var(--tq)}
+.note{margin-top:30px;color:var(--mut);font-size:14px;max-width:70ch}
+.leg{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;font-size:14px;color:var(--mut)}
+.leg i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.top{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;background:var(--pan);border-bottom:2px solid var(--nasa)}
+.top input,.top select{background:var(--bg);color:var(--txt);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font:inherit;min-width:0}
+.top input{flex:1 1 220px}
+.b{background:var(--pan2);border:1px solid var(--line);border-radius:999px;padding:8px 14px}
+.b.on{background:var(--nasa);border-color:#5b86e0}.b.tq{background:#0e7a6e;border-color:var(--tq)}
+.seg{display:flex;gap:4px}
+#stage{position:relative;flex:1;min-height:0}
+canvas#sky{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+.zoom{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:6px}
+.zoom button{width:44px;height:44px;border-radius:50%;background:var(--pan);border:2px solid var(--line);font-size:22px}
+.chips{position:absolute;left:10px;right:70px;bottom:10px;display:flex;gap:6px;flex-wrap:wrap}
+.chips button{background:rgba(12,23,54,.88);border:1px solid var(--org);color:var(--txt);border-radius:999px;padding:6px 12px;font-size:14px}
+.hud{position:absolute;left:12px;top:12px;font-size:13px;color:var(--mut);background:rgba(5,10,26,.7);padding:4px 10px;border-radius:8px;max-width:60%}
+#pop{position:absolute;left:12px;bottom:64px;width:min(340px,calc(100% - 24px));background:var(--pan);border:2px solid var(--org);border-radius:16px;padding:16px;box-shadow:0 8px 30px #000a}
+#pop h3{font-size:22px;color:#fff}#pop .t{color:var(--org);font-size:14px}
+#pop dl{margin:10px 0;display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:14px}
+#pop dt{color:var(--mut)}#pop dd{margin:0}
+#pop .x{position:absolute;right:10px;top:8px;background:none;border:0;font-size:20px}
+.fact{font-size:14px;color:var(--warn);margin:8px 0}
+.modal{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;padding:16px;z-index:9}
+.box{background:var(--pan);border:2px solid var(--tq);border-radius:20px;padding:22px;max-width:480px;width:100%;max-height:92%;overflow:auto}
+.box h2{font-size:26px;margin-bottom:8px}.box p{color:var(--mut)}
+.dots{display:flex;gap:6px;margin:12px 0}.dots i{height:6px;flex:1;border-radius:3px;background:var(--line)}.dots i.a{background:var(--tq)}
+.row{display:flex;justify-content:space-between;gap:8px;margin-top:14px}
+#vis{width:100%;aspect-ratio:4/3;background:#000;border-radius:10px;display:block}
+@media (prefers-reduced-motion:reduce){.card{transition:none}}
+
+#landing{padding:0;background:#000;display:flex;flex-direction:column;overflow:auto;height:100%}
+.nav{display:flex;align-items:center;gap:22px;padding:12px 24px;background:#000;border-bottom:1px solid #1f2a4d;flex-wrap:wrap}
+.nav b{font:700 20px/1 "Helvetica Neue",Arial,sans-serif;letter-spacing:.02em}
+.nav a{color:#cfd8f5;text-decoration:none;font-size:14px}.nav a:hover{color:#fff;text-decoration:underline}
+.nav .sp{flex:1}
+.sky-hero{position:relative;flex:1;min-height:540px;display:flex;flex-direction:column;justify-content:center;padding:48px 24px 140px;overflow:hidden;background:radial-gradient(1.5px 1.5px at 12% 22%,#fff,transparent),radial-gradient(1px 1px at 30% 60%,#cfe,transparent),radial-gradient(1.5px 1.5px at 55% 15%,#fff,transparent),radial-gradient(1px 1px at 72% 40%,#fff,transparent),radial-gradient(1.5px 1.5px at 88% 18%,#bcd,transparent),radial-gradient(1px 1px at 45% 45%,#fff,transparent),linear-gradient(#000,#030a22 70%)}
+.earth{position:absolute;left:-25%;right:-25%;bottom:-78%;height:100%;border-radius:50%;background:radial-gradient(ellipse at 50% 0,#3b82f6 0,#0b3d91 7%,#06194a 28%,#020617 60%);box-shadow:0 -4px 50px 8px #4aa3ff88,0 -2px 0 #bfe0ff}
+.sky-hero .in{position:relative;max-width:1000px;width:100%;margin:0 auto}
+.sky-hero h1{font:800 clamp(44px,9vw,104px)/.98 "Helvetica Neue",Arial,sans-serif;letter-spacing:-.02em;max-width:11ch}
+.sky-hero p{font-size:19px;color:#cfd8f5;max-width:50ch;margin:20px 0 28px}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.cta button{border-radius:999px;padding:14px 28px;font-weight:700;font-size:17px;border:2px solid #fff;background:transparent}
+.cta .red{background:var(--red);border-color:var(--red)}
+.cta button:hover{filter:brightness(1.15)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));background:#0a1230;border-top:3px solid var(--red)}
+.tiles div{padding:22px 24px;border-right:1px solid #1f2a4d}
+.tiles h3{font:700 20px "Helvetica Neue",Arial,sans-serif;margin-bottom:4px}.tiles span{color:var(--mut);font-size:15px}
+#levels{height:100%;overflow:auto;padding:22px 20px 40px;background:radial-gradient(ellipse at 50% -20%,#1d4ed8 0,transparent 55%),linear-gradient(#0a1230,#050a1a)}
+#levels .in{max-width:980px;margin:0 auto}
+.steps{display:flex;gap:8px;margin:18px 0 26px;font-size:14px;color:var(--mut)}
+.steps span{flex:1;padding-top:8px;border-top:4px solid var(--line)}.steps .a{border-color:var(--tq);color:#fff;font-weight:700}
+#levels h2{font-size:clamp(30px,5vw,46px)}#levels .sub{color:var(--mut);font-size:18px;margin:10px 0 26px;max-width:52ch}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}
+.opt{position:relative;background:var(--pan);border:3px solid var(--line);border-radius:28px;padding:26px 22px 22px;text-align:center;transition:transform .15s,border-color .15s,background .15s}
+.opt:hover{transform:translateY(-4px)}
+.opt .em{width:84px;height:84px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;font-size:42px;background:var(--c)}
+.opt h3{font-size:26px}.opt .who{color:var(--mut);font-size:15px;margin:4px 0 12px}
+.opt .see{font-size:15px;line-height:1.45;background:#0003;border-radius:14px;padding:10px 12px}
+.opt .ck{position:absolute;right:14px;top:14px;width:30px;height:30px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-weight:700;color:transparent}
+.opt[aria-pressed="true"]{border-color:var(--c);background:var(--pan2);transform:translateY(-4px)}
+.opt[aria-pressed="true"] .ck{background:var(--c);border-color:var(--c);color:#04122e}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:28px;flex-wrap:wrap}
+.foot .hint{color:var(--mut)}
+#enter{border-radius:999px;padding:14px 30px;font-weight:700;font-size:17px;background:var(--tq);color:#04122e;border:0}
+#enter:disabled{background:var(--pan2);color:var(--mut);cursor:not-allowed}
+
+body.l1 .n2,body.l1 .n3,body.l2 .n3{display:none!important}
+.mut{color:var(--mut)}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:8px 12px;background:var(--bg);border-bottom:1px solid var(--line)}
+.tabs button{white-space:nowrap;background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 14px}
+.tabs button.on{background:var(--tq);color:#04122e;border-color:var(--tq);font-weight:700}
+.coords{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 12px;background:var(--pan2);border-bottom:1px solid var(--line);font-size:14px}
+.coords input{background:var(--bg);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:6px 10px;width:170px}
+#pn{position:absolute;inset:0;overflow:auto;background:var(--bg);padding:16px;z-index:5}
+.g2{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px}
+@media(max-width:760px){.g2{grid-template-columns:1fr}}
+#pn h2{font-size:24px;margin-bottom:6px}#pn h3{font-size:17px;margin:14px 0 6px;font-family:inherit}
+#pn canvas{width:100%;background:#000;border-radius:10px;display:block}
+#pn .cd{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:10px 0}
+#pn .cd div{background:var(--pan);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:13px;color:var(--mut)}#pn .cd b{display:block;font-size:21px;color:var(--txt)}
+#pn p,#pn li{color:var(--mut);font-size:14px}#pn label{display:block;font-size:14px;margin:4px 0}
+#pn input:not([type]),#pn input[type=text]{background:var(--pan);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:6px 10px;width:100%}
+#pn table{width:100%;border-collapse:collapse;font-size:14px}#pn td,#pn th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+.row2{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.alr{background:#4a0d0d;border:2px solid var(--red);border-radius:12px;padding:12px;margin:10px 0}
+.okb{background:#0b3a1f;border:2px solid var(--ok);border-radius:12px;padding:12px;margin:10px 0}
+.new{background:var(--org);color:#000;border-radius:6px;padding:0 6px;font-size:12px;font-weight:700}
+#pn pre{background:var(--pan);padding:10px;border-radius:10px;overflow:auto;font-size:12px;white-space:pre-wrap;color:var(--txt)}
+.b.home{border-color:var(--red)}
+</style>
+</head>
+<body>
+<main id="landing">
+ <nav class="nav"><span class="logo"></span><b>Cielo en Movimiento</b><span class="sp"></span><a href="#" id="nv1">Explorar</a><a href="#" id="nv2">Tutorial</a><a>NASA Space Apps 2026 · SPHEREx</a></nav>
+ <section class="sky-hero">
+  <div class="in">
+   <h1>Made on Earth for all humanity</h1>
+   <p>Explora el cielo, encuentra algo que se mueve y entiende de qué está hecho. Un mapa del universo visible hecho para todas las personas.</p>
+   <div class="cta"><button class="red" id="start">Comenzar</button><button id="lt">Ver tutorial</button></div>
+  </div>
+  <div class="earth"></div>
+ </section>
+ <section class="tiles"><div><h3>Explora el cielo</h3><span>Gira el planeta o despliega el mapa plano.</span></div><div><h3>Encuentra algo que se mueve</h3><span>Compara fechas y mira el desplazamiento.</span></div><div><h3>Entiende de qué está hecho</h3><span>Las 102 bandas de SPHEREx, muy pronto.</span></div></section>
+</main>
+<main id="levels" class="hide">
+ <div class="in">
+  <button class="b" id="back">← Volver</button>
+  <div class="steps"><span>Inicio</span><span class="a">Tu nivel</span><span>Mapa</span></div>
+  <h2>¿Cómo quieres explorar?</h2>
+  <p class="sub">Elige la opción que más se parezca a ti. No hay respuestas incorrectas y puedes cambiarla cuando quieras.</p>
+  <div class="opts" role="group" aria-label="Nivel de experiencia">
+   <button class="opt" data-n="1" aria-pressed="false" style="--c:#2dd4bf"><span class="ck">✓</span><div class="em">🌙</div><h3>Principiante</h3><div class="who">Estoy empezando o solo tengo curiosidad</div><div class="see">Planeta fácil de girar, frases cortas, datos curiosos y un mini reto.</div></button>
+   <button class="opt" data-n="2" aria-pressed="false" style="--c:#60a5fa"><span class="ck">✓</span><div class="em">🔭</div><h3>Normal</h3><div class="who">Me gusta la astronomía o enseño</div><div class="see">Planeta o mapa plano, coordenadas, tipo de objeto y visor con vídeo.</div></button>
+   <button class="opt" data-n="3" aria-pressed="false" style="--c:#a78bfa"><span class="ck">✓</span><div class="em">🛰️</div><h3>Profesional</h3><div class="who">Quiero los datos completos</div><div class="see">Distancia, movimiento propio, catálogos y coordenadas del centro.</div></button>
+  </div>
+  <div class="foot"><span class="hint" id="hint">Toca una opción para continuar.</span><button id="enter" disabled>Entrar al mapa</button></div>
+ </div>
+</main>
+
+<div id="app" class="hide">
+ <div class="top">
+  <button class="b home" id="home" title="Volver a la portada (tecla H)">🏠 Inicio</button><span class="logo" title="Cielo en Movimiento"></span>
+  <input id="q" type="search" placeholder="Buscar: WISE 0855, 133.795 -7.245 o 08h55m10.8s -07d14m42.5s" aria-label="Buscar objeto o coordenadas">
+  <button class="b tq" id="go">Buscar</button>
+  <span class="seg"><button class="b on" id="vp">Planeta</button><button class="b" id="vm">Mapa plano</button><button class="b" id="vo">Ojo de pez</button><button class="b" id="vn" title="Todo el cielo en un óvalo">Planisferio</button><button class="b" id="vg" aria-pressed="false" title="Mapa de calor del brillo infrarrojo">🔥 Mapa de calor</button></span>
+  <select id="lvl" aria-label="Nivel de uso"><option value="1">Principiante</option><option value="2">Normal</option><option value="3">Profesional</option></select>
+  <button class="b" id="help" aria-label="Tutorial">? Tutorial</button>
+ </div>
+<div class="coords n3"><b>Coordenadas</b>RA <input id="ra" placeholder="133.795 o 08h55m10.8s" aria-label="RA"> Dec <input id="de" placeholder="-7.245 o -07d14m42.5s" aria-label="Dec"><button class="b tq" id="cg">Ir a RA/Dec</button><span id="cm" class="mut"></span></div>
+ <nav class="tabs" id="tabs" aria-label="Secciones"></nav>
+ <div id="stage">
+  <canvas id="sky" aria-label="Mapa del cielo"></canvas>
+  <div class="hud" id="hud"></div>
+  <div class="zoom"><button id="zi" aria-label="Acercar">+</button><button id="zo" aria-label="Alejar">−</button></div>
+  <div class="chips" id="chips"></div>
+  <div id="pop" class="hide"></div>
+  <div id="pn" class="hide"></div>
+ </div>
+</div>
+
+<div id="tut" class="modal hide"><div class="box" role="dialog" aria-modal="true"><h2 id="th"></h2><p id="tp"></p><div class="dots" id="td"></div><div class="row"><button class="b" id="tb">Atrás</button><button class="b tq" id="tn">Siguiente</button></div></div></div>
+<div id="vm2" class="modal hide"><div class="box"><h2 id="vt"></h2><canvas id="vis" width="320" height="240"></canvas><p id="vi" style="margin:10px 0 0"></p><div class="row"><span class="tag">Demostración con datos simulados</span><button class="b tq" id="vc">Cerrar</button></div></div></div>
+
+<script>
+const $=s=>document.querySelector(s),D=Math.PI/180;
+const O=[
+{n:"Barnard’s Star",t:"Estrella enana roja",ra:269.452,dec:4.693,mv:1,pm:"10.4″/año",d:"≈ 6 años luz",f:"Es la estrella que más rápido se desplaza en el cielo visto desde la Tierra.",cat:"Gaia, SIMBAD, WISE"},
+{n:"ε Indi B",t:"Enana marrón",ra:330.84,dec:-56.79,mv:1,pm:"≈ 4.7″/año",d:"≈ 12 años luz",f:"Una enana marrón es un objeto más grande que un planeta pero sin masa para ser estrella.",cat:"Gaia, SIMBAD"},
+{n:"WISE 0855",t:"Enana marrón · muy rápida",ra:133.795,dec:-7.245,mv:1,pm:"≈ 8.1″/año",d:"≈ 7 años luz",f:"Es uno de los objetos más fríos conocidos: casi tan frío como una nevera.",cat:"WISE, SIMBAD"},
+{n:"RW Aur",t:"Estrella variable joven",ra:76.96,dec:30.4,mv:0,pm:"pequeño",d:"≈ 450 años luz",f:"Su brillo cambia cuando el polvo que la rodea pasa delante de ella.",cat:"SIMBAD, Gaia"},
+{n:"R Dra",t:"Estrella variable roja",ra:248.18,dec:66.76,mv:0,pm:"pequeño",d:"—",f:"Late: se hace más y menos brillante a lo largo de meses.",cat:"SIMBAD"}];
+const B=[["Sirio",101.287,-16.716],["Canopus",95.988,-52.696],["Arturo",213.915,19.182],["Vega",279.234,38.784],["Capella",79.172,45.998],["Rigel",78.634,-8.202],["Betelgeuse",88.793,7.407],["Procyon",114.825,5.225],["Altair",297.696,8.868],["Aldebarán",68.98,16.509],["Antares",247.352,-26.432],["Spica",201.298,-11.161],["Deneb",310.358,45.28],["Polaris",37.954,89.264],["Fomalhaut",344.413,-29.622],["Pólux",116.329,28.026],["Régulo",152.093,11.967],["Achernar",24.429,-57.237],["Alfa Centauri",219.9,-60.834]];
+let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const BG=Array.from({length:700},()=>[rnd()*360,Math.asin(rnd()*2-1)/D,rnd()*1.1+.3]);
+const S={v:"p",cx:133.795,cy:-7.245,z:1,sel:null,lv:1,pop:null};
+const cv=$("#sky"),c=cv.getContext("2d");let W=0,H=0;
+function size(){const r=cv.getBoundingClientRect(),k=devicePixelRatio||1;W=r.width;H=r.height;cv.width=W*k;cv.height=H*k;c.setTransform(k,0,0,k,0,0);draw()}
+const wrap=a=>((a+540)%360)-180;
+function mxy(l,b){const p=b*D;let t=p;for(let i=0;i<10;i++){const f=2*t+Math.sin(2*t)-Math.PI*Math.sin(p),g=2+2*Math.cos(2*t);if(Math.abs(g)<1e-6)break;t-=f/g}return [2*Math.SQRT2/Math.PI*l*D*Math.cos(t),Math.SQRT2*Math.sin(t)]}
+const mk=()=>Math.min(W/(4*Math.SQRT2*1.08),H/(2*Math.SQRT2*1.08))*S.z;
+function proj(ra,dec){
+ if(S.v=="m"){const k=mk(),a=mxy(wrap(ra-S.cx),dec),b=mxy(0,S.cy);return [W/2-a[0]*k,H/2-(a[1]-b[1])*k,1]}
+ if(S.v=="f"){const k=W/360*S.z*1.4;return [W/2-wrap(ra-S.cx)*k,H/2-(dec-S.cy)*k,1]}
+ const m=Math.min(W,H),a=wrap(ra-S.cx)*D,d=dec*D,p=S.cy*D,cc=Math.sin(p)*Math.sin(d)+Math.cos(p)*Math.cos(d)*Math.cos(a),xo=Math.cos(d)*Math.sin(a),yo=Math.cos(p)*Math.sin(d)-Math.sin(p)*Math.cos(d)*Math.cos(a);
+ if(S.v=="o"){const R=m*.45*S.z,th=Math.acos(Math.max(-1,Math.min(1,cc))),sn=Math.hypot(xo,yo)||1,r=th*R/2.356;if(r>R)return null;return [W/2-r*xo/sn,H/2-r*yo/sn,1]}
+ if(cc<0)return null;const R=m*.42*S.z;return [W/2-R*xo,H/2-R*yo,cc]}
+const dpp=()=>S.v=="f"?1/(W/360*S.z*1.4):S.v=="m"?57/mk():S.v=="o"?57.3/(Math.min(W,H)*.45*S.z/2.356):57.3/(Math.min(W,H)*.42*S.z);
+function draw(){
+ c.clearRect(0,0,W,H);c.fillStyle="#030714";c.fillRect(0,0,W,H);
+ if(S.v=="p"){const R=Math.min(W,H)*.42*S.z,g=c.createRadialGradient(W/2,H/2,R*.2,W/2,H/2,R);g.addColorStop(0,"#0f2557");g.addColorStop(1,"#050d26");c.fillStyle=g;c.beginPath();c.arc(W/2,H/2,R,0,7);c.fill();c.strokeStyle="#0b3d91";c.lineWidth=3;c.stroke()}
+ if(S.v=="m"){const k=mk(),b0=mxy(0,S.cy)[1],pt=(l,t)=>{const q=mxy(l,t);return [W/2-q[0]*k,H/2-(q[1]-b0)*k]};c.fillStyle="#08143a";c.strokeStyle="#0b3d91";c.lineWidth=3;c.beginPath();for(let t=-90;t<=90;t+=3){const q=pt(180,t);t==-90?c.moveTo(q[0],q[1]):c.lineTo(q[0],q[1])}for(let t=90;t>=-90;t-=3){const q=pt(-180,t);c.lineTo(q[0],q[1])}c.closePath();c.fill();c.stroke()}
+ if(S.v=="o"){const R=Math.min(W,H)*.45*S.z;c.fillStyle="#08143a";c.beginPath();c.arc(W/2,H/2,R,0,7);c.fill();c.strokeStyle="#0b3d91";c.lineWidth=3;c.stroke()}
+ c.strokeStyle="rgba(91,134,224,.22)";c.lineWidth=1;
+ for(let r=0;r<360;r+=30){c.beginPath();let m=0;for(let d=-90;d<=90;d+=3){const p=proj(r,d);if(p&&(S.v=="p"||S.v=="o"||Math.abs(wrap(r-S.cx))<179)){m?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]);m=1}}c.stroke()}
+ for(let d=-60;d<=60;d+=30){c.beginPath();let m=0,px=0;for(let r=0;r<=360;r+=3){const p=proj(r,d);if(p&&(!m||Math.abs(p[0]-px)<W/2)){m?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]);m=1;px=p[0]}else m=0}c.stroke()}
+ if(S.fg){const cs=S.z>6?2:S.z>2.5?3:6;c.globalAlpha=.6;for(let a=0;a<360;a+=cs)for(let b=-90;b<90;b+=cs){const q=[[a,b],[a+cs,b],[a+cs,b+cs],[a,b+cs]].map(t=>proj(t[0],t[1]));if(q.some(t=>!t)||((S.v=="f"||S.v=="m")&&Math.abs(q[0][0]-q[1][0])>W/2))continue;c.fillStyle=hc(hv(a+cs/2,b+cs/2));c.beginPath();q.forEach((t,i)=>i?c.lineTo(t[0],t[1]):c.moveTo(t[0],t[1]));c.fill()}c.globalAlpha=1}
+ BG.forEach(s=>{const p=proj(s[0],s[1]);if(p){c.fillStyle="rgba(220,230,255,"+(.35+s[2]*.3)+")";c.fillRect(p[0],p[1],s[2],s[2])}});
+ c.font="12px Trebuchet MS,sans-serif";
+ B.forEach(s=>{const p=proj(s[1],s[2]);if(!p)return;c.fillStyle="#fff";c.beginPath();c.arc(p[0],p[1],2.6,0,7);c.fill();if(S.z>.9){c.fillStyle="#9fb0d6";c.fillText(s[0],p[0]+7,p[1]+4)}});
+ O.forEach(o=>{const p=proj(o.ra,o.dec);if(!p)return;c.strokeStyle=o.mv?"#f97316":"#2dd4bf";c.lineWidth=2.5;c.beginPath();c.arc(p[0],p[1],9,0,7);c.stroke();c.fillStyle="#fff";c.fillText(o.n,p[0]+13,p[1]+4)});
+ if(S.sel){const p=proj(S.sel.ra,S.sel.dec);if(p){c.strokeStyle="#fc3d21";c.lineWidth=2;c.beginPath();c.moveTo(p[0]-18,p[1]);c.lineTo(p[0]-8,p[1]);c.moveTo(p[0]+8,p[1]);c.lineTo(p[0]+18,p[1]);c.moveTo(p[0],p[1]-18);c.lineTo(p[0],p[1]-8);c.moveTo(p[0],p[1]+8);c.lineTo(p[0],p[1]+18);c.stroke()}}
+ $("#hud").textContent=(S.lv>=3?"Centro RA "+((S.cx+360)%360).toFixed(2)+"° · Dec "+S.cy.toFixed(2)+"° · ":"")+"Zoom ×"+S.z.toFixed(1)+(S.fg?" · Mapa de calor: azul = poco brillo, rojo = mucho":"")}
+const hms=ra=>{ra=(ra+360)%360/15;const h=Math.floor(ra),m=Math.floor((ra-h)*60);return h+"h "+m+"m "+(((ra-h)*60-m)*60).toFixed(1)+"s"};
+const dms=d=>{const s=d<0?"−":"+";d=Math.abs(d);const g=Math.floor(d),m=Math.floor((d-g)*60);return s+g+"° "+m+"′ "+(((d-g)*60-m)*60).toFixed(1)+"″"};
+function fly(ra,dec,z){const a=[S.cx,S.cy,S.z],t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/600),e=k*k*(3-2*k);S.cx=a[0]+wrap(ra-a[0])*e;S.cy=a[1]+(dec-a[1])*e;S.z=a[2]+(z-a[2])*e;draw();if(k<1)requestAnimationFrame(f)})(t0)}
+function show(o){S.sel=o;const L=S.lv,r=[];
+ let h='<button class="x" aria-label="Cerrar" onclick="S.sel=null;$(\'#pop\').classList.add(\'hide\');draw()">×</button><h3>'+o.n+'</h3><div class="t">'+(o.t||"Estrella brillante")+'</div>';
+ if(L==1)h+='<p class="fact">¿Sabías que? '+(o.f||"Las estrellas que ves a simple vista están entre las más cercanas y brillantes.")+'</p>';
+ else{h+='<dl><dt>RA</dt><dd>'+o.ra.toFixed(3)+'° · '+hms(o.ra)+'</dd><dt>Dec</dt><dd>'+o.dec.toFixed(3)+'° · '+dms(o.dec)+'</dd><dt>Tipo</dt><dd>'+(o.t||"Estrella")+'</dd>';
+  if(L>=3)h+='<dt>Distancia</dt><dd>'+(o.d||"—")+'</dd><dt>Mov. propio</dt><dd>'+(o.pm||"—")+'</dd><dt>Catálogos</dt><dd>'+(o.cat||"SIMBAD")+'</dd>';h+='</dl>'}
+ if(o.f||o.mv!=null)h+='<button class="b tq" onclick="visor()">Acercarme →</button>';
+ const p=$("#pop");p.innerHTML=h;p.classList.remove("hide");draw()}
+function pick(x,y){let best=null,bd=18;[...O,...B.map(s=>({n:s[0],ra:s[1],dec:s[2]}))].forEach(o=>{const p=proj(o.ra,o.dec);if(p){const d=Math.hypot(p[0]-x,p[1]-y);if(d<bd){bd=d;best=o}}});return best}
+let dr=null,mv=0;
+cv.onpointerdown=e=>{dr={x:e.clientX,y:e.clientY};mv=0;cv.setPointerCapture(e.pointerId);cv.style.cursor="grabbing"};
+cv.onpointermove=e=>{if(!dr)return;const dx=e.clientX-dr.x,dy=e.clientY-dr.y;dr={x:e.clientX,y:e.clientY};mv+=Math.abs(dx)+Math.abs(dy);const k=dpp();S.cx=(S.cx+dx*k+360)%360;S.cy=Math.max(-89,Math.min(89,S.cy+dy*k));draw()};
+cv.onpointerup=e=>{cv.style.cursor="grab";if(dr&&mv<6){const r=cv.getBoundingClientRect(),o=pick(e.clientX-r.left,e.clientY-r.top);if(o)show(o);else if(S.fg)finfo(e.clientX-r.left,e.clientY-r.top)}dr=null};
+cv.onwheel=e=>{e.preventDefault();zoom(e.deltaY<0?1.2:1/1.2)};
+function zoom(f){S.z=Math.max(.6,Math.min(40,S.z*f));draw()}
+$("#zi").onclick=()=>zoom(1.5);$("#zo").onclick=()=>zoom(1/1.5);
+function view(v){S.v=v;[["vp","p"],["vm","f"],["vo","o"],["vn","m"]].forEach(a=>$("#"+a[0]).classList.toggle("on",v==a[1]));draw()}
+$("#vp").onclick=()=>view("p");$("#vm").onclick=()=>view("f");$("#vo").onclick=()=>view("o");$("#vn").onclick=()=>view("m");
+const norm=s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[’']/g,"").trim();
+function search(){const q=$("#q").value;if(!q.trim())return;
+ let o=[...O,...B.map(s=>({n:s[0],ra:s[1],dec:s[2]}))].find(x=>norm(x.n).includes(norm(q))||norm(q).includes(norm(x.n)));
+ if(!o){let m=q.replace(/−/g,"-").match(/(\d+)h\s*(\d+)m\s*([\d.]+)s\s*([+-]?)\s*(\d+)d\s*(\d+)m\s*([\d.]+)s?/i);
+  if(m)o={n:"Coordenadas",t:"Punto del cielo",ra:15*(+m[1]+m[2]/60+m[3]/3600),dec:(m[4]=="-"?-1:1)*(+m[5]+m[6]/60+m[7]/3600)};
+  else{m=q.replace(/−/g,"-").match(/(-?[\d.]+)[\s,]+(-?[\d.]+)/);if(m)o={n:"Coordenadas",t:"Punto del cielo",ra:+m[1],dec:+m[2]}}}
+ if(!o){$("#hud").textContent="No encontré ese objeto. Prueba un atajo de abajo o escribe RA y Dec en grados.";return}
+ fly(o.ra,o.dec,Math.max(S.z,3));show(o)}
+$("#go").onclick=search;$("#q").onkeydown=e=>{if(e.key=="Enter")search()};
+$("#chips").innerHTML=O.map((o,i)=>'<button data-i="'+i+'">'+o.n+'</button>').join("");
+$("#chips").onclick=e=>{const i=e.target.dataset.i;if(i!=null){const o=O[i];fly(o.ra,o.dec,4);show(o)}};
+function setLv(n){S.lv=+n;document.body.className="l"+n;$("#lvl").value=n;if(S.sel)show(S.sel);else draw()}
+$("#lvl").onchange=e=>setLv(e.target.value);
+const NM={1:"Principiante",2:"Normal",3:"Profesional"};let chosen=0;
+const scr=id=>["landing","levels"].forEach(x=>$("#"+x).classList.toggle("hide",x!=id));
+$("#start").onclick=$("#nv1").onclick=e=>{e&&e.preventDefault&&e.preventDefault();scr("levels")};
+$("#lt").onclick=$("#nv2").onclick=e=>{e&&e.preventDefault&&e.preventDefault();tut(0)};
+$("#back").onclick=()=>scr("landing");
+document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{chosen=+b.dataset.n;document.querySelectorAll(".opt").forEach(o=>o.setAttribute("aria-pressed",o===b));$("#enter").disabled=false;$("#enter").textContent="Entrar como "+NM[chosen];$("#hint").textContent="Nivel elegido: "+NM[chosen]+"."});
+$("#enter").onclick=()=>{if(!chosen)return;$("#levels").classList.add("hide");$("#app").classList.remove("hide");setLv(chosen);size();tut(0)};
+const T=[["Bienvenido al cielo","Arrastra el mapa con el dedo o el ratón para girar el cielo. Todo lo que ves es un cielo de demostración."],["Busca algo","Escribe un nombre como WISE 0855 o coordenadas en el buscador. La cámara viaja hasta el objeto."],["Toca un astro","Toca una estrella o un círculo naranja para abrir su ficha. Naranja significa que se mueve; turquesa, que cambia de brillo."],["Usa la lupa","Los botones + y − acercan y alejan. También sirve la rueda del ratón o pellizcar la pantalla."],["Acércate","Pulsa Acercarme → en la ficha para ver el vídeo del parche. Compara las fechas y mira cómo se mueve el objeto."],["Explora las secciones","Arriba tienes pestañas: Visor, Bandas, Espectro, Gráficos, Imágenes, Alertas y Compartir. En el nivel Profesional hay además un recuadro para escribir RA y Dec. Pulsa H para volver al inicio."],["Cambia de nivel","En cualquier momento puedes cambiar entre Principiante, Normal y Profesional en el menú superior. Los niveles altos añaden mapa plano, coordenadas y datos técnicos."]];
+let ti=0;
+function tut(i){ti=i||0;$("#tut").classList.remove("hide");rt()}
+function rt(){$("#th").textContent=T[ti][0];$("#tp").textContent=T[ti][1];$("#td").innerHTML=T.map((_,j)=>'<i class="'+(j<=ti?"a":"")+'"></i>').join("");$("#tb").style.visibility=ti?"visible":"hidden";$("#tn").textContent=ti==T.length-1?"Empezar a explorar":"Siguiente"}
+$("#tb").onclick=()=>{ti--;rt()};$("#tn").onclick=()=>{ti==T.length-1?$("#tut").classList.add("hide"):(ti++,rt())};$("#help").onclick=()=>tut(0);
+let vt=null;
+function visor(){const o=S.sel;if(!o)return;$("#vm2").classList.remove("hide");$("#vt").textContent=o.n+" · parche de 2′";
+ const x=$("#vis").getContext("2d"),ds=["may 2025","ago 2025","nov 2025","feb 2026","jun 2026","nov 2026"];let f=0;const st=Array.from({length:30},()=>[rnd()*320,rnd()*240,rnd()*1.5+.5]);
+ $("#vi").textContent=o.mv?"Naranja: el objeto se movió respecto a las estrellas fijas entre la primera y la última fecha.":"Este objeto no se desplaza, pero su brillo cambia con el tiempo.";
+ clearInterval(vt);vt=setInterval(()=>{x.fillStyle="#05060c";x.fillRect(0,0,320,240);for(let i=0;i<500;i++){x.fillStyle="rgba(150,170,220,"+rnd()*.25+")";x.fillRect(rnd()*320,rnd()*240,1.5,1.5)}
+  x.fillStyle="#cdd8ff";st.forEach(s=>{x.beginPath();x.arc(s[0],s[1],s[2],0,7);x.fill()});
+  const px=o.mv?60+f*40:160,r=o.mv?5:4+3*Math.sin(f*1.3);x.fillStyle="#f97316";x.beginPath();x.arc(px,o.mv?150-f*14:120,Math.abs(r),0,7);x.fill();x.strokeStyle="#fc3d21";x.strokeRect(px-14,(o.mv?150-f*14:120)-14,28,28);
+  x.fillStyle="#fff";x.font="14px sans-serif";x.fillText(ds[f],10,20);f=(f+1)%6},650)}
+$("#vc").onclick=()=>{clearInterval(vt);$("#vm2").classList.add("hide")};
+
+function crisp(cv){if(!cv)return;if(!cv.dataset.w){cv.dataset.w=cv.getAttribute("width");cv.dataset.h=cv.getAttribute("height")}const lw=+cv.dataset.w,lh=+cv.dataset.h,k=((cv.clientWidth||lw)/lw)*(devicePixelRatio||1);cv.width=Math.round(lw*k);cv.height=Math.round(lh*k);cv.getContext("2d").setTransform(k,0,0,k,0,0)}
+const R={},P=h=>{$("#pn").innerHTML=h;$("#pn").querySelectorAll("canvas").forEach(crisp)},cur=()=>S.sel&&S.sel.t?S.sel:O[2],kind=o=>/marr/.test(o.t)?"bd":/variable/.test(o.t)?"var":"st";
+const DS=["may 2025","ago 2025","nov 2025","feb 2026","jun 2026","nov 2026"],SP=Array.from({length:40},()=>[rnd()*320,rnd()*240,rnd()*1.6+.6]);
+const V={m:"v",f:0,fov:2,det:"Σ",s:.5,l:{gaia:1}},AL={c:"F97316",s:5,on:1};let tm=null,tabNow="mapa";
+const ZN=[[1.4,.12,"#38bdf8"],[1.9,.15,"#38bdf8"],[2.7,.25,"#38bdf8"],[4.26,.1,"#f472b6"],[4.67,.1,"#a78bfa"]];
+function spec(o){const k=kind(o);return Array.from({length:102},(_,i)=>{const l=.75*Math.pow(5/.75,i/101);let f=k=="bd"?4+22*Math.exp(-Math.pow((l-4.5)/.7,2))+6*Math.exp(-Math.pow((l-1.25)/.15,2)):k=="var"?30*Math.exp(-Math.pow((l-1.6)/1.1,2))+3:26/(l*l)+1;[[1.4,.08],[1.9,.1],[2.7,.2]].forEach(z=>f*=1-.35*Math.exp(-Math.pow((l-z[0])/z[1],2)));f*=1-.5*Math.exp(-Math.pow((l-4.26)/.07,2));f*=1-.3*Math.exp(-Math.pow((l-4.67)/.06,2));return [l,f*(1+.03*Math.sin(i*7.3)),i]})}
+function plot(id,ser,o){const cv=$(id);crisp(cv);const x=cv.getContext("2d"),w=+cv.dataset.w,h=+cv.dataset.h,m=40,xs=ser.flatMap(s=>s.map(p=>p[0])),x0=Math.min(...xs),x1=Math.max(...xs),y1=Math.max(...ser.flatMap(s=>s.map(p=>p[1])))*1.1,X=v=>m+(v-x0)/(x1-x0)*(w-m-8),Y=v=>h-m+4-v/y1*(h-m-10);
+ x.fillStyle="#050a1a";x.fillRect(0,0,w,h);(o.z||[]).forEach(z=>{x.fillStyle=z[2]+"55";x.fillRect(X(z[0]-z[1]),6,X(z[0]+z[1])-X(z[0]-z[1]),h-m-2)});
+ x.strokeStyle="#25397a";x.fillStyle="#9fb0d6";x.font="13px sans-serif";x.beginPath();x.moveTo(m,6);x.lineTo(m,h-m+4);x.lineTo(w-8,h-m+4);x.stroke();
+ for(let i=0;i<=4;i++){const v=x0+(x1-x0)*i/4;x.fillText(v.toFixed(o.d||1),X(v)-10,h-20)}x.fillText(o.xl,w/2-40,h-4);x.fillText(o.yl,4,16);
+ ser.forEach((s,j)=>{x.strokeStyle=o.c[j];x.lineWidth=2;x.beginPath();s.forEach((p,i)=>i?x.lineTo(X(p[0]),Y(p[1])):x.moveTo(X(p[0]),Y(p[1])));x.stroke()});return {X,x0,x1,m,w}}
+function tab(t){clearInterval(tm);tabNow=t;document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.t==t));const p=$("#pn");if(t=="mapa"){p.classList.add("hide");return}p.classList.remove("hide");R[t]();p.scrollTop=0}
+const TB=[["mapa","Mapa",""],["visor","Visor",""],["comparar","Comparar","n2"],["bandas","Bandas","n2"],["espectro","Espectro",""],["graficos","Gráficos","n2"],["imagenes","Imágenes",""],["alertas","Alertas","n2"],["compartir","Compartir","n2"]];
+$("#tabs").innerHTML=TB.map(t=>'<button class="'+t[2]+'" data-t="'+t[0]+'">'+t[1]+'</button>').join("");
+$("#tabs").onclick=e=>{if(e.target.dataset.t)tab(e.target.dataset.t)};
+visor=function(){tab("visor")};
+const sl0=setLv;setLv=n=>{sl0(n);if(tabNow!="mapa")tab(tabNow)};
+function home(){clearInterval(tm);$("#app").classList.add("hide");scr("landing")}
+$("#home").onclick=home;
+addEventListener("keydown",e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||$("#app").classList.contains("hide"))return;const k=e.key.toLowerCase();if(k=="h")home();if(k=="b"){tab("alertas");trail("estela")}});
+const nm=(s,r)=>{s=s.replace(/−/g,"-");const n=(s.match(/\d+(?:\.\d+)?/g)||[]).map(Number);if(!n.length)return NaN;const g=/^\s*-/.test(s)?-1:1;if(n.length==1)return g*n[0]*(r&&/h/i.test(s)?15:1);const v=n[0]+(n[1]||0)/60+(n[2]||0)/3600;return g*(r?v*15:v)};
+function goRD(){const ra=nm($("#ra").value,1),de=nm($("#de").value,0);if(isNaN(ra)||isNaN(de)||Math.abs(de)>90||ra<0||ra>=360){$("#cm").textContent="Revisa: RA entre 0° y 360° (o 0h–24h) y Dec entre −90° y +90°.";return}$("#cm").textContent="RA "+ra.toFixed(3)+"° · Dec "+de.toFixed(3)+"°";tab("mapa");fly(ra,de,Math.max(S.z,4));show({n:"Coordenadas",t:"Punto del cielo",ra,dec:de})}
+$("#cg").onclick=goRD;$("#ra").onkeydown=$("#de").onkeydown=e=>{if(e.key=="Enter")goRD()};
+/* VISOR */
+const pos=(f,o)=>o.mv?[50+f*44,175-f*20]:[160,120];
+function patch(){const o=cur(),x=$("#pv").getContext("2d"),sn=Math.sqrt(V.det=="Σ"?10:4),P0=pos(0,o),P5=pos(5,o),L=V.l;x.fillStyle=V.m=="r"?"#3a3a3a":"#05060c";x.fillRect(0,0,320,240);
+ for(let i=0;i<900/sn;i++){x.fillStyle="rgba(170,185,230,"+rnd()*.25+")";x.fillRect(rnd()*320,rnd()*240,1.5,1.5)}
+ if(V.m!="r"){x.fillStyle="#cdd8ff";SP.forEach(s=>{x.beginPath();x.arc(s[0],s[1],s[2],0,7);x.fill()})}
+ const dot=(f,c,a)=>{const p=pos(f,o);x.globalAlpha=a;x.fillStyle=c;x.beginPath();x.arc(p[0],p[1],o.mv?6:5+2*Math.sin(f*1.3),0,7);x.fill();x.globalAlpha=1};
+ if(V.m=="v"){dot(V.f,"#f97316",1);const p=pos(V.f,o);x.strokeStyle="#fc3d21";x.strokeRect(p[0]-14,p[1]-14,28,28)}else if(V.m=="a"){dot(0,"#f97316",1-V.s);dot(5,"#f97316",V.s)}else{dot(0,"#fff",1);dot(5,"#000",1)}
+ x.lineWidth=1.5;if(L.gaia){x.strokeStyle="#2dd4bf";x.setLineDash([4,3]);x.beginPath();x.moveTo(P0[0],P0[1]);x.lineTo(P5[0],P5[1]);x.stroke();x.setLineDash([])}
+ if(L.wise){x.strokeStyle="#facc15";x.strokeRect(SP[0][0]-8,SP[0][1]-8,16,16)}
+ if(L.simbad){x.strokeStyle="#a78bfa";x.beginPath();x.moveTo(SP[1][0]-8,SP[1][1]);x.lineTo(SP[1][0]+8,SP[1][1]);x.moveTo(SP[1][0],SP[1][1]-8);x.lineTo(SP[1][0],SP[1][1]+8);x.stroke()}
+ if(L.mask){x.fillStyle="rgba(252,61,33,.35)";x.fillRect(250,0,70,50)}
+ x.fillStyle="#fff";x.font="13px sans-serif";if(L.orf)x.fillText("sin pareja en Gaia",P5[0]-45,P5[1]-20);
+ x.fillText(V.m=="v"?DS[V.f]:V.m=="a"?"A "+DS[0]+" ↔ B "+DS[5]:"A − B ("+DS[0]+" − "+DS[5]+")",8,18)}
+R.visor=()=>{const o=cur();P('<h2>Visor del parche · '+o.n+'</h2><div class="g2"><div><canvas id="pv" width="320" height="240"></canvas><p id="pi"></p><input type="range" id="ts" min="0" max="100" value="50" aria-label="Entre fecha A y B"></div><div><h3>Modo</h3><div class="row2"><button class="b" data-m="v">▶ Vídeo</button><button class="b n2" data-m="a">Antes/después</button><button class="b n2" data-m="r">Resta</button></div><div class="n2"><h3>Campo de visión</h3><input type="range" id="fv" min="1" max="10" value="'+V.fov+'"><p id="fi"></p><h3>Detector</h3><div class="row2">'+["D1","D2","D3","D4","D5","D6","Σ"].map(d=>'<button class="b" data-d="'+d+'">'+d+'</button>').join("")+'</div><p>Señal/ruido: <b id="sn"></b></p><h3>Capas</h3>'+[["gaia","Gaia (mov. propio)"],["wise","WISE"],["simbad","SIMBAD"],["mask","Máscara de calidad"],["orf","Solo «huérfanos»"]].map(l=>'<label><input type="checkbox" data-l="'+l[0]+'"'+(V.l[l[0]]?" checked":"")+'> '+l[1]+'</label>').join("")+'</div><p>Naranja = lo que se mueve. Rojo = zona de datos malos.</p></div></div>');
+ const q=a=>[...$("#pn").querySelectorAll(a)],upd=()=>{q("[data-m]").forEach(b=>b.classList.toggle("on",b.dataset.m==V.m));q("[data-d]").forEach(b=>b.classList.toggle("on",b.dataset.d==V.det));const n=V.det=="Σ"?10:4;$("#fi").textContent=V.fov+"′ ≈ "+(.75*V.fov*V.fov).toFixed(1)+" MB · ~"+Math.ceil(V.fov*V.fov/2)+" s · más ancho = más lento";$("#sn").textContent="×"+Math.sqrt(n).toFixed(1)+" ("+n+" imágenes)";$("#pi").textContent=o.mv?"Se movió 3.2″ (0.5 px) · sin pareja en Gaia":"Cambió de brillo +8 % entre fechas";$("#ts").style.visibility=V.m=="a"?"visible":"hidden";patch()};
+ q("[data-m]").forEach(b=>b.onclick=()=>{V.m=b.dataset.m;upd()});q("[data-d]").forEach(b=>b.onclick=()=>{V.det=b.dataset.d;upd()});q("[data-l]").forEach(b=>b.onchange=()=>{V.l[b.dataset.l]=b.checked;upd()});$("#fv").oninput=e=>{V.fov=+e.target.value;upd()};$("#ts").oninput=e=>{V.s=e.target.value/100;patch()};
+ upd();tm=setInterval(()=>{if(V.m=="v"){V.f=(V.f+1)%6;patch()}},700)};
+/* BANDAS */
+const FL=["#22c55e","#facc15","#fc3d21"],FN=["● buena: dato confiable","▲ aviso: cerca de un píxel marcado, podría ser un artefacto","■ mala: contaminado, no confiar"];
+R.bandas=()=>{const o=cur(),sp=spec(o);let md="f",bn=40,sel=null;
+ P('<h2>Bandas y calidad de datos</h2><div class="g2"><div><div class="row2" id="bm"></div><canvas id="cb" width="360" height="360"></canvas><label>Banda <b id="bt"></b><input type="range" id="bs" min="1" max="102" value="40" aria-label="Banda"></label></div><div><h3>Ficha del píxel</h3><div id="bi"><p>Toca un píxel para ver sus datos. Mueve el deslizador de banda para ver qué cambia.</p></div><canvas id="px" width="480" height="180"></canvas><h3>Elementos principales</h3>'+[["H₂O  Agua","#38bdf8"],["CO₂  Dióxido de carbono","#f472b6"],["CO  Monóxido de carbono","#a78bfa"],["Hielo y otros","#e5e7eb"]].map(e=>'<p style="margin:3px 0"><span style="color:'+e[1]+'">●</span> '+e[0]+'</p>').join("")+'<h3>Banderas</h3><p><span style="color:#22c55e">●</span> buena · <span style="color:#facc15">▲</span> aviso · <span style="color:#fc3d21">■</span> mala</p><h3>Las 102 bandas (0.75–5 µm)</h3><canvas id="cr" width="480" height="64"></canvas></div></div>');
+ const fl=(i,j)=>{const q=((i*73+j*151)%97)/97+Math.hypot(i-11.5,j-11.5)/80,f=q>1?2:q>.88?1:0;return S.lv==1&&f==1?0:f},br=(i,j,b)=>3+25*Math.exp(-(Math.pow(i-11.5,2)+Math.pow(j-11.5,2))/18)*sp[b][1]/30+2*Math.sin(i*3.1+j*1.7+b*.2),cv=$("#cb"),x=cv.getContext("2d");
+ const dr=()=>{x.fillStyle="#000";x.fillRect(0,0,360,360);for(let i=0;i<24;i++)for(let j=0;j<24;j++){const d=Math.hypot(i*15-172,j*15-172);if(d>172)continue;const v=Math.min(1,br(i,j,bn-1)/30);x.fillStyle=md=="f"?FL[fl(i,j)]:md=="b"?"hsl("+(260-v*260)+" 80% "+(12+v*48)+"%)":md=="l"?"hsl(0 0% "+(35+(i*j*7)%25)+"%)":"hsl("+(205+d/6)+" 70% "+(55-d/6)+"%)";x.fillRect(i*15,j*15,14,14)}if(sel){x.strokeStyle="#fff";x.lineWidth=2;x.strokeRect(sel[0]*15-1,sel[1]*15-1,16,16)}};
+ const info=()=>{if(!sel)return;const i=sel[0],j=sel[1],f=fl(i,j),v=br(i,j,bn-1),ch=Math.round(((i*31+j*17)%21-10)+(Math.hypot(i-11.5,j-11.5)<2?25:0)),la=sp[bn-1][0].toFixed(2),cs=Math.cos(o.dec*D)||1;
+  $("#bi").innerHTML=S.lv==1?'<p>'+(f?"■ No confíes en este píxel.":"● Puedes confiar en este píxel.")+' '+(Math.abs(ch)>15?"Aquí algo cambió.":"Aquí casi no cambió nada.")+'</p>':'<p>Píxel ('+i+', '+j+') · RA '+(o.ra+(11.5-i)*6/3600/cs).toFixed(4)+'° · Dec '+(o.dec+(11.5-j)*6/3600).toFixed(4)+'°<br><span style="color:'+FL[f]+'">'+FN[f]+'</span><br>Banda '+bn+' ('+la+' µm): <b style="color:var(--txt)">'+v.toFixed(1)+' mJy</b><br>Cambio A→B: <b style="color:'+(Math.abs(ch)>15?"#fc3d21":"#22c55e")+'">'+(ch>0?"+":"")+ch+' %</b>'+(S.lv>=3?' · S/N ×'+(v/2.2).toFixed(1)+' · apertura de 1 píxel (6″)':'')+'</p>';
+  const pl=plot("#px",[sp.map(p=>[p[0],br(i,j,p[2])])],{z:ZN,c:["#f97316"],xl:"µm",yl:"mJy"}),c=$("#px").getContext("2d");c.strokeStyle="#fff";c.beginPath();c.moveTo(pl.X(sp[bn-1][0]),6);c.lineTo(pl.X(sp[bn-1][0]),140);c.stroke()};
+ $("#bm").innerHTML=[["f","Banderas"],["b","Brillo"],["p","Planeta"],["l","Luna"]].map(m=>'<button class="b'+(m[0]=="f"?" on":"")+'" data-k="'+m[0]+'">'+m[1]+'</button>').join("");
+ $("#bm").onclick=e=>{const k=e.target.dataset.k;if(!k)return;md=k;[...$("#bm").children].forEach(b=>b.classList.toggle("on",b.dataset.k==k));dr()};
+ $("#bt").textContent="40 · "+sp[39][0].toFixed(2)+" µm";$("#bs").oninput=e=>{bn=+e.target.value;$("#bt").textContent=bn+" · "+sp[bn-1][0].toFixed(2)+" µm";dr();info()};
+ cv.onclick=e=>{const r=cv.getBoundingClientRect(),i=Math.floor((e.clientX-r.left)*24/r.width),j=Math.floor((e.clientY-r.top)*24/r.height);if(i<0||j<0||i>23||j>23||Math.hypot(i*15-172,j*15-172)>172)return;sel=[i,j];dr();info()};
+ dr();const y=$("#cr").getContext("2d");for(let i=0;i<102;i++){y.fillStyle="hsl("+(270-i*2.6)+" 80% 55%)";y.fillRect(i*480/102,0,5,40)}y.fillStyle="#fff";y.font="12px sans-serif";for(let d=0;d<6;d++){y.fillText("D"+(d+1),d*80+30,56);y.fillRect(d*80,40,1,6)}};
+/* ESPECTRO */
+R.espectro=()=>{const o=cur(),sp=spec(o),k=kind(o);P('<h2>Espectro · '+o.n+'</h2><p>'+({bd:"Se parece a una enana marrón: brilla sobre todo en el infrarrojo.",var:"Se parece a una estrella roja variable.",st:"Se parece a una estrella normal."})[k]+'</p><canvas id="cs" width="720" height="280"></canvas><div class="cd"><div>Brillo<b id="sb">—</b></div><div>Cambio 30 d<b>+8 %</b></div><div>S/N<b>×3.1</b></div></div><p id="sl">Pasa el ratón por el espectro para ver la banda.</p><div class="n2"><p><span style="color:#38bdf8">■ H₂O</span> <span style="color:#f472b6">■ CO₂</span> <span style="color:#a78bfa">■ CO</span> · una bajada en una zona sugiere esa molécula.</p><label><input type="checkbox" id="cm2"> Comparar con una estrella normal</label><button class="b" id="cc">Copiar CSV</button></div>');
+ let pl;const dr=()=>{pl=plot("#cs",$("#cm2")&&$("#cm2").checked?[sp,spec({t:"estrella"})]:[sp],{z:ZN,c:["#f97316","#2dd4bf"],xl:"Longitud de onda (µm)",yl:"Brillo (mJy)"})};dr();
+ const cv=$("#cs");cv.onpointermove=e=>{const r=cv.getBoundingClientRect(),xp=(e.clientX-r.left)*(+cv.dataset.w)/r.width,l=pl.x0+(xp-pl.m)/(pl.w-pl.m-8)*(pl.x1-pl.x0);let i=0;sp.forEach((p,j)=>{if(Math.abs(p[0]-l)<Math.abs(sp[i][0]-l))i=j});dr();const c=cv.getContext("2d");c.strokeStyle="#f97316";c.beginPath();c.moveTo(pl.X(sp[i][0]),6);c.lineTo(pl.X(sp[i][0]),240);c.stroke();$("#sl").textContent="λ = "+sp[i][0].toFixed(2)+" µm · banda "+(i+1)+" de 102 · brillo "+sp[i][1].toFixed(1)+" mJy";$("#sb").textContent=sp[i][1].toFixed(1)+" mJy"};
+ if($("#cm2"))$("#cm2").onchange=dr;if($("#cc"))$("#cc").onclick=()=>{try{navigator.clipboard.writeText("banda,lambda_um,brillo_mJy\n"+sp.map(p=>(p[2]+1)+","+p[0].toFixed(3)+","+p[1].toFixed(2)).join("\n"));$("#cc").textContent="Copiado ✓"}catch(e){$("#cc").textContent="No se pudo copiar"}}};
+/* GRÁFICOS */
+R.graficos=()=>{const o=kind(cur())=="var"?cur():O[3],dra=/Dra/.test(o.n),lc=Array.from({length:60},(_,i)=>[i*10,dra?18+9*Math.sin(i*.256)+Math.sin(i*3.1):14+4*Math.sin(i*.3)-(i%23<3?6:0)]);
+ P('<h2>Gráficos</h2><div class="cd"><div>Brillo actual<b>12.4 mJy</b>▲ tendencia</div><div>Cambio 30 d<b>+8 %</b>▲</div><div>S/N<b>×3.1</b>▬</div></div><h3>Curva de luz · '+o.n+'</h3><canvas id="g1" width="720" height="240"></canvas><div class="n2"><h3>Comparar espectros: estrella normal y enana marrón</h3><canvas id="g2" width="720" height="240"></canvas></div><p>Sirve para ver cómo cambia el brillo con el tiempo y cómo se comparan dos tipos de objeto.</p>');
+ plot("#g1",[lc],{c:["#f97316"],xl:"Días",yl:"Brillo (mJy)",d:0});plot("#g2",[spec({t:"estrella"}),spec({t:"marrón"})],{c:["#60a5fa","#f97316"],xl:"µm",yl:"mJy"})};
+/* IMÁGENES */
+R.imagenes=()=>{const q=[["#22c55e","● buena"],["#22c55e","● buena"],["#facc15","▲ aviso"],["#22c55e","● buena"],["#fc3d21","■ mala"],["#22c55e","● buena"]];
+ P('<h2>Recopilación de imágenes</h2><p>Algo cambió desde tu última visita: dato nuevo del 09 nov 2026.</p><table><tr><th>Fecha</th><th>Detectores</th><th>Imágenes</th><th>Calidad</th></tr>'+DS.map((d,i)=>'<tr><td>'+d+(i==5?' <span class="new">NUEVO</span>':"")+'</td><td>D1–D6</td><td>'+(12+i*3)+'</td><td style="color:'+q[i][0]+'">'+q[i][1]+'</td></tr>').join("")+'</table><h3>Fuentes de datos</h3><p>✓ SPHEREx (IRSA) · ✓ Gaia · ✓ SIMBAD · ✓ WISE — en esta demostración son datos locales de prueba.</p><details class="n2" open><summary>¿Qué son los 6 detectores y la señal/ruido?</summary><p>SPHEREx tiene 6 matrices (D1–D6) que cubren 0.75–5 µm; cada imagen es una «rebanada» de color y las 102 bandas se completan con muchas exposiciones. La <b>señal</b> es la luz del objeto y el <b>ruido</b> son variaciones al azar. Al sumar, la señal se refuerza y el ruido se cancela en parte: la S/N mejora con la raíz cuadrada de las imágenes (1→×1, 4→×2, 9→×3, 16→×4, 36→×6).</p><p>Se suma por detector para no mezclar colores y Σ (los seis) da la imagen más limpia. Si el objeto se mueve, se mancha: por eso se suman fechas cercanas y la Resta usa fechas lejanas a propósito.</p></details><h3>Exportar</h3><p class="n2">GIF/MP4 del vídeo, CSV del espectro e informe PDF con QR: próximamente.</p>')};
+/* ALERTAS */
+function trail(m){const c=$("#ct");if(!c)return;const x=c.getContext("2d"),o=cur(),col=/^[0-9a-f]{6}$/i.test(AL.c)?"#"+AL.c:"#f97316";x.fillStyle="#000";x.fillRect(0,0,320,200);for(let f=0;f<6;f++){const p=o.mv?[40+f*44,160-f*22]:[160,100];x.fillStyle=col;if(m=="brillo"){const h=20+14*Math.sin(f*1.3)+f*6;x.fillRect(30+f*48,190-h,30,h)}else{x.globalAlpha=.25+f*.15;x.beginPath();x.arc(p[0],p[1],7,0,7);x.fill();x.globalAlpha=1}}x.fillStyle="#fff";x.font="12px sans-serif";x.fillText(m=="brillo"?"Brillo máximo por fecha":"Estela: máximo de cada píxel en el tiempo",8,14)}
+R.alertas=()=>{const o=cur();let last="12 jun 2026";try{last=localStorage.getItem("cem_last")||last}catch(e){}
+ P('<h2>Alertas y seguimiento</h2><div class="g2"><div><label><input type="checkbox" id="ao"'+(AL.on?" checked":"")+'> Modo alerta de cambios</label><div id="ab"></div><h3>Sensibilidad</h3><input type="range" id="as" min="3" max="10" value="'+AL.s+'"><p id="at"></p><div class="n3"><h3>Filtro por código de color</h3><input id="ac" value="#'+AL.c+'"></div><h3>Comando (atajo: B)</h3><input id="ak" placeholder="/estela o /brillo"><canvas id="ct" width="320" height="200" style="margin-top:8px"></canvas></div><div><h3>Notificaciones</h3><div class="cd"><div>Último dato visto<b id="lv">'+last+'</b></div><div>Dato más reciente<b>09 nov 2026</b></div></div><p>'+o.n+': '+(o.mv?"se movió 3.2″":"cambió de brillo +8 %")+'</p><button class="b tq" id="am">Marcar como visto</button></div></div>');
+ const u=()=>{$("#ab").innerHTML=AL.on&&7>AL.s?'<div class="alr"><b>¡Cambio brusco!</b> +42 % en 3 fotogramas (≈7σ)</div>':'<div class="okb">Sin cambios bruscos con esta sensibilidad.</div>';$("#at").textContent="Alerta si supera "+AL.s+"σ del ruido."};u();trail("estela");
+ $("#ao").onchange=e=>{AL.on=e.target.checked;u()};$("#as").oninput=e=>{AL.s=+e.target.value;u()};if($("#ac"))$("#ac").onchange=e=>{AL.c=e.target.value.replace("#","").toUpperCase();trail("estela")};
+ $("#ak").onkeydown=e=>{if(e.key=="Enter"){const m=e.target.value.replace("/","").trim();trail(m=="brillo"?"brillo":"estela")}};
+ $("#am").onclick=()=>{try{localStorage.setItem("cem_last","09 nov 2026")}catch(e){}$("#lv").textContent="09 nov 2026"}};
+/* COMPARTIR */
+R.compartir=()=>{const o=cur(),u="cielo-en-movimiento.app/?ra="+o.ra.toFixed(3)+"&dec="+o.dec.toFixed(3)+"&fov="+V.fov+"&modo="+{v:"video",a:"antesdespues",r:"resta"}[V.m]+"&vista="+{p:"planeta",f:"plano",o:"ojo"}[S.v]+"&det="+(V.det=="Σ"?"sum":V.det)+"&nivel="+S.lv+"&color="+AL.c+"&sens="+AL.s,
+ L=[["Fácil de actualizar con datos nuevos (etiqueta NUEVO)",1],["Mostrar las 102 bandas",1],["Espectros sobre la marcha",1],["Sumar para mejorar S/N",1],["Sumar o restar fechas",1],["Elegir el campo de visión",1],["Superponer otros telescopios (capas)",1],["Coordenadas en la URL",1],["Metadatos y banderas de calidad",1],["Aladin y Astropy con datos reales",0]];
+ P('<h2>Compartir</h2><p>Enlace con todo el estado de la vista:</p><pre id="lk">'+u+'</pre><div class="row2"><button class="b tq" id="cl">Copiar enlace</button></div><p>Incrustar: <code>&lt;iframe src="https://'+u+'&amp;embed=1"&gt;</code></p><h3>Retos del plan y su estado</h3><table>'+L.map(l=>'<tr><td style="color:'+(l[0]?"#22c55e":"#facc15")+'">'+(l[1]?"✓":"◔")+'</td><td>'+l[0]+'</td></tr>').join("")+'</table><p>✓ = en esta demostración · ◔ = requiere conectar datos reales.</p>');
+ $("#cl").onclick=()=>{try{navigator.clipboard.writeText("https://"+u);$("#cl").textContent="Copiado ✓"}catch(e){$("#cl").textContent="No se pudo copiar"}}};
+
+const hv=(a,b)=>{const d=b*D,g=27.128*D,bl=Math.asin(Math.sin(d)*Math.sin(g)+Math.cos(d)*Math.cos(g)*Math.cos((a-192.859)*D))/D,gc=Math.acos(Math.max(-1,Math.min(1,-Math.sin(d)*.4848+Math.cos(d)*.8746*Math.cos((a-266.4)*D))))/D;return Math.min(1,.12+.7*Math.exp(-Math.pow(bl/9,2))+.5*Math.exp(-Math.pow(gc/28,2))+.05*Math.sin(a*.7)*Math.cos(b*.9))},hc=v=>"hsl("+(240-240*v)+" 90% "+(22+32*v)+"%)";
+$("#vg").onclick=()=>{S.fg=!S.fg;$("#vg").classList.toggle("on",S.fg);$("#vg").setAttribute("aria-pressed",!!S.fg);draw()};
+function finfo(x,y){const cs=S.z>6?2:S.z>2.5?3:6;let best=null,bd=1e9;for(let a=0;a<360;a+=cs)for(let b=-90;b<90;b+=cs){const p=proj(a+cs/2,b+cs/2);if(!p)continue;const d=Math.hypot(p[0]-x,p[1]-y);if(d<bd){bd=d;best=[a+cs/2,b+cs/2]}}if(!best)return;const v=hv(best[0],best[1]);
+ $("#pop").innerHTML='<button class="x" aria-label="Cerrar" onclick="$(\'#pop\').classList.add(\'hide\')">×</button><h3>Mapa de calor</h3><div class="t">'+(S.lv>=2?"RA "+best[0].toFixed(1)+"° · Dec "+best[1].toFixed(1)+"°":"Zona del cielo")+'</div><p style="margin:8px 0"><span style="color:'+hc(v)+'">■</span> Brillo infrarrojo relativo: <b>'+v.toFixed(2)+'</b> (0 a 1)<br>'+(v>.65?"Alto: cerca del plano de la Vía Láctea.":v<.3?"Bajo: cielo profundo, ideal para ver lo tenue.":"Medio.")+'</p>';$("#pop").classList.remove("hide")}
+/* COMPARAR (reto: sumar/restar fechas, S/N, FOV, capas, banderas, espectro) */
+const MS="may jun jul ago sep oct nov dic ene feb mar abr may jun jul ago sep oct nov".split(" ").map((m,i)=>m+" "+(i<8?2025:2026)),QL=[0,0,1,0,0,2,0,0,0,1,0,2,0,0,0,1,0,0,0],QS=["● buena","▲ aviso","■ mala"],QC=["#22c55e","#facc15","#fc3d21"];
+const C={m:"s",sel:[1,2,5,8],s:.5,k:0,min:0,fov:2,det:"Σ",skip:1,op:"-"},has=i=>i%4!=3,bv=t=>12.4*(1+.01*t),mp=(t,o)=>o.mv?[40+t*13,185-t*5.5]:[160,120],ym=i=>(2025+Math.floor((4+i)/12))+"-"+String((4+i)%12+1).padStart(2,"0");
+const pmv=o=>{const n=(o.pm||"").match(/\d+(?:\.\d+)?/);return n&&o.mv?+n[0]:0},fr=()=>C.sel.filter(i=>has(i)&&(!C.skip||QL[i]<2)).sort((a,b)=>a-b),snr=n=>Math.sqrt(Math.max(1,n)*(C.det=="Σ"?2.5:1));
+const CM=[["v","▶ Vídeo","Reproduce las fechas elegidas en orden."],["b","Parpadeo","Alterna A y B. Así se descubrió Plutón."],["a","Antes/después","Desliza para pasar de la fecha A a la B."],["r","Resta A−B","Lo fijo se vuelve gris; lo móvil deja una mancha clara (+) y otra oscura (−)."],["u","Suma Σ","Suma las fechas para subir la señal/ruido (√N). Si el objeto se mueve, se mancha: suma fechas cercanas."],["s","Sin cielo fijo ★","Resta la mediana de todos los fotogramas: solo quedan los objetos móviles. Es el modo recomendado."],["e","Estela","Apila el máximo: cada objeto dibuja su trayectoria."]];
+function cpatch(){const o=cur(),x=$("#cv2").getContext("2d"),f=fr(),n=f.length,m=C.m,a=n?f[0]:0,b=n?f[n-1]:0,A=mp(a,o),B=mp(b,o),sn=snr(n),hid=o.mv&&pmv(o)*(b-a)/12/6<C.min,T=p=>[160+(p[0]-160)*2/C.fov,120+(p[1]-120)*2/C.fov];
+ x.fillStyle=m=="r"?"#3a3a3a":"#05060c";x.fillRect(0,0,320,240);for(let i=0;i<900/sn;i++){x.fillStyle="rgba(170,185,230,"+rnd()*.25+")";x.fillRect(rnd()*320,rnd()*240,1.5,1.5)}
+ if(m!="r"&&m!="s"){x.fillStyle="#cdd8ff";SP.forEach(t=>{const p=T(t);x.beginPath();x.arc(p[0],p[1],t[2],0,7);x.fill()})}
+ const dot=(p,c,al,r)=>{p=T(p);x.globalAlpha=al;x.fillStyle=c;x.beginPath();x.arc(p[0],p[1],r||6,0,7);x.fill();x.globalAlpha=1};
+ if(!hid&&n){if(m=="v")dot(mp(f[C.k%n],o),"#f97316",1);if(m=="b")dot(C.k%2?B:A,"#f97316",1);if(m=="a"){dot(A,"#f97316",1-C.s);dot(B,"#f97316",C.s)}if(m=="r"){dot(A,"#fff",1,7);dot(B,"#000",1,7)}
+  if(m=="u")f.forEach(t=>dot(mp(t,o),"#f97316",.45,6));if(m=="s")for(let t=0;t<19;t++)dot(mp(t,o),"#f97316",f.includes(t)?1:.2,4);
+  if(m=="e"){x.strokeStyle="#f97316";x.beginPath();for(let t=0;t<19;t++){const p=T(mp(t,o));t?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])}x.stroke();f.forEach(t=>dot(mp(t,o),"#f97316",.7,3))}}
+ x.lineWidth=1.5;const L=V.l;if(L.gaia){const p=T(A),q=T(B);x.strokeStyle="#2dd4bf";x.setLineDash([4,3]);x.beginPath();x.moveTo(p[0],p[1]);x.lineTo(q[0],q[1]);x.stroke();x.setLineDash([])}
+ if(L.wise){const p=T(SP[0]);x.strokeStyle="#facc15";x.strokeRect(p[0]-8,p[1]-8,16,16)}if(L.simbad){const p=T(SP[1]);x.strokeStyle="#a78bfa";x.beginPath();x.moveTo(p[0]-8,p[1]);x.lineTo(p[0]+8,p[1]);x.moveTo(p[0],p[1]-8);x.lineTo(p[0],p[1]+8);x.stroke()}
+ x.fillStyle="#fff";x.font="13px sans-serif";x.fillText(!n?"Elige al menos una fecha con datos":hid?"Oculto por el filtro de movimiento mínimo":m=="v"?MS[f[C.k%n]]+" "+QS[QL[f[C.k%n]]][0]:m=="b"?MS[C.k%2?b:a]:m=="a"?"A "+MS[a]+" ↔ B "+MS[b]:m=="r"?"A − B":m=="u"?"Σ "+n+" fechas · S/N ×"+sn.toFixed(1):m=="s"?"Sin cielo fijo":"Estela",8,18)}
+R.comparar=()=>{P('<h2>Comparar fechas y encontrar movimiento</h2><div class="g2"><div><canvas id="cv2" width="320" height="240"></canvas><input type="range" id="cs2" min="0" max="100" value="50" aria-label="Entre fecha A y B"><p id="cp">Toca la imagen para sacar el espectro de ese punto.</p><canvas id="csp" width="480" height="150" class="hide"></canvas></div><div><h3>Calendario (celeste = hay datos; toca varios meses para sumarlos)</h3><div class="row2" id="cal"></div><p id="ct2"></p><h3>Modo de comparación</h3><div class="row2" id="cm3">'+CM.map(m=>'<button class="b" data-k="'+m[0]+'">'+m[1]+'</button>').join("")+'</div><p id="cd"></p><h3>Campo de visión</h3><input type="range" id="cfv" min="1" max="10" value="'+C.fov+'"><p id="cfi"></p><h3>Detector</h3><div class="row2" id="cdt">'+["D1","D2","D3","D4","D5","D6","Σ"].map(d=>'<button class="b" data-d="'+d+'">'+d+'</button>').join("")+'</div><p>Señal/ruido: <b id="csn" style="color:var(--txt)"></b></p><label><input type="checkbox" id="csk" checked> Saltar fotogramas de mala calidad</label><h3>Superponer otros telescopios</h3><label><input type="checkbox" data-l="gaia"'+(V.l.gaia?" checked":"")+'> Gaia (mov. propio)</label><label><input type="checkbox" data-l="wise"'+(V.l.wise?" checked":"")+'> WISE</label><label><input type="checkbox" data-l="simbad"'+(V.l.simbad?" checked":"")+'> SIMBAD</label><h3>Filtro de movimiento mínimo</h3><input type="range" id="cmn" min="0" max="3" step=".1" value="'+C.min+'"><p id="cmv"></p></div></div><h3>Fotogramas elegidos: metadatos y banderas</h3><table id="ctb"></table><h3>Detección automática y medidor de movimiento</h3><p id="mm"></p><h3>Calculadora de imágenes</h3><div class="row2" id="cop"><button class="b" data-o="+">A+B</button><button class="b" data-o="-">A−B</button><button class="b" data-o="/">(A−B)/(A+B)</button></div><p id="co"></p><h3>Enlace de esta comparación</h3><pre id="clk"></pre><button class="b tq" id="ccp">Copiar enlace</button><p class="n3">Paralaje: los objetos cercanos dibujan un pequeño bucle; con movimiento propio y paralaje se estima la distancia (WISE 0855 es el ejemplo ideal). Próximamente.</p><p style="color:var(--warn)">Cuidado: la longitud de onda cambia según la posición en el detector. Compara la misma banda o detector.</p>');
+ const upd=()=>{const o=cur(),f=fr(),n=f.length,a=n?f[0]:0,b=n?f[n-1]:0,yr=(b-a)/12,ds=pmv(o)*yr,A=bv(a),B=bv(b),r=C.op=="+"?A+B:C.op=="-"?A-B:(A-B)/(A+B),sn=snr(n);
+  $("#cal").innerHTML=MS.map((m,i)=>'<button class="b'+(C.sel.includes(i)?" on":"")+'" data-i="'+i+'"'+(has(i)?' style="border-color:var(--tq)"':" disabled")+'>'+m+(QL[i]?(QL[i]==1?" ▲":" ■"):"")+'</button>').join("");
+  $("#ct2").textContent=n+" fotogramas válidos · A = "+MS[a]+" · B = "+MS[b]+(C.sel.length>n?" · "+(C.sel.length-n)+" excluidos":"");
+  [...$("#cm3").children].forEach(q=>q.classList.toggle("on",q.dataset.k==C.m));[...$("#cdt").children].forEach(q=>q.classList.toggle("on",q.dataset.d==C.det));$("#cd").textContent=CM.find(q=>q[0]==C.m)[2];$("#cs2").style.visibility=C.m=="a"?"visible":"hidden";
+  $("#cfi").textContent=C.fov+"′ ≈ "+(.75*C.fov*C.fov).toFixed(1)+" MB · ~"+Math.ceil(C.fov*C.fov/2)+" s · más ancho = más lento";$("#csn").textContent="×"+sn.toFixed(1)+" ("+n+" fechas · "+(C.det=="Σ"?"6 detectores":"detector "+C.det)+")";$("#cmv").textContent="Mostrar solo lo que se mueva más de "+C.min+" px";
+  $("#ctb").innerHTML='<tr><th>Fecha</th><th>Detectores</th><th>Calidad</th><th>Estado</th></tr>'+C.sel.slice().sort((x,y)=>x-y).map(i=>'<tr><td>'+MS[i]+'</td><td>D1–D6</td><td style="color:'+QC[QL[i]]+'">'+QS[QL[i]]+'</td><td>'+(!has(i)?"sin datos":C.skip&&QL[i]==2?"excluida":"incluida")+'</td></tr>').join("");
+  $("#mm").textContent=!n?"Elige fechas con datos.":o.mv?"Se movió "+ds.toFixed(1)+"″ ("+(ds/6).toFixed(2)+" px de 6″) entre "+MS[a]+" y "+MS[b]+" → movimiento propio ≈ "+pmv(o)+"″/año. "+(o.n=="WISE 0855"?"Sin pareja en Gaia: posible objeto frío. ":"Tiene pareja en Gaia. ")+(o.n=="ε Indi B"?"Límite: SPHEREx no separa la pareja de enanas marrones. ":"")+(n<2?"Elige otra fecha lejana para medir.":""):"Sin movimiento medible; cambio de brillo de "+(((B-A)/A)*100).toFixed(1)+" %.";
+  $("#co").textContent="A = "+A.toFixed(2)+" · B = "+B.toFixed(2)+" mJy · "+(C.op=="+"?"A+B":C.op=="-"?"A−B":"(A−B)/(A+B)")+" = "+r.toFixed(3);
+  $("#clk").textContent="cielo-en-movimiento.app/?ra="+o.ra.toFixed(3)+"&dec="+o.dec.toFixed(3)+"&fov="+C.fov+"&modo="+{v:"video",b:"blink",a:"antesdespues",r:"resta",u:"suma",s:"sinfijas",e:"estela"}[C.m]+"&t1="+ym(a)+"&t2="+ym(b)+"&det="+(C.det=="Σ"?"sum":C.det)+"&nivel="+S.lv;cpatch()};
+ $("#cal").onclick=e=>{const i=e.target.dataset.i;if(i==null)return;const k=C.sel.indexOf(+i);k<0?C.sel.push(+i):C.sel.length>1&&C.sel.splice(k,1);upd()};
+ $("#cm3").onclick=e=>{if(e.target.dataset.k){C.m=e.target.dataset.k;upd()}};$("#cdt").onclick=e=>{if(e.target.dataset.d){C.det=e.target.dataset.d;upd()}};$("#cop").onclick=e=>{if(e.target.dataset.o){C.op=e.target.dataset.o;upd()}};
+ $("#pn").querySelectorAll("[data-l]").forEach(q=>q.onchange=()=>{V.l[q.dataset.l]=q.checked;cpatch()});
+ $("#cs2").oninput=e=>{C.s=e.target.value/100;cpatch()};$("#cmn").oninput=e=>{C.min=+e.target.value;upd()};$("#cfv").oninput=e=>{C.fov=+e.target.value;upd()};$("#csk").onchange=e=>{C.skip=e.target.checked?1:0;upd()};
+ $("#ccp").onclick=()=>{try{navigator.clipboard.writeText("https://"+$("#clk").textContent);$("#ccp").textContent="Copiado ✓"}catch(e){$("#ccp").textContent="No se pudo copiar"}};
+ $("#cv2").onclick=e=>{const o=cur(),r=e.target.getBoundingClientRect(),u=160+((e.clientX-r.left)*320/r.width-160)*C.fov/2,w=120+((e.clientY-r.top)*240/r.height-120)*C.fov/2;
+  $("#cp").innerHTML="Punto: RA "+(o.ra+(160-u)*.375/3600/(Math.cos(o.dec*D)||1)).toFixed(4)+"° · Dec "+(o.dec+(120-w)*.375/3600).toFixed(4)+"° <button class='b tq' id='cgo'>Ver espectro completo →</button>";$("#cgo").onclick=()=>tab("espectro");$("#csp").classList.remove("hide");plot("#csp",[spec(o)],{z:ZN,c:["#f97316"],xl:"µm",yl:"mJy"})};
+ upd();tm=setInterval(()=>{if(C.m=="v"||C.m=="b"){C.k++;cpatch()}},700)};
+addEventListener("resize",()=>{size();if(tabNow!="mapa")tab(tabNow)});
+// ===== Imágenes reales de SPHEREx en la pestaña Comparar =====
+// Lee data/<carpeta>/frames.json (lo genera make_frames.py). Si no existe,
+// la pestaña sigue usando la simulación de siempre.
+const REAL = {};
+const REAL_DIR = {"Barnard’s Star":"barnard","ε Indi B":"eps_indi_b","WISE 0855":"wise0855","RW Aur":"rw_aur","R Dra":"r_dra"};
+
+function carpetaDe(o){
+  const n = String(o && o.n || "").normalize("NFKC").replace(/\s+/g, " ").trim().toLowerCase();
+  for(const k in REAL_DIR){ if(k.normalize("NFKC").toLowerCase() == n) return REAL_DIR[k]; }
+  if(n.includes("0855")) return "wise0855";
+  if(n.includes("barnard")) return "barnard";
+  if(n.includes("indi")) return "eps_indi_b";
+  if(n.includes("rw aur")) return "rw_aur";
+  if(n.includes("r dra")) return "r_dra";
+  return null;
+}
+function cargarReal(o){
+  const d = carpetaDe(o);
+  if(!d || d in REAL) return;           // ya se intentó cargar
+  REAL[d] = null;
+  console.info("[SPHEREx] buscando data/" + d + "/frames.json");
+  fetch("data/"+d+"/frames.json")
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(j => Promise.all(j.frames.map(f => new Promise(ok => {
+        const im = new Image();
+        im.onload = () => ok({...f, img: im});
+        im.onerror = () => ok(null);
+        im.src = "data/"+d+"/"+f.png;
+      }))).then(L => { REAL[d] = {...j, frames: L.filter(Boolean)};
+        console.info("[SPHEREx] " + d + ": " + REAL[d].frames.length + " imagenes reales cargadas");
+        if(tabNow == "comparar") cpatch(); }))
+    .catch(e => console.info("[SPHEREx] sin datos reales para " + d + " (" + e + "); se usa la simulacion"));
+}
+
+// Resta B − A píxel por píxel: lo fijo queda gris, lo que se movió queda blanco/negro.
+function restaReal(A, B, s){
+  const c = document.createElement("canvas"); c.width = c.height = s;
+  const g = c.getContext("2d"); g.imageSmoothingEnabled = false;
+  g.drawImage(A.img, 0, 0, s, s); const a = g.getImageData(0, 0, s, s);
+  g.drawImage(B.img, 0, 0, s, s); const b = g.getImageData(0, 0, s, s);
+  for(let i = 0; i < a.data.length; i += 4){
+    const v = Math.max(0, Math.min(255, 128 + (b.data[i] - a.data[i])));
+    b.data[i] = b.data[i+1] = b.data[i+2] = v;
+  }
+  g.putImageData(b, 0, 0); return c;
+}
+
+const cpatchSim = cpatch;
+cpatch = function(){
+  const o = cur(); cargarReal(o);
+  const R0 = REAL[carpetaDe(o)];
+  if(!R0 || R0.frames.length < 2) return cpatchSim();
+
+  // Detector: el elegido; con Σ, el que tenga más fechas.
+  let det = C.det;
+  if(det == "Σ"){ const cnt = {}; R0.frames.forEach(f => cnt[f.detector] = (cnt[f.detector]||0) + 1);
+    det = Object.keys(cnt).sort((p, q) => cnt[q] - cnt[p])[0]; }
+  let F = R0.frames.filter(f => f.detector == det).sort((p, q) => p.fecha < q.fecha ? -1 : 1);
+  if(C.skip){ const G = F.filter(f => f.calidad != "mala"); if(G.length >= 2) F = G; }
+
+  const x = $("#cv2").getContext("2d"), W = 320, H = 240, S = 240, X0 = (W - S) / 2;
+  x.fillStyle = "#05070d"; x.fillRect(0, 0, W, H); x.imageSmoothingEnabled = false;
+  x.fillStyle = "#cbd5e1"; x.font = "12px system-ui";
+  if(F.length < 2){ x.fillText("Hay menos de 2 fechas reales en "+det+". Prueba otro detector.", 10, 120); return; }
+
+  const A = F[0], B = F[F.length - 1], m = C.m;
+  let etiqueta;
+  if(m == "a"){                                   // Antes/después con el deslizador
+    x.drawImage(A.img, X0, 0, S, S);
+    x.save(); x.beginPath(); x.rect(X0 + S * C.s, 0, S, S); x.clip(); x.drawImage(B.img, X0, 0, S, S); x.restore();
+    x.fillStyle = "#2dd4bf"; x.fillRect(X0 + S * C.s - 1, 0, 2, S);
+    etiqueta = A.fecha + "  |  " + B.fecha;
+  } else if(m == "r" || m == "s"){               // Resta / sin cielo fijo
+    x.drawImage(restaReal(A, B, S), X0, 0, S, S);
+    etiqueta = "Resta " + B.fecha.slice(0, 7) + " − " + A.fecha.slice(0, 7);
+  } else if(m == "e" || m == "u"){               // Estela / suma: todas las fechas juntas
+    F.forEach((f, i) => { x.globalAlpha = m == "u" ? 1 / (i + 1) : 1; x.globalCompositeOperation = m == "e" ? "lighten" : "source-over"; x.drawImage(f.img, X0, 0, S, S); });
+    x.globalAlpha = 1; x.globalCompositeOperation = "source-over";
+    etiqueta = (m == "e" ? "Estela" : "Promedio") + " de " + F.length + " fechas";
+  } else {                                        // Vídeo / parpadeo
+    const f = m == "b" ? [A, B][C.k % 2] : F[C.k % F.length];
+    x.drawImage(f.img, X0, 0, S, S);
+    etiqueta = f.fecha;
+  }
+  x.strokeStyle = "#f97316"; x.lineWidth = 1.5; x.beginPath(); x.arc(W / 2, H / 2, 14, 0, 7); x.stroke();
+  x.fillStyle = "rgba(5,7,13,.75)"; x.fillRect(0, H - 20, W, 20);
+  x.fillStyle = "#e2e8f0"; x.font = "11px system-ui";
+  x.fillText("● Datos reales SPHEREx · " + det + " · " + etiqueta, 8, H - 6);
+};
+</script>
+</body>
+</html>
