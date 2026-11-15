@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("cem_theme")||"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
+<title>Made On Earth Team · SPHEREx Data Explorer — NASA Space Apps 2026</title>
+<style>
+/* =====================================================================
+   Made On Earth Team · SPHEREx Data Explorer
+   Dark theme (default) + light theme · square corners
+   ===================================================================== */
+
+:root{
+  --sans:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --mono:"Cascadia Mono",Consolas,"SF Mono",Menlo,"Courier New",monospace;
+
+  /* Dark theme (default): black background, like NASA sites */
+  --bg:#000000; --bg2:#000000;
+  --pan:#0f1a33; --pan2:#14203d; --pan3:#1a2748;
+  --line:#223159; --line2:#2d3f70; --line3:#3d5288;
+  --txt:#e7edfb; --mut:#9db0d4; --mut2:#66799f;
+  --nasa:#2456b8; --blue:#6ea3ff; --red:#fc3d21; --org:#f97316;
+  --tq:#2dd4bf; --ok:#22c55e; --warn:#fbbf24;
+  --onbg:#17336e; --onbr:#5b86e0; --onfg:#dbe7ff;
+  --zebra:rgba(255,255,255,.035);
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#ffffff; --bg2:#ffffff;
+  --pan:#ffffff; --pan2:#f3f5fb; --pan3:#e8edf8;
+  --line:#dbe1ee; --line2:#c4cde2; --line3:#a8b4d0;
+  --txt:#1a2338; --mut:#5b6a8c; --mut2:#8b98b8;
+  --nasa:#0b3d91; --blue:#1d4ed8; --red:#fc3d21; --org:#c2410c;
+  --tq:#0f766e; --ok:#15803d; --warn:#b45309;
+  --onbg:#eaf0fe; --onbr:#0b3d91; --onfg:#0b3d91;
+  --zebra:#f8fafd;
+  color-scheme:light;
+}
+
+/* Header chrome: always dark (uses the SPHEREx image) */
+:root{
+  --chrome:#0a1326; --chtxt:#dbe4f8; --chmut:#93a3c4; --chline:#22315c;
+}
+
+html{height:100%}
+*{box-sizing:border-box}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--txt);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+input,select,textarea{font:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+::selection{background:var(--nasa);color:#fff}
+.hide{display:none!important}
+h1,h2,h3{margin:0;font-weight:650;letter-spacing:-.005em;line-height:1.25}
+a{color:var(--blue)}
+pre,code,kbd{font-family:var(--mono)}
+*::-webkit-scrollbar{width:11px;height:11px}
+*::-webkit-scrollbar-thumb{background:var(--line3);border-radius:0;border:3px solid transparent;background-clip:content-box}
+*::-webkit-scrollbar-track{background:transparent}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+
+/* ---------- Buttons and utilities ---------- */
+.b{background:var(--pan2);border:1px solid var(--line2);border-radius:0;padding:6px 12px;font-size:13.5px;line-height:1.4;color:var(--txt);transition:background .12s,border-color .12s}
+.b:hover{background:var(--pan3);border-color:var(--line3)}
+.b:active{transform:translateY(1px)}
+.b[disabled]{opacity:.55;cursor:not-allowed}
+.b.on{background:var(--onbg);border-color:var(--onbr);color:var(--onfg);font-weight:600}
+.b.tq{background:var(--nasa);border-color:var(--nasa);color:#fff;font-weight:600}
+.b.tq:hover{filter:brightness(1.12)}
+.new{background:var(--red);color:#fff;border-radius:0;padding:1px 6px;font-size:11px;font-weight:700;letter-spacing:.04em}
+.mut{color:var(--mut)}
+body.l1 .n2,body.l1 .n3,body.l2 .n3{display:none!important}
+
+/* ---------- Landing ---------- */
+#landing{min-height:100vh;display:flex;flex-direction:column;background:transparent}
+.nav{display:flex;align-items:center;gap:22px;padding:13px 28px;min-height:46px;flex-wrap:wrap;
+  background:linear-gradient(90deg,rgba(3,7,16,.93) 0,rgba(3,7,16,.66) 45%,rgba(3,7,16,.42) 75%,rgba(3,7,16,.72) 100%),var(--hdr,linear-gradient(90deg,#050b1c,#0b1734)) 70% 32%/cover no-repeat;
+  border-bottom:2px solid var(--red)}
+.nav b{font-size:16px;color:#fff}
+.nav a{color:#9db4ec;text-decoration:none;font-size:13.5px}
+.nav a:hover{color:#fff;text-decoration:underline}
+.nav .sp{flex:1}
+.logo{width:30px;height:30px;border-radius:50%;background:#0b3d91;border:2px solid #fff;position:relative;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.25)}
+.logo:after{content:"";position:absolute;left:-5px;top:12px;width:42px;height:3px;background:var(--red);transform:rotate(-24deg);border-radius:2px}
+.sky-hero{position:relative;flex:1;min-height:520px;display:flex;flex-direction:column;justify-content:center;padding:72px 32px 150px;overflow:hidden;
+  background:radial-gradient(1.5px 1.5px at 12% 22%,#fff,transparent),radial-gradient(1px 1px at 30% 60%,#cfe,transparent),radial-gradient(1.5px 1.5px at 55% 15%,#fff,transparent),radial-gradient(1px 1px at 72% 40%,#fff,transparent),radial-gradient(1.5px 1.5px at 88% 18%,#bcd,transparent),radial-gradient(1px 1px at 45% 45%,#fff,transparent),linear-gradient(#050b1c,#0b1734 75%)}
+.earth{position:absolute;left:-25%;right:-25%;bottom:-78%;height:100%;border-radius:50%;background:radial-gradient(ellipse at 50% 0,#3b82f6 0,#0b3d91 7%,#06194a 28%,#020617 60%);box-shadow:0 -4px 50px 8px #4aa3ff55,0 -2px 0 #bfe0ff;opacity:.85}
+.sky-hero .in{position:relative;max-width:1080px;width:100%;margin:0 auto}
+.sky-hero h1{font-size:clamp(40px,6.5vw,78px);line-height:1.03;max-width:14ch;color:#fff}
+.sky-hero p{font-size:18px;color:#b9c7e6;max-width:58ch;margin:22px 0 30px}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.cta button{border-radius:0;padding:12px 26px;font-weight:600;font-size:15.5px;border:1.5px solid rgba(255,255,255,.7);background:transparent;color:#fff}
+.cta .red{background:var(--red);border-color:var(--red)}
+.cta button:hover{filter:brightness(1.12)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));background:#0b1734;border-top:3px solid var(--red)}
+.tiles div{padding:22px 28px;border-right:1px solid rgba(255,255,255,.12)}
+.tiles h3{color:#fff;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.tiles span{color:#93a3c4;font-size:14px}
+
+/* ---------- Level selection ---------- */
+#levels{min-height:100vh;padding:40px 24px 64px;background:transparent}
+#levels .in{max-width:980px;margin:0 auto}
+.steps{display:flex;gap:10px;margin:20px 0 30px;font-size:13px;color:var(--mut)}
+.steps span{flex:1;padding-top:10px;border-top:3px solid var(--line)}
+.steps .a{border-color:var(--nasa);color:var(--txt);font-weight:600}
+#levels h2{font-size:clamp(28px,4.5vw,42px)}
+#levels .sub{color:var(--mut);font-size:16.5px;margin:10px 0 30px;max-width:56ch}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.opt{position:relative;background:var(--pan);border:1px solid var(--line2);border-radius:0;padding:26px 22px 22px;text-align:center;transition:border-color .15s,box-shadow .15s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+:root[data-theme="light"] .opt{box-shadow:0 1px 2px rgba(16,24,40,.05)}
+.opt:hover{border-color:var(--line3);box-shadow:0 3px 10px rgba(0,0,0,.35)}
+:root[data-theme="light"] .opt:hover{box-shadow:0 3px 10px rgba(16,24,40,.08)}
+.opt .em{width:84px;height:84px;border-radius:0;margin:0 auto 14px;display:grid;place-items:center;background:transparent;border:1.5px solid var(--c);color:var(--c);position:relative;transition:background .15s,color .15s}
+.opt h3{font-size:19px}
+.opt .who{color:var(--mut);font-size:14px;margin:4px 0 12px}
+.opt .see{font-size:14px;line-height:1.5;background:var(--pan2);border:1px solid var(--line);border-radius:0;padding:10px 12px;color:var(--mut)}
+.opt .ck{position:absolute;right:14px;top:14px;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--line2);display:grid;place-items:center;font-weight:700;font-size:13px;color:transparent}
+.opt[aria-pressed="true"]{border-color:var(--nasa);box-shadow:0 0 0 3px rgba(36,86,184,.18)}
+:root[data-theme="light"] .opt[aria-pressed="true"]{box-shadow:0 0 0 3px rgba(11,61,145,.12)}
+.opt[aria-pressed="true"] .ck{background:var(--nasa);border-color:var(--nasa);color:#fff}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:32px;flex-wrap:wrap}
+.foot .hint{color:var(--mut)}
+#enter{border-radius:0;padding:12px 28px;font-weight:600;font-size:15.5px;background:var(--nasa);color:#fff;border:0}
+#enter:hover{filter:brightness(1.12)}
+#enter:disabled{background:var(--pan3);color:var(--mut2);cursor:not-allowed}
+.cr{color:var(--mut2);font-size:12.5px;margin-top:36px}
+
+/* ---------- Explorer chrome (always dark, with image) ---------- */
+#app{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.top{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;min-height:56px;
+  background:linear-gradient(90deg,rgba(3,7,16,.93) 0,rgba(3,7,16,.66) 45%,rgba(3,7,16,.42) 75%,rgba(3,7,16,.72) 100%),var(--hdr,linear-gradient(90deg,#050b1c,#0b1734)) 70% 32%/cover no-repeat;
+  border-bottom:2px solid var(--red)}
+.top .b{background:rgba(15,25,50,.72);border-color:#33477a;color:var(--chtxt)}
+.top .b:hover{background:rgba(26,40,76,.85);border-color:#4a63a0}
+.top .b.tq{background:var(--nasa);border-color:var(--nasa);color:#fff}
+.top .b.on{background:var(--onbg);border-color:var(--onbr);color:var(--onfg)}
+.top input,.top select{background:rgba(10,16,34,.78);color:#eaf0ff;border:1px solid #33477a;border-radius:0;padding:6px 12px;font-size:13.5px;min-width:0}
+.top input{flex:1 1 480px;min-width:240px}
+.top input::placeholder{color:#6d7fa8}
+.top select{width:auto;max-width:160px}
+.seg{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+#tools:empty{display:none}
+.top .tl{font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--chmut);margin:0 2px}
+.coords{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:7px 12px;background:var(--chrome);border-bottom:1px solid var(--chline);font-size:13px;color:var(--chmut)}
+.coords b{font-weight:600;color:#fff}
+.coords input{background:rgba(10,16,34,.78);color:#eaf0ff;border:1px solid #33477a;border-radius:0;padding:5px 10px;width:190px;font-family:var(--mono);font-size:12.5px}
+.tabs{display:flex;gap:2px;overflow-x:auto;padding:0 10px;background:var(--chrome);border-bottom:1px solid var(--chline)}
+.tabs button{white-space:nowrap;background:transparent;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;border-radius:0;padding:10px 14px;font-size:13.5px;color:var(--chmut)}
+.tabs button:hover{color:#fff}
+.tabs button.on{background:transparent;border-bottom-color:var(--red);color:#fff;font-weight:600}
+
+/* ---------- Sky canvas (dark overlay) ---------- */
+#stage{position:relative;flex:1;min-height:0;background:#05070f}
+canvas#sky{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+.hud{position:absolute;left:12px;top:12px;font:12px var(--mono);color:#aebadd;background:rgba(6,10,20,.72);border:1px solid var(--ovline,rgba(140,160,205,.25));border-radius:0;padding:5px 10px;max-width:70%;pointer-events:none}
+.zoom{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:6px}
+.zoom button{width:36px;height:36px;border-radius:0;background:rgba(11,17,33,.88);border:1px solid rgba(140,160,205,.25);color:#e2e9fa;font-size:19px}
+.zoom button:hover{background:rgba(22,32,58,.95)}
+.chips{position:absolute;left:10px;right:64px;bottom:10px;display:flex;gap:6px;flex-wrap:wrap}
+.chips button{background:rgba(11,17,33,.85);border:1px solid rgba(140,160,205,.25);color:#e2e9fa;border-radius:0;padding:5px 10px;font-size:12.5px}
+.chips button:hover{background:rgba(22,32,58,.95)}
+#pop{position:absolute;left:12px;bottom:64px;width:min(360px,calc(100% - 24px));background:rgba(11,17,33,.94);border:1px solid rgba(140,160,205,.25);border-radius:0;padding:16px;box-shadow:0 12px 40px rgba(0,0,0,.5);color:#e2e9fa}
+#pop h3{font-size:18px;color:#fff}
+#pop .t{color:#f97316;font-size:13px;margin-top:2px}
+#pop dl{margin:10px 0;display:grid;grid-template-columns:auto 1fr;gap:3px 14px;font-size:13.5px}
+#pop dt{color:#9db0d6}
+#pop dd{margin:0;font-variant-numeric:tabular-nums}
+#pop .x{position:absolute;right:8px;top:6px;background:none;border:0;font-size:18px;color:#9db0d6}
+#pop .fact{font-size:13.5px;color:#fbbf24;margin:10px 0;border-left:2px solid #fbbf24;padding-left:10px}
+#pop .b{background:#14203d;border-color:#2d3f70;color:#e2e9fa}
+#pop .b.tq{background:var(--nasa);border-color:var(--nasa);color:#fff}
+#stage.sec>#sky,#stage.sec>.hud,#stage.sec>.zoom,#stage.sec>.chips,#stage.sec>#pop{display:none!important}
+
+/* ---------- Data panels (#pn) ---------- */
+#pn{position:absolute;inset:0;overflow:auto;background:var(--bg);padding:26px 32px 56px}
+#pn>*{max-width:1180px;margin-left:auto;margin-right:auto}
+#pn h2{font-size:22px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+#pn h3{font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);margin:22px 0 8px;font-weight:650}
+#pn p,#pn li{color:var(--mut);font-size:14px;max-width:78ch}
+#pn label{display:block;font-size:13.5px;margin:6px 0;color:var(--txt)}
+#pn canvas{width:100%;background:#05070f;border:1px solid var(--line2);border-radius:0;display:block}
+#pn .cd{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
+#pn .cd div{background:var(--pan);border:1px solid var(--line);border-radius:0;padding:10px 12px;font-size:12.5px;color:var(--mut)}
+#pn .cd b{display:block;font-size:19px;color:var(--txt);font-family:var(--mono);margin-top:2px;font-weight:600}
+#pn table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--pan);border:1px solid var(--line);border-radius:0;overflow:hidden}
+#pn td,#pn th{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+#pn th{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);background:var(--pan2);font-weight:600}
+#pn tr:nth-child(even) td{background:var(--zebra)}
+#pn tr:last-child td{border-bottom:0}
+#pn pre{background:var(--pan2);border:1px solid var(--line);padding:10px;border-radius:0;overflow:auto;font-size:12.5px;color:var(--txt)}
+#pn input:not([type]),#pn input[type=text]{background:var(--pan2);color:var(--txt);border:1px solid var(--line2);border-radius:0;padding:6px 10px;width:100%;max-width:560px;font-size:13.5px}
+#pn select{background:var(--pan2);color:var(--txt);border:1px solid var(--line2);border-radius:0;padding:6px 10px;font-size:13.5px;max-width:100%}
+#pn input[type=range]{width:100%;max-width:420px;display:block;accent-color:var(--nasa);margin:6px 0}
+#pn input[type=checkbox]{accent-color:var(--nasa)}
+#pn details:not(.dd){background:var(--pan);border:1px solid var(--line);border-radius:0;padding:10px 14px;margin:10px 0}
+#pn details:not(.dd) summary{cursor:pointer;font-weight:600;font-size:14px}
+#pn summary{list-style:none}
+#pn summary::-webkit-details-marker{display:none}
+.g2{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:22px}
+@media(max-width:820px){.g2{grid-template-columns:1fr}}
+.row2{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.alr{background:rgba(252,61,33,.08);border:1px solid rgba(252,61,33,.35);border-left:3px solid var(--red);border-radius:0;padding:12px 14px;margin:10px 0;font-size:14px}
+.okb{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.35);border-left:3px solid var(--ok);border-radius:0;padding:12px 14px;margin:10px 0;font-size:14px}
+.dd{background:var(--pan);border:1px solid var(--line2);border-radius:0;margin-bottom:14px}
+.dd summary{cursor:pointer;padding:12px 16px;font-weight:600;list-style:none;display:flex;align-items:center;gap:8px;font-size:14px}
+.dd summary::-webkit-details-marker{display:none}
+.dd summary:after{content:"▾";margin-left:auto;transition:transform .15s;color:var(--mut)}
+.dd[open] summary:after{transform:rotate(180deg)}
+.dd summary span{font-weight:400;color:var(--mut);font-size:12.5px}
+.ddp{padding:4px 16px 16px;border-top:1px solid var(--line)}
+.wr{display:flex;align-items:center;gap:8px;margin:6px 0;flex-wrap:wrap}
+.wr .b:first-child{flex:1;text-align:left}
+
+/* ---------- Share ---------- */
+.shc{background:var(--pan);border:1px solid var(--line2);border-radius:0;overflow:hidden;align-self:start}
+.shc img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;background:#05070f}
+.shm{padding:14px 16px}
+.chp{display:flex;gap:6px;flex-wrap:wrap}
+.chp span{background:var(--pan2);border:1px solid var(--line);border-radius:0;padding:2px 8px;font-size:11.5px;color:var(--mut);font-family:var(--mono)}
+.qrb{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+#qb canvas{width:170px;height:170px;border-radius:0;image-rendering:pixelated;display:block;background:#fff;border:1px solid var(--line2)}
+.pr{display:flex;align-items:center;gap:12px}
+.pbar{height:8px;background:var(--pan3);border-radius:0;overflow:hidden;flex:1}
+.pbar i{display:block;height:100%;background:var(--ok)}
+.rg{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;margin-top:10px}
+.rc{text-align:left;background:var(--pan);border:1px solid var(--line);border-radius:0;padding:10px 12px;font-size:13.5px;display:flex;gap:8px;color:var(--txt)}
+button.rc:hover{border-color:var(--line3);background:var(--pan2)}
+.rc span{color:var(--ok);font-weight:700}
+.rc.pe span{color:var(--warn)}
+.rc.pe{opacity:.85}
+.rc small{display:block;color:var(--mut)}
+
+/* ---------- Modals and tutorial ---------- */
+.modal{position:fixed;inset:0;background:rgba(2,6,14,.62);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9}
+.box{background:var(--pan);border:1px solid var(--line2);border-radius:0;padding:24px;max-width:520px;width:100%;max-height:92%;overflow:auto;box-shadow:0 24px 64px rgba(0,0,0,.45)}
+.box h2{font-size:20px;margin-bottom:8px}
+.box p{color:var(--mut);font-size:14px}
+.dots{display:flex;gap:6px;margin:14px 0}
+.dots i{height:4px;flex:1;border-radius:0;background:var(--pan3)}
+.dots i.a{background:var(--nasa)}
+.row{display:flex;justify-content:space-between;gap:8px;margin-top:16px}
+#vis{width:100%;aspect-ratio:4/3;background:#05070f;border:1px solid var(--line2);border-radius:0;display:block}
+.tag{font-size:12.5px;color:var(--tq)}
+
+/* ---------- Report ---------- */
+#rep{position:fixed;inset:0;background:#fff;color:#000;padding:32px;overflow:auto;z-index:99;font-family:Georgia,"Times New Roman",serif}
+#rep.hide{display:none!important}
+#rep h1{font-size:28px}
+#rep h2{font-size:17px;margin-top:20px}
+#rep p,#rep td{color:#222;font-size:13.5px}
+#rep img,#rep canvas{max-width:100%;height:auto;display:block;border-radius:0}
+#rep img.rq{width:140px}
+#rep table{border-collapse:collapse}
+#rep td{border-bottom:1px solid #ddd;padding:4px 14px 4px 0}
+.rb{margin-bottom:16px}
+
+/* ---------- Site footer ---------- */
+#ft{background:#0b1734;color:#93a3c4;font-size:13.5px}
+#ft .ftin{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:28px;padding:34px 28px 22px}
+#ft h3{color:#fff;font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;font-weight:600}
+#ft p{margin:0 0 8px;max-width:52ch}
+#ft a{color:#9db4ec;text-decoration:none;display:block;margin:4px 0}
+#ft a:hover{color:#fff;text-decoration:underline}
+#ft .bar{max-width:1080px;margin:0 auto;padding:14px 28px;border-top:1px solid rgba(255,255,255,.12);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12.5px;color:#6f7fa8}
+@media(max-width:760px){#ft .ftin{grid-template-columns:1fr}}
+#app:not(.hide)~#ft,#rep:not(.hide)~#ft{display:none!important}
+
+/* ---------- Embed mode and printing ---------- */
+html.emb .top,html.emb .coords,html.emb .tabs{display:none!important}
+@media print{
+  body>*:not(#rep){display:none!important}
+  body::before{content:none!important}
+  html,body{height:auto!important;background:#fff!important}
+  #rep{position:static;padding:0;overflow:visible}
+  #rep .no{display:none}
+}
+
+
+:root{--hdr:url("assets/header.jpg")}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Ccircle cx='86' cy='56' r='1.63' fill='%23bcd2ff' fill-opacity='0.54'/%3E%3Ccircle cx='87' cy='352' r='0.93' fill='%23ffe9d2' fill-opacity='0.72'/%3E%3Ccircle cx='541' cy='12' r='1.30' fill='%23cfe0ff' fill-opacity='0.59'/%3E%3Ccircle cx='409' cy='665' r='0.90' fill='%23cfe0ff' fill-opacity='0.80'/%3E%3Ccircle cx='85' cy='713' r='0.79' fill='%23ffffff' fill-opacity='0.90'/%3E%3Ccircle cx='634' cy='775' r='1.20' fill='%23bcd2ff' fill-opacity='0.78'/%3E%3Ccircle cx='172' cy='526' r='0.81' fill='%23ffe9d2' fill-opacity='0.64'/%3E%3Ccircle cx='105' cy='669' r='0.57' fill='%23bcd2ff' fill-opacity='0.57'/%3E%3Ccircle cx='297' cy='485' r='0.85' fill='%23bcd2ff' fill-opacity='0.88'/%3E%3Ccircle cx='365' cy='650' r='0.45' fill='%23ffe9d2' fill-opacity='0.65'/%3E%3Ccircle cx='91' cy='799' r='1.69' fill='%23ffffff' fill-opacity='0.62'/%3E%3Ccircle cx='850' cy='599' r='0.81' fill='%23bcd2ff' fill-opacity='0.78'/%3E%3Ccircle cx='480' cy='351' r='1.70' fill='%23cfe0ff' fill-opacity='0.85'/%3E%3Ccircle cx='686' cy='882' r='0.38' fill='%23ffffff' fill-opacity='0.87'/%3E%3Ccircle cx='231' cy='361' r='0.42' fill='%23cfe0ff' fill-opacity='0.82'/%3E%3Ccircle cx='10' cy='233' r='0.72' fill='%23ffe9d2' fill-opacity='0.78'/%3E%3Ccircle cx='457' cy='870' r='1.12' fill='%23ffffff' fill-opacity='0.82'/%3E%3Ccircle cx='729' cy='69' r='1.16' fill='%23ffffff' fill-opacity='0.69'/%3E%3Ccircle cx='845' cy='347' r='1.66' fill='%23bcd2ff' fill-opacity='0.77'/%3E%3Ccircle cx='537' cy='387' r='1.02' fill='%23ffe9d2' fill-opacity='0.76'/%3E%3Ccircle cx='538' cy='329' r='0.74' fill='%23ffe9d2' fill-opacity='0.78'/%3E%3Ccircle cx='255' cy='645' r='0.75' fill='%23ffffff' fill-opacity='0.89'/%3E%3Ccircle cx='527' cy='570' r='0.90' fill='%23bcd2ff' fill-opacity='0.53'/%3E%3Ccircle cx='284' cy='358' r='1.14' fill='%23ffe9d2' fill-opacity='0.54'/%3E%3Ccircle cx='815' cy='387' r='0.99' fill='%23cfe0ff' fill-opacity='0.52'/%3E%3Ccircle cx='89' cy='729' r='1.58' fill='%23cfe0ff' fill-opacity='0.99'/%3E%3Ccircle cx='735' cy='543' r='0.51' fill='%23bcd2ff' fill-opacity='0.73'/%3E%3Ccircle cx='183' cy='47' r='1.06' fill='%23ffffff' fill-opacity='0.68'/%3E%3Ccircle cx='126' cy='375' r='1.16' fill='%23bcd2ff' fill-opacity='0.68'/%3E%3Ccircle cx='669' cy='734' r='0.53' fill='%23ffe9d2' fill-opacity='0.87'/%3E%3Ccircle cx='215' cy='102' r='1.56' fill='%23ffe9d2' fill-opacity='0.64'/%3E%3Ccircle cx='549' cy='653' r='1.29' fill='%23cfe0ff' fill-opacity='0.82'/%3E%3Ccircle cx='678' cy='171' r='0.69' fill='%23cfe0ff' fill-opacity='0.94'/%3E%3Ccircle cx='36' cy='55' r='0.72' fill='%23bcd2ff' fill-opacity='0.51'/%3E%3Ccircle cx='34' cy='200' r='0.73' fill='%23ffffff' fill-opacity='0.96'/%3E%3Ccircle cx='145' cy='211' r='1.68' fill='%23bcd2ff' fill-opacity='0.74'/%3E%3Ccircle cx='190' cy='309' r='1.36' fill='%23ffffff' fill-opacity='0.90'/%3E%3Ccircle cx='403' cy='740' r='1.48' fill='%23cfe0ff' fill-opacity='0.72'/%3E%3Ccircle cx='673' cy='351' r='0.55' fill='%23cfe0ff' fill-opacity='0.83'/%3E%3Ccircle cx='890' cy='293' r='1.09' fill='%23cfe0ff' fill-opacity='0.71'/%3E%3C/svg%3E")}
+:root[data-theme="light"] body::before{content:none}
+
+/* ---------- User account ---------- */
+.nav .acct{border:1px solid var(--line3);padding:5px 12px;color:var(--chtxt)}
+.nav .acct:hover{border-color:#fff;color:#fff;text-decoration:none}
+.lrow{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.kick{display:flex;align-items:center;gap:12px;margin:0 0 18px;font:600 12px/1 var(--sans);letter-spacing:.22em;text-transform:uppercase;color:var(--red)}
+.kick:before{content:"";width:32px;height:1px;background:var(--red)}
+.kick.lvk{margin-top:14px}
+.opt .em:before{content:"";position:absolute;inset:-9px;border:1px dashed var(--line);opacity:.8}
+.opt .em svg{width:52px;height:52px}
+.opt .cls{font:600 11px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--c);margin-bottom:10px}
+.opt h3{font-size:22px}
+.opt[aria-pressed="true"] .em{background:var(--c);color:#fff}
+.fld{display:block;margin:12px 0 4px;font-size:14px;color:var(--mut)}
+.err{color:#ff8a7a;font-size:14px;min-height:20px;margin:8px 0 0}
+.box input[type=text],.box input[type=password]{width:100%;background:var(--pan2);color:var(--txt);border:1px solid var(--line2);border-radius:0;padding:10px 12px;font:inherit}
+.hl{display:flex;flex-direction:column;gap:6px;margin:8px 0 12px;max-height:220px;overflow:auto}
+.hl .b{display:flex;justify-content:space-between;gap:10px;text-align:left}
+.hl .b span{color:var(--mut);font-size:13px}
+.box h3{font-size:17px;margin:14px 0 4px}
+.box .note{font-size:13px;color:var(--mut);margin-top:12px}
+
+/* ---------- Landing constellation ---------- */
+.sky-hero .con{position:absolute;right:3%;top:6%;width:min(48vw,540px);pointer-events:none;opacity:.92}
+.sky-hero .con .ln{stroke:#7fa6f0;stroke-width:.9;opacity:.45;fill:none}
+.sky-hero .con .st{fill:#fff}
+.sky-hero .con .ring{stroke:#5b86e0;stroke-width:.8;fill:none;opacity:.5}
+.sky-hero .con .lb{fill:#9fb0d6;font:10px var(--sans);letter-spacing:.12em}
+.sky-hero .in{z-index:1}
+.tw{animation:tw 4.5s ease-in-out infinite}.tw2{animation-delay:1.3s}.tw3{animation-delay:2.6s}
+@keyframes tw{0%,100%{opacity:.35}50%{opacity:1}}
+.orb{transform-box:fill-box;transform-origin:center;animation:orb 120s linear infinite}
+@keyframes orb{to{transform:rotate(360deg)}}
+@media (max-width:760px){.sky-hero .con{opacity:.3}}
+@media (prefers-reduced-motion:reduce){.tw,.orb{animation:none}}
+
+/* ---------- Map format (dropdown) ---------- */
+.mapfmt{position:relative}
+.mfm{position:absolute;top:calc(100% + 8px);left:0;z-index:8;min-width:230px;background:var(--pan);border:1px solid var(--line2);border-radius:0;padding:8px;display:flex;flex-direction:column;gap:4px;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.mfm .b{text-align:left}
+.mfm .sep{font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--chmut);padding:6px 8px 2px}
+
+/* ---------- Object card ---------- */
+#pop{animation:pin .25s ease}
+@keyframes pin{from{opacity:0;transform:translateY(10px)}}
+@media(prefers-reduced-motion:reduce){#pop{animation:none}}
+#pop .ph h3{font-size:20px;margin-right:30px}
+#pop .t{color:var(--tq);font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+#pop .st{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+#pop .st div{background:rgba(255,255,255,.05);border:1px solid var(--ovline);border-radius:0;padding:8px 10px}
+#pop small{display:block;color:var(--ovmut);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em}
+#pop .st b{font-size:14.5px}
+#pop .fb{background:linear-gradient(135deg,rgba(45,212,191,.12),rgba(167,139,250,.12));border-left:3px solid var(--tq);border-radius:0;padding:10px 12px;margin:10px 0}
+#pop .fb small{color:var(--tq);font-weight:700}
+#pop .fb p{margin:4px 0 8px;font-size:14px;color:#e2e9fa}
+body.l1 #pop .fb p{font-size:16px}
+#pop .fb .b{font-size:12.5px;padding:4px 12px}
+#pop .x{color:#9db0d6;width:28px;height:28px;background:rgba(255,255,255,.08);line-height:1;top:12px}
+
+/* ---------- Levels: visibility by age ---------- */
+body.l2 .n1,body.l3 .n1,body.l3 .chips{display:none!important}
+body.l1 #pn h2{font-size:26px}
+body.l1 #pn p,body.l1 #pn li{font-size:15.5px}
+body.l1 #pn .b{font-size:15px}
+
+/* ---------- Challenge, Learn and Practice ---------- */
+.kc{display:block;background:var(--pan);border:1px solid var(--line);border-radius:0;padding:10px 14px;margin:8px 0}
+.kc summary{cursor:pointer;font-size:16px;font-weight:650;color:var(--txt)}
+.kc[open]{border-color:var(--tq)}
+.lvc{border:1px solid var(--line);border-radius:0;margin:10px 0;background:var(--pan)}
+.lvc.open{border-color:var(--tq)}
+.lvh{display:flex;gap:12px;align-items:center;width:100%;background:none;border:0;padding:12px 14px;text-align:left;font-size:15px;color:var(--txt)}
+.lvh small{color:var(--mut);font-size:13.5px}
+.lvh b{font-size:18px;color:var(--txt)}
+.lvn{width:38px;height:38px;border-radius:0;background:var(--tq);color:#04222e;display:grid;place-items:center;font-weight:700;flex:none}
+.lvb{padding:0 14px 14px}
+p.ex,.lab p.ex{background:var(--pan2);border-left:3px solid var(--org);border-radius:0;padding:8px 10px}
+.res{background:var(--pan2);border:1px solid var(--tq);border-radius:0;padding:10px 12px;color:var(--txt)}
+.lvi{width:64px;height:64px;flex:none;background:#000;overflow:hidden;display:block}
+.himg{background:radial-gradient(circle at 50% 40%,#0b1a45,#000 72%);border-radius:0;margin:0 0 12px;display:flex;flex-direction:column;align-items:center;padding:12px;border-bottom:3px solid var(--red)}
+.himg svg{max-width:100%;height:auto}.himg .src{color:var(--mut);font-size:11px;margin-top:6px;text-transform:uppercase;letter-spacing:.08em}
+.fs{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin:10px 0}
+.fs div{background:#000;border-top:3px solid var(--red);padding:8px 10px}
+.fs small{display:block;color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.08em}.fs b{font-size:17px;color:var(--txt)}
+
+/* ---------- Made On Earth brand ---------- */
+.moe{height:26px;width:auto;flex:none;color:#fff;display:block}
+.moe.mini{height:20px}
+.top .moe.mini{color:#fff}
+.nav b{display:flex;align-items:center;gap:10px}
+.nav .moe{margin-right:2px}
+
+/* ---------- Light theme: landing and chrome ---------- */
+:root[data-theme="light"] .nav,:root[data-theme="light"] .top{
+  background:linear-gradient(90deg,rgba(255,255,255,.94) 0,rgba(255,255,255,.82) 45%,rgba(255,255,255,.62) 75%,rgba(255,255,255,.88) 100%),var(--hdr,linear-gradient(90deg,#e8edf8,#dbe4f5)) 70% 32%/cover no-repeat;
+  border-bottom:2px solid var(--red)}
+:root[data-theme="light"] .nav b{color:#0b1734}
+:root[data-theme="light"] .nav .moe,:root[data-theme="light"] .top .moe.mini{color:#0b1734}
+:root[data-theme="light"] .nav a{color:#33509b}
+:root[data-theme="light"] .nav a:hover{color:#0b1734}
+:root[data-theme="light"] .nav .acct{border-color:#a8b4d0;color:#1a2338}
+:root[data-theme="light"] .nav .acct:hover{border-color:#0b3d91;color:#0b3d91}
+:root[data-theme="light"] .sky-hero{background:radial-gradient(1.5px 1.5px at 12% 22%,#0b1734,transparent),radial-gradient(1px 1px at 30% 60%,#0b3d91,transparent),radial-gradient(1.5px 1.5px at 55% 15%,#0b1734,transparent),radial-gradient(1px 1px at 72% 40%,#0b1734,transparent),radial-gradient(1.5px 1.5px at 88% 18%,#0b3d91,transparent),radial-gradient(1px 1px at 45% 45%,#0b1734,transparent),linear-gradient(#ffffff,#eef2fb 75%)}
+:root[data-theme="light"] .sky-hero h1{color:#101a30}
+:root[data-theme="light"] .sky-hero p{color:#44506e}
+:root[data-theme="light"] .cta button{border-color:rgba(11,23,52,.5);color:#101a30;background:transparent}
+:root[data-theme="light"] .cta .red{background:var(--red);border-color:var(--red);color:#fff}
+:root[data-theme="light"] .earth{opacity:.55}
+:root[data-theme="light"] .sky-hero .con .ln{stroke:#1d4ed8;opacity:.4}
+:root[data-theme="light"] .sky-hero .con .st{fill:#1a2338}
+:root[data-theme="light"] .sky-hero .con .ring{stroke:#1d4ed8;opacity:.45}
+:root[data-theme="light"] .sky-hero .con .lb{fill:#5b6a8c}
+:root[data-theme="light"] .tiles{background:#eef2fb}
+:root[data-theme="light"] .tiles div{border-right:1px solid #dbe1ee}
+:root[data-theme="light"] .tiles h3{color:#101a30}
+:root[data-theme="light"] .tiles span{color:#44506e}
+:root[data-theme="light"] #ft{background:#eef2fb;color:#44506e;border-top:1px solid #dbe1ee}
+:root[data-theme="light"] #ft h3{color:#101a30}
+:root[data-theme="light"] #ft a{color:#33509b}
+:root[data-theme="light"] #ft a:hover{color:#0b1734}
+:root[data-theme="light"] #ft .bar{border-top:1px solid #dbe1ee;color:#5b6a8c}
+:root[data-theme="light"] .top .b{background:rgba(255,255,255,.85);border-color:#a8b4d0;color:#1a2338}
+:root[data-theme="light"] .top .b:hover{background:#fff;border-color:#0b3d91}
+:root[data-theme="light"] .top input,:root[data-theme="light"] .top select{background:#fff;color:#1a2338;border-color:#a8b4d0}
+:root[data-theme="light"] .top input::placeholder{color:#8b98b8}
+:root[data-theme="light"] .top .tl{color:#5b6a8c}
+:root[data-theme="light"] .coords{background:#eef2fb;border-bottom:1px solid #dbe1ee;color:#5b6a8c}
+:root[data-theme="light"] .coords b{color:#1a2338}
+:root[data-theme="light"] .coords input{background:#fff;color:#1a2338;border-color:#c4cde2}
+:root[data-theme="light"] .tabs{background:#eef2fb;border-bottom:1px solid #dbe1ee}
+:root[data-theme="light"] .tabs button{color:#5b6a8c}
+:root[data-theme="light"] .tabs button:hover{color:#0b1734}
+:root[data-theme="light"] .tabs button.on{color:#0b1734}
+:root[data-theme="light"] .hud{color:#44506e;background:rgba(255,255,255,.88);border-color:rgba(20,32,61,.28)}
+:root[data-theme="light"] .zoom button{background:rgba(255,255,255,.92);border-color:rgba(20,32,61,.32);color:#1a2338}
+:root[data-theme="light"] .zoom button:hover{background:#fff}
+:root[data-theme="light"] .chips button{background:rgba(255,255,255,.92);border-color:rgba(20,32,61,.32);color:#1a2338}
+:root[data-theme="light"] .chips button:hover{background:#fff}
+:root[data-theme="light"] #pop{background:rgba(255,255,255,.97);border-left-color:#c4cde2;box-shadow:-14px 0 40px rgba(16,24,40,.18);color:#1a2338}
+:root[data-theme="light"] #pop h3{color:#101a30}
+:root[data-theme="light"] #pop dl dt{color:#5b6a8c}
+:root[data-theme="light"] #pop .x{color:#5b6a8c}
+:root[data-theme="light"] #pop .b{background:#f3f5fb;border-color:#c4cde2;color:#1a2338}
+:root[data-theme="light"] #pop .st div{background:rgba(11,61,145,.05);border-color:#dbe1ee}
+:root[data-theme="light"] #pop small{color:#5b6a8c}
+:root[data-theme="light"] #pop canvas{background:#05070f}
+:root[data-theme="light"] .mfm{background:#fff;border-color:#c4cde2;box-shadow:0 12px 40px rgba(16,24,40,.25)}
+:root[data-theme="light"] .mfm .b{color:#1a2338}
+:root[data-theme="light"] .mfm .b:hover{background:#f3f5fb}
+:root[data-theme="light"] .mfm .b.on{background:#eaf0fe;border-color:#0b3d91;color:#0b3d91}
+
+/* ---------- Side panel of the object card (map) ---------- */
+#pop{position:absolute;top:100px;right:0;bottom:0;width:min(370px,94%);background:rgba(8,13,26,.96);border:0;border-left:1px solid rgba(140,160,205,.3);padding:18px 18px 26px;overflow:auto;box-shadow:-14px 0 40px rgba(0,0,0,.5);animation:pin .22s ease}
+#stage:has(#pop:not(.hide)) .chips{right:min(382px,calc(94% + 12px))}
+#pop .ph{padding-right:26px;border-bottom:1px solid rgba(140,160,205,.25);padding-bottom:12px}
+#pop .ph h3{font-size:21px;color:#fff}
+#pop .st{margin-top:14px}
+#pop .pr2{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:6px 0;border-bottom:1px dashed rgba(140,160,205,.18);font-size:13.5px}
+#pop .pr2 span{color:#9db0d6}
+#pop .pr2 b{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--mono);font-weight:600;font-size:12.5px}
+#pop .sec2{font:600 10.5px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:#7fa6f0;margin:16px 0 4px}
+#pop canvas{width:100%;height:auto;display:block;background:#05070f;border:1px solid #2d3f70}
+#pop .src2{color:#7f8db0;font-size:11px;margin-top:6px}
+
+/* ---------- Collapsible grid for level 2 ---------- */
+.lvs{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:10px;align-items:start;margin-top:14px}
+#pn .lvs{max-width:1180px}
+#pn .lvs .lvc{margin:10px 0}
+.lvc{display:flex;flex-direction:column}
+.lvc .lvh{height:100%}
+.lvc .lvb{border-top:1px solid var(--line);margin-top:2px}
+.lvc.open{grid-column:1/-1}
+#pn .lvc canvas{max-width:760px}
+#pn .lvc .kc{background:var(--pan2)}
+#pn .lvc pre{max-width:760px}
+
+/* ---------- User guide (formal form) ---------- */
+#tut .box{max-width:600px}
+#tut .gkick{display:flex;align-items:center;gap:10px;font:600 11px var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--red);margin-bottom:10px}
+#tut .gkick:before{content:"";width:26px;height:1px;background:var(--red)}
+#tut .box h2{font-size:21px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+#tut .box p{font-size:14.5px;line-height:1.65}
+#tut .dots{margin:18px 0 6px}
+
+/* ---------- Layout adjustments ---------- */
+/* NASA images, with the illustration kept as fallback */
+.lvi{position:relative}
+.pimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#05070f}
+.nf{margin:12px 0;background:#000;border:1px solid var(--line2);border-top:3px solid var(--red)}
+.nfb{position:relative;height:240px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(circle at 50% 40%,#0b1a45,#000 72%)}
+.nfb svg{max-height:100%}
+.nf figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 12px;padding:8px 12px;background:var(--pan2);font-size:12.5px;color:var(--mut)}
+.nf figcaption b{color:var(--txt);font-size:13.5px;font-weight:600}
+.nf.nq{max-width:560px}.nf.nq .nfb{height:230px}
+.ng{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:8px 0 18px}
+.ng .nf{margin:0;display:flex;flex-direction:column}.ng .nfb{height:150px}.ng .nf figcaption{flex:1;flex-direction:column;align-items:flex-start}
+.lvb .nf{width:100%}.lvb .nfb{height:260px}
+/* Full-width blocks of the same thickness */
+#pn{padding:26px 40px 56px}#pn>*{max-width:none}#pn p,#pn li{max-width:110ch}
+.lvs{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));align-items:stretch}
+.lvc:not(.open){min-height:92px}.lvc:not(.open) .lvh{height:100%}.lvh{align-items:center}
+#pn .lvc canvas,#pn .lvc pre{max-width:none}
+.cd div,.fs div{min-height:84px}.rg{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}.rc{align-items:flex-start}
+.opts{align-items:stretch}.opt{display:flex;flex-direction:column;align-items:center}.opt .see{margin-top:auto;width:100%;text-align:left}
+/* ---------- Explorer header ---------- */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:10px 20px}
+.top .tbrand{display:flex;align-items:center;gap:14px;flex:none}
+.top .tbrand .home{border-color:transparent;padding:6px 10px}
+.top .tsearch{display:flex;flex:1 1 340px;max-width:620px;min-width:0}
+.top .tsearch input{flex:1 1 auto;min-width:0;border-right:0}
+.top .tsearch .b{flex:none;padding:6px 18px}
+.top .tmap{display:flex;align-items:center;gap:8px;flex:0 1 auto}.top .tmap:empty{display:none}
+.top .tutil{display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap}
+.top .lvlw{display:flex;align-items:center;gap:8px;margin:0}
+.top .lvlw span{font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--chmut)}
+:root[data-theme="light"] .top .lvlw span{color:#5b6a8c}
+.top .tutil .b{white-space:nowrap}.top .tutil #acb{border-color:var(--onbr)}
+.tabs{justify-content:flex-start;padding:0 20px;gap:4px}
+.tabs button{padding:12px 16px;font-size:13px;letter-spacing:.02em}
+.nav{gap:14px 28px;padding:13px 28px}
+.nav .nl{display:flex;align-items:center;gap:6px 22px;flex-wrap:wrap}
+.nav .nu{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.nav .nl a{padding:4px 0;border-bottom:2px solid transparent}.nav .nl a:hover{border-bottom-color:var(--red);text-decoration:none}
+.nav b{margin-right:6px}
+@media(max-width:820px){.top .tsearch{flex-basis:100%;max-width:none;order:3}.top .tutil{margin-left:0}}
+
+#hips{position:absolute;inset:0;z-index:0;pointer-events:none;background:#05070f;overflow:hidden;visibility:hidden}
+#hips,#hips *{pointer-events:none!important}
+#hips .aladin-logo-container,#hips .aladin-location,#hips .aladin-box,#hips .aladin-btn{display:none!important}
+#stage>canvas#sky{position:relative;z-index:1}
+#stage>.hud,#stage>.zoom,#stage>.chips,#stage>#pop{z-index:3}
+#stage>#pn{z-index:4}
+#stage.sec>#hips{visibility:hidden!important}
+
+/* Real data: interactive Aladin + FITS sequence (API) */
+#pn .cem-track-status{padding:10px 12px;background:var(--pan);border-left:3px solid var(--tq);margin:10px 0;font-size:13px}
+#pn .cem-track-status.error{border-left-color:var(--red);color:var(--red)}
+#pn .cem-track-layout{align-items:start;margin:14px 0}
+#pn .cem-track-image-wrap{background:#000;border:1px solid var(--line);padding:8px}
+#cemTrackCanvas{width:100%;height:auto;display:block;aspect-ratio:1/1;object-fit:contain;background:#02040a;border:0}
+#pn .cem-track-image-caption{font-size:12px;color:var(--mut);padding:7px 2px 0}
+#pn .cem-track-slider-label{display:block;margin:12px 0}
+#pn .cem-track-slider-label input,#pn #cemTrackBlend{width:100%}
+#pn #cemTrackModes{margin:8px 0}
+#pn #cemTrackDetector,#pn #cemTrackA,#pn #cemTrackB{width:100%;max-width:none;margin:5px 0 10px}
+#pn .cem-track-frames{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin:10px 0}
+#pn .cem-track-frames button{background:var(--pan);border:1px solid var(--line);padding:6px;text-align:left;color:var(--txt);min-width:0}
+#pn .cem-track-frames button.on{border-color:var(--tq);background:var(--pan2)}
+#pn .cem-track-frames img{width:100%;aspect-ratio:1/1;object-fit:contain;background:#000;display:block}
+#pn .cem-track-frames small{display:block;color:var(--mut);font-size:11px}
+#pn .cem-track-table-wrap{overflow-x:auto}
+#pn #cemTrackTable{width:100%;border-collapse:collapse;font-size:12px}
+#pn #cemTrackTable th,#pn #cemTrackTable td{padding:7px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+#pn .cem-live-intro{max-width:100ch;margin:0 0 14px}
+#pn .cem-live-controls{display:grid;grid-template-columns:repeat(5,minmax(115px,1fr));gap:10px;align-items:end;background:var(--pan);border:1px solid var(--line);padding:14px;margin:12px 0}
+#pn .cem-live-controls label{margin:0;font-size:12px;color:var(--mut)}
+#pn .cem-live-controls select,#pn .cem-live-controls input{width:100%;max-width:none;margin-top:5px;min-height:38px}
+#pn .cem-live-controls .b{min-height:38px}
+#cemAladin{width:100%;height:560px;min-height:390px;background:#030817;border:1px solid var(--line2);position:relative;overflow:hidden}
+#cemAladin canvas{border:0;background:transparent}
+#pn .cem-live-map-note{font-size:12px;margin:7px 0 12px}
+#pn #cemLiveStatus{padding:10px 12px;background:var(--pan);border-left:3px solid var(--tq);margin:10px 0;font-size:13px;max-width:none}
+#pn #cemLiveStatus.error{border-left-color:var(--red);color:var(--red)}
+#pn #cemLiveResults{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:8px;margin:10px 0}
+#pn #cemLiveResults button{background:var(--pan);color:var(--txt);border:1px solid var(--line2);padding:10px;text-align:left;font-size:12px;cursor:pointer;min-width:0;overflow-wrap:anywhere}
+#pn #cemLiveResults button:hover{border-color:var(--tq)}
+#pn #cemLiveResults button:disabled{opacity:.55;cursor:wait}
+#pn .cem-live-foot{font-size:12px;max-width:100ch}
+@media(max-width:900px){#pn .cem-live-controls{grid-template-columns:repeat(2,minmax(0,1fr))}#cemAladin{height:480px}}
+@media(max-width:700px){#pn .cem-track-layout{grid-template-columns:1fr}}
+@media(max-width:560px){#pn .cem-live-controls{grid-template-columns:1fr 1fr;padding:10px}#cemAladin{height:420px;min-height:350px}}
+
+</style>
+</head>
+<body>
+<main id="landing">
+ <nav class="nav"><svg class="moe" viewBox="0 0 1060 300" role="img" aria-label="Made On Earth logo"><g fill="currentColor" font-family="Segoe UI,system-ui,sans-serif" font-weight="300"><text x="14" y="128" font-size="146" letter-spacing="4">MADE</text><text x="14" y="276" font-size="146" letter-spacing="4">EARTH</text><text x="884" y="278" font-size="296" font-weight="250">N</text></g><circle cx="540" cy="150" r="128" fill="none" stroke="currentColor" stroke-width="26"/><clipPath id="moeG"><circle cx="540" cy="150" r="115"/></clipPath><g clip-path="url(#moeG)"><rect x="425" y="35" width="230" height="230" fill="#2f7dd1"/><path d="M440 78 q28 -22 58 -12 q20 7 12 26 q-9 22 -36 18 q-14 16 -36 11 q-28 -7 -2 -43z" fill="#4caf50"/><path d="M472 138 q24 -3 28 15 q6 28 -9 54 q-11 19 -24 9 q-13 -13 -9 -43 q3 -25 14 -35z" fill="#4caf50"/><path d="M566 48 q38 -11 62 6 q19 13 6 27 q-17 17 -46 11 q-27 -4 -31 -19 q-2 -17 9 -25z" fill="#4caf50"/><path d="M566 108 q31 -6 45 13 q13 19 2 42 q-11 25 -31 27 q-21 0 -27 -23 q-6 -36 11 -59z" fill="#d2b48c"/></g></svg><b>Made On Earth Team</b><span class="nl"><a href="#" id="nv1">Explore data</a><a href="#" id="nv2">User guide</a><a href="https://www.spaceappschallenge.org/2026/challenges/planet-x-and-spherex/" target="_blank" rel="noopener">NASA Space Apps 2026 · SPHEREx Mission</a><a href="https://spherex.caltech.edu/" target="_blank" rel="noopener">SPHEREx Mission · NASA/JPL-Caltech</a><a href="https://irsa.ipac.caltech.edu/applications/spherex/" target="_blank" rel="noopener">Archive at IRSA</a></span><span class="sp"></span><span class="nu"><a href="#" id="tthm">Light theme</a><a href="#" id="nvu" class="acct">Create account · Sign in</a></span></nav>
+ <section class="sky-hero">
+  <svg class="con" viewBox="0 0 520 360" aria-hidden="true">
+   <ellipse class="ring orb" cx="300" cy="190" rx="210" ry="70" transform="rotate(-18 300 190)"/>
+   <ellipse class="ring" cx="300" cy="190" rx="130" ry="44" transform="rotate(-18 300 190)" stroke-dasharray="2 5"/>
+   <polyline class="ln" points="40,260 110,200 190,215 260,140 360,120 440,60"/>
+   <polyline class="ln" points="260,140 300,230 380,270"/>
+   <circle class="st tw" cx="40" cy="260" r="2.2"/>
+   <circle class="st tw tw2" cx="110" cy="200" r="3"/>
+   <circle class="st tw tw3" cx="190" cy="215" r="2"/>
+   <circle class="st tw" cx="260" cy="140" r="3.6"/>
+   <circle class="st tw tw2" cx="360" cy="120" r="2.4"/>
+   <circle class="st tw tw3" cx="440" cy="60" r="3"/>
+   <circle class="st tw tw2" cx="300" cy="230" r="2.2"/>
+   <circle class="st tw" cx="380" cy="270" r="2.8"/>
+   <circle cx="260" cy="140" r="9" fill="none" stroke="#fc3d21" stroke-width="1"/>
+   <circle cx="470" cy="190" r="4" fill="#f97316"/>
+   <text class="lb" x="274" y="132">WISE 0855</text>
+   <text class="lb" x="392" y="276">ε INDI B</text>
+   <text class="lb" x="452" y="54">VEGA</text>
+  </svg>
+  <div class="in">
+   <h1>Made on Earth for all humanity</h1>
+   <p>Exploration platform for the SPHEREx mission spectral archive: locate sources, examine their apparent motion, and analyze their composition across 102 infrared bands (0.75–5 µm).</p>
+   <div class="cta"><button class="red" id="start">Explore the data</button><button id="lt">User guide</button></div>
+  </div>
+  <div class="earth"></div>
+ </section>
+ <section class="tiles"><div><h3>Explore the sky</h3><span>Interactive map with four celestial-sphere projections.</span></div><div><h3>Detect motion</h3><span>Date-to-date comparison and proper-motion measurement.</span></div><div><h3>Analyze composition</h3><span>Spectra in 102 bands (0.75–5 µm) with quality flags.</span></div></section>
+</main>
+<main id="levels" class="hide">
+ <div class="in">
+  <div class="lrow"><button class="b" id="back">← Back</button><button class="b" id="acl">Create account · Sign in</button></div>
+  <div class="kick lvk">Mode selection</div>
+  <h2>How do you want to explore?</h2>
+  <p class="sub">Each mode enables a different set of tools. Choose one to enter; you can change it anytime from the header.</p>
+  <div class="opts" role="group" aria-label="Exploration mode">
+   <button class="opt" data-n="1" aria-pressed="false" style="--c:#2dd4bf"><span class="ck">✓</span><div class="em"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M24 4l4.6 15.4L44 24l-15.4 4.6L24 44l-4.6-15.4L4 24l15.4-4.6z"/><circle cx="24" cy="24" r="3" fill="currentColor" stroke="none"/></svg></div><h3>Beginner</h3><div class="who">Guided exploration</div><div class="see">Guided experience: interactive globe with facts about each object, animated viewer of celestial-body motion, Solar System and mission lessons with NASA-illustrated trivia, and an option to share the view.</div></button>
+   <button class="opt" data-n="2" aria-pressed="false" style="--c:#60a5fa"><span class="ck">✓</span><div class="em"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><ellipse cx="24" cy="24" rx="20" ry="9" transform="rotate(-25 24 24)"/><circle cx="24" cy="24" r="5" fill="currentColor" stroke="none"/><circle cx="40" cy="16" r="2.8" fill="currentColor" stroke="none"/></svg></div><h3>Standard</h3><div class="who">Exploration with practice</div><div class="see">Practice experience: map with the four projections and coordinate search, patch viewer with comparison modes, motion-detection challenges, date comparison, and exercises with mission data.</div></button>
+   <button class="opt" data-n="3" aria-pressed="false" style="--c:#a78bfa"><span class="ck">✓</span><div class="em"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><polyline points="6,36 16,22 28,28 34,12 43,18"/><circle cx="6" cy="36" r="3" fill="currentColor" stroke="none"/><circle cx="16" cy="22" r="3" fill="currentColor" stroke="none"/><circle cx="28" cy="28" r="3" fill="currentColor" stroke="none"/><circle cx="34" cy="12" r="3.6" fill="currentColor" stroke="none"/><circle cx="43" cy="18" r="3" fill="currentColor" stroke="none"/></svg></div><h3>Professional</h3><div class="who">Full analysis</div><div class="see">Analysis experience: map without preset objects, object card with parameters and spectrum, advanced viewer and comparison, quality-controlled bands, spectra, charts, image log, alerts, and export.</div></button>
+  </div>
+  <div class="foot"><span class="hint" id="hint">Tap an option to continue.</span><button id="enter" disabled>Enter the map</button></div>
+  <p class="cr">SPHEREx is a Jet Propulsion Laboratory (JPL-Caltech) project for NASA’s Science Mission Directorate.</p>
+ </div>
+</main>
+
+<div id="app" class="hide">
+ <div class="top">
+   <div class="tbrand"><button class="b home" id="home" title="Back to the home page (H key)">← Home</button><svg class="moe mini" viewBox="0 0 1060 300" role="img" aria-label="Made On Earth Team"><g fill="currentColor" font-family="Segoe UI,system-ui,sans-serif" font-weight="300"><text x="14" y="128" font-size="146" letter-spacing="4">MADE</text><text x="14" y="276" font-size="146" letter-spacing="4">EARTH</text><text x="884" y="278" font-size="296" font-weight="250">N</text></g><circle cx="540" cy="150" r="128" fill="none" stroke="currentColor" stroke-width="26"/><clipPath id="moeG2"><circle cx="540" cy="150" r="115"/></clipPath><g clip-path="url(#moeG2)"><rect x="425" y="35" width="230" height="230" fill="#2f7dd1"/><path d="M440 78 q28 -22 58 -12 q20 7 12 26 q-9 22 -36 18 q-14 16 -36 11 q-28 -7 -2 -43z" fill="#4caf50"/><path d="M472 138 q24 -3 28 15 q6 28 -9 54 q-11 19 -24 9 q-13 -13 -9 -43 q3 -25 14 -35z" fill="#4caf50"/><path d="M566 48 q38 -11 62 6 q19 13 6 27 q-17 17 -46 11 q-27 -4 -31 -19 q-2 -17 9 -25z" fill="#4caf50"/><path d="M566 108 q31 -6 45 13 q13 19 2 42 q-11 25 -31 27 q-21 0 -27 -23 q-6 -36 11 -59z" fill="#d2b48c"/></g></svg></div>
+   <div class="tsearch" role="search"><input id="q" type="search" placeholder="Search: WISE 0855, 133.795 -7.245 or 08h55m10.8s -07d14m42.5s" aria-label="Search for an object or coordinates"><button class="b tq" id="go">Search</button></div>
+   <div class="tmap"><span class="seg" id="vseg"><span class="mapfmt"><button class="b" id="mf" aria-haspopup="true" aria-expanded="false">Map format: <b id="mfl">Globe</b> ▾</button><div class="mfm hide" id="mfm" role="group" aria-label="Map format"><div class="sep">View</div><button class="b on" id="vp">Globe</button><button class="b" id="vm">Flat map</button><button class="b" id="vo">Fisheye</button><button class="b" id="vn" title="The whole sky in an oval">Planisphere</button><div class="sep">Layer</div><button class="b" id="vg" aria-pressed="false" title="Infrared-brightness heat map">Heat map</button><div class="sep">Background image (CDS Aladin)</div><button class="b on" data-bg="P/DSS2/color">Optical (DSS)</button><button class="b" data-bg="P/2MASS/color">Infrared (2MASS)</button><button class="b" data-bg="P/allWISE/color">Infrared (WISE)</button><button class="b" data-bg="">No image</button></div></span></span><span class="seg" id="tools"></span></div>
+   <div class="tutil"><label class="lvlw"><span>Mode</span><select id="lvl" aria-label="Usage mode"><option value="1">Beginner</option><option value="2">Standard</option><option value="3">Professional</option></select></label><button class="b" id="help" aria-label="User guide">User guide</button><button class="b" id="thm" title="Switch between dark and light theme">Light theme</button><button class="b" id="acb">Sign in</button></div>
+ </div>
+<div class="coords"><b>Coordinates</b>RA <input id="ra" placeholder="133.795 or 08h55m10.8s" aria-label="RA"> Dec <input id="de" placeholder="-7.245 or -07d14m42.5s" aria-label="Dec"><button class="b tq" id="cg">Go to RA/Dec</button><span id="cm" class="mut"></span><span class="n1 mut">RA runs from 0° to 360° and Dec from −90° to +90°.</span></div>
+ <nav class="tabs" id="tabs" aria-label="Sections"></nav>
+ <div id="stage">
+  <div id="hips" aria-hidden="true"></div>
+  <canvas id="sky" aria-label="Sky map"></canvas>
+  <div class="hud" id="hud"></div>
+  <div class="zoom"><button id="zi" aria-label="Zoom in">+</button><button id="zo" aria-label="Zoom out">−</button></div>
+  <div class="chips" id="chips"></div>
+  <div id="pop" class="hide"></div>
+  <div id="pn" class="hide"></div>
+ </div>
+</div>
+
+<div id="rep" class="hide" aria-label="Report"></div>
+<div id="tut" class="modal hide"><div class="box guide" role="dialog" aria-modal="true" aria-labelledby="th"><span class="gkick">User guide</span><h2 id="th"></h2><p id="tp"></p><div class="dots" id="td"></div><div class="row"><button class="b" id="tb">Back</button><button class="b" id="tsk">Do not show again</button><button class="b tq" id="tn">Next</button></div></div></div>
+<div id="acc" class="modal hide"><div class="box" role="dialog" aria-modal="true" aria-labelledby="ah"><h2 id="ah"></h2><div id="ab2"></div><div class="row"><span></span><button class="b" id="ax">Close</button></div></div></div>
+<div id="vm2" class="modal hide"><div class="box"><h2 id="vt"></h2><canvas id="vis" width="320" height="240"></canvas><p id="vi" style="margin:10px 0 0"></p><div class="row"><span class="tag">Demonstration with simulated data</span><button class="b tq" id="vc">Close</button></div></div></div>
+
+<footer id="ft">
+  <div class="ftin">
+    <div>
+      <h3>Made On Earth Team</h3>
+      <p>Exploration platform for the SPHEREx mission spectral archive, built for the NASA Space Apps Challenge 2026. Spectral data shown in this demonstration are simulated for illustration.</p>
+    </div>
+    <div>
+      <h3>Resources</h3>
+      <a href="https://spherex.caltech.edu/" target="_blank" rel="noopener">SPHEREx Mission · Caltech</a>
+      <a href="https://irsa.ipac.caltech.edu/applications/spherex/" target="_blank" rel="noopener">SPHEREx Data Explorer · IRSA</a>
+      <a href="https://www.spaceappschallenge.org/" target="_blank" rel="noopener">NASA Space Apps Challenge</a>
+    </div>
+    <div>
+      <h3>About</h3>
+      <p>SPHEREx is managed by the Jet Propulsion Laboratory (JPL-Caltech) for NASA’s Science Mission Directorate.</p>
+    </div>
+  </div>
+  <div class="bar"><span>© 2026 · Made On Earth Team</span><span>NASA Space Apps Challenge 2026</span></div>
+</footer>
+
+<script>
+const $=s=>document.querySelector(s),D=Math.PI/180;
+/* ---------- Accounts (stored only in this browser) ---------- */
+const MEM={},LS={g:k=>{try{const v=localStorage.getItem(k);if(v!==null)return v}catch(e){}return MEM[k]??null},s:(k,v)=>{MEM[k]=v;try{localStorage.setItem(k,v)}catch(e){}},r:k=>{delete MEM[k];try{localStorage.removeItem(k)}catch(e){}}};
+const US=()=>{try{return JSON.parse(LS.g("cem_users")||"{}")}catch(e){return {}}},saveUS=u=>LS.s("cem_users",JSON.stringify(u));
+let ME=LS.g("cem_session")||"";
+const usr=()=>ME?US()[ME]||null:null;
+function uu(f){if(!ME)return;const u=US();if(!u[ME])return;f(u[ME]);saveUS(u)}
+async function hp(s){try{const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode("cem:"+s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}catch(e){let h=5381;for(const ch of "cem:"+s)h=(h*33^ch.charCodeAt(0))>>>0;return "x"+h}}
+const skipT=()=>ME?!!(usr()||{}).skip:LS.g("cem_skip")=="1",setSkip=v=>ME?uu(u=>{u.skip=v}):LS.s("cem_skip",v?"1":"0");
+const O=[
+{n:"Barnard’s Star",t:"Red dwarf star",ra:269.452,dec:4.693,mv:1,pm:"10.4″/yr",d:"≈ 6 light-years",f:"It is the star that moves fastest across the sky as seen from Earth.",cat:"SPHEREx, WISE, 2MASS"},
+{n:"ε Indi B",t:"Brown dwarf",ra:330.84,dec:-56.79,mv:1,pm:"≈ 4.7″/yr",d:"≈ 12 light-years",f:"A brown dwarf is larger than a planet but not massive enough to be a star.",cat:"SPHEREx, WISE"},
+{n:"WISE 0855",t:"Brown dwarf · very fast",ra:133.795,dec:-7.245,mv:1,pm:"≈ 8.1″/yr",d:"≈ 7 light-years",f:"It is one of the coldest known objects: almost as cold as a refrigerator.",cat:"SPHEREx, WISE"},
+{n:"RW Aur",t:"Young variable star",ra:76.96,dec:30.4,mv:0,pm:"small",d:"≈ 450 light-years",f:"Its brightness changes when surrounding dust passes in front of it.",cat:"SPHEREx, 2MASS"},
+{n:"R Dra",t:"Red variable star",ra:248.18,dec:66.76,mv:0,pm:"small",d:"—",f:"It pulsates: it grows brighter and fainter over months.",cat:"2MASS"}];
+const B=[["Sirius",101.287,-16.716],["Canopus",95.988,-52.696],["Arcturus",213.915,19.182],["Vega",279.234,38.784],["Capella",79.172,45.998],["Rigel",78.634,-8.202],["Betelgeuse",88.793,7.407],["Procyon",114.825,5.225],["Altair",297.696,8.868],["Aldebaran",68.98,16.509],["Antares",247.352,-26.432],["Spica",201.298,-11.161],["Deneb",310.358,45.28],["Polaris",37.954,89.264],["Fomalhaut",344.413,-29.622],["Pollux",116.329,28.026],["Regulus",152.093,11.967],["Achernar",24.429,-57.237],["Alpha Centauri",219.9,-60.834]];
+const ST={
+"Sirius":["White star · the brightest in the night sky","8.6 light-years",["It is the brightest star in the entire night sky.","It has a tiny companion: a white dwarf.","The ancient Egyptians used it to know when the Nile would rise."]],
+"Betelgeuse":["Red supergiant","≈ 550 light-years",["If it replaced the Sun, it would extend beyond Mars.","Someday it will explode as a supernova.","Its brightness rises and falls: it is a variable star."]],
+"Vega":["Blue-white star","25 light-years",["About 12,000 years ago it was the pole star, and it will be again.","It spins so fast that it is flattened."]],
+"Polaris":["Pole star","≈ 430 light-years",["It barely moves in the sky: it points north.","It pulses: it grows and shrinks every few days."]],
+"Arcturus":["Orange giant","37 light-years",["It is the brightest star in the northern sky.","It travels very fast through the galaxy."]],
+"Alpha Centauri":["Star system","4.4 light-years",["It is the nearest star system to the Sun.","Its light takes more than 4 years to reach us."]],
+"Rigel":["Blue supergiant","≈ 860 light-years",["It shines like tens of thousands of Suns."]],
+"Antares":["Red supergiant","≈ 550 light-years",["Its name means “rival of Mars” because of its reddish color."]],
+"Canopus":["White supergiant","≈ 310 light-years",["It is the second-brightest star in the night sky."]],
+"Barnard’s Star":[0,0,["It moves about 10″ per year: in 180 years it covers the width of the full Moon.","It is a red dwarf so faint it cannot be seen with the naked eye.","It is approaching us: in about 8000 years it will be even closer."]],
+"ε Indi B":[0,0,["They are actually two brown dwarfs orbiting each other.","They orbit the star ε Indi A, which has a giant planet photographed by NASA’s James Webb Space Telescope.","SPHEREx cannot separate the pair: they appear as a single point."]],
+"WISE 0855":[0,0,["It is about −20 °C: almost as cold as a freezer.","It was discovered with NASA’s WISE telescope and is among the coldest objects outside the Solar System.","Its parallax is huge: it is the ideal example for measuring distances!"]],
+"RW Aur":[0,0,["It is a young star with a disk of dust and gas around it.","Its brightness drops when a dust cloud passes in front of it."]],
+"R Dra":[0,0,["It is a Mira-type pulsating red star.","It takes about 245 days to complete a brightness cycle."]]};
+const BS=B.map(s=>{const e=ST[s[0]]||[];return {n:s[0],ra:s[1],dec:s[2],t:e[0]||"Bright star",d:e[1]||"",fs:e[2]}});
+O.forEach(o=>o.fs=ST[o.n][2]);
+const FA=o=>o.fs&&o.fs.length?o.fs:["Many cultures used bright stars to navigate and mark the seasons.","Stars look still, but they move; it would take thousands of years to notice with the naked eye."];
+let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const BG=Array.from({length:700},()=>[rnd()*360,Math.asin(rnd()*2-1)/D,rnd()*1.1+.3]);
+const S={v:"p",cx:133.795,cy:-7.245,z:1,sel:null,lv:1,pop:null,bg:0,bgs:"P/DSS2/color"};
+let HPE=0,HPA=null,HPL="",HPK="",HPT=0;const HPP={p:"SIN",f:"MER",o:"STG",m:"MOL"};
+const HIPU={"P/DSS2/color":"https://irsa.ipac.caltech.edu/data/hips/CDS/DSS2/color","P/2MASS/color":"https://irsa.ipac.caltech.edu/data/hips/CDS/2MASS/Color","P/allWISE/color":"https://irsa.ipac.caltech.edu/data/hips/CDS/AllWISE/RGB-W4-W2-W1"};
+const hipsId=id=>id?HIPU[id]||id:"";
+const HPU=["https://cdn.jsdelivr.net/npm/aladin-lite@3/dist/aladin.js","https://unpkg.com/aladin-lite@3/dist/aladin.js"];
+let hipsBooting=0;
+function hipsBoot(){if(HPA||hipsBooting||!(window.A&&A.aladin))return;hipsBooting=1;try{A.init.then(()=>{if(!$("#hips")){hipsBooting=0;return}HPA=A.aladin("#hips",{survey:hipsId(S.bgs)||HIPU["P/DSS2/color"],projection:HPP[S.v],fov:60,target:"0 0",cooFrame:"ICRS",showReticle:false,showZoomControl:false,showFullscreenControl:false,showLayersControl:false,showGotoControl:false,showShareControl:false,showCatalog:false,showFrame:false,showCooGridControl:false,showSimbadPointerControl:false,showProjectionControl:false,showStatusBar:false,showContextMenu:false});HPL=hipsId(S.bgs)||HIPU["P/DSS2/color"];HPK="";draw()}).catch(()=>{HPA=null;HPE=1;hipsBooting=0;draw()})}catch(e){HPA=null;HPE=1;hipsBooting=0;draw()}}
+function hipsLoad(){if(window.A&&window.A.aladin){hipsBoot();return}if(!window.__cemAladin){window.__cemAladin=(async()=>{let last;for(const url of HPU){try{const m=await import(url);window.A=m.default||m;return window.A}catch(e){last=e}}throw last})()}window.__cemAladin.then(()=>hipsBoot()).catch(()=>{HPA=null;HPE=1;draw()})}
+let HPQ="",HPRA=1e9,HPDE=1e9;
+function hipsFov(){const z=Math.max(S.z,.6);if(S.v=="m")return Math.max(12,Math.min(360,360/z));if(S.v=="f")return Math.max(6,Math.min(150,150/z));if(S.v=="o")return Math.max(6,Math.min(130,130/z));return Math.max(4,Math.min(170,W*dpp()))}
+function hipsSync(){const el=$("#hips");if(!el)return;if(!HPA||!S.bgs||!W){el.style.visibility="hidden";el.style.transform="";S.bg=0;return}
+ el.style.visibility="visible";el.style.transform="";S.bg=1;
+ try{if(HPA.view&&Math.abs(HPA.view.width-el.clientWidth)>2)HPA.view.fixLayoutDimensions();
+  if(HPK!=S.v){HPA.setProjection(HPP[S.v]);HPK=S.v;HPQ=""}
+  const sid=hipsId(S.bgs);if(sid&&HPL!=sid){HPA.setImageSurvey(sid);HPL=sid}
+  const fov=hipsFov(),ky=S.v+"|"+fov.toFixed(3)+"|"+Math.round(W)+"|"+Math.round(H);
+  if(ky!=HPQ){HPQ=ky;HPA.setFoV(fov)}
+  const ra=(S.cx+360)%360,dec=Math.max(-89,Math.min(89,S.cy));
+  if(Math.abs(ra-HPRA)>1e-4||Math.abs(dec-HPDE)>1e-4){HPRA=ra;HPDE=dec;HPA.gotoRaDec(ra,dec)}
+  const R=S.v=="p"?Math.min(W,H)*.42*S.z:S.v=="o"?Math.min(W,H)*.45*S.z:0;
+  el.style.clipPath=R?"circle("+R+"px at 50% 50%)":"none"}catch(e){}}
+function aladinPix(ra,dec){if(!HPA||!S.bgs)return null;let q;try{q=HPA.world2pix((ra%360+360)%360,dec)}catch(e){return null}if(!q||!isFinite(q[0])||!isFinite(q[1])||Math.abs(q[0])>W*5||Math.abs(q[1])>H*5)return null;return q}
+const cv=$("#sky"),c=cv.getContext("2d");let W=0,H=0;
+function size(){const r=cv.getBoundingClientRect(),k=devicePixelRatio||1;if(!r.width)return;if(!HPT){HPT=1;hipsLoad()}W=r.width;H=r.height;cv.width=W*k;cv.height=H*k;c.setTransform(k,0,0,k,0,0);draw()}
+const wrap=a=>((a+540)%360)-180;
+function mxy(l,b){const p=b*D;let t=p;for(let i=0;i<10;i++){const f=2*t+Math.sin(2*t)-Math.PI*Math.sin(p),g=2+2*Math.cos(2*t);if(Math.abs(g)<1e-6)break;t-=f/g}return [2*Math.SQRT2/Math.PI*l*D*Math.cos(t),Math.SQRT2*Math.sin(t)]}
+const fk=()=>Math.min(W/360,H/180)*S.z*.94;const mk=()=>Math.min(W/(4*Math.SQRT2*1.08),H/(2*Math.SQRT2*1.08))*S.z;
+function proj(ra,dec){
+ if(HPA&&S.bgs){const q=aladinPix(ra,dec);if(!q)return null;if(S.v=="p"||S.v=="o"){const R=S.v=="p"?Math.min(W,H)*.42*S.z:Math.min(W,H)*.45*S.z;if(Math.hypot(q[0]-W/2,q[1]-H/2)>R+1)return null}return [q[0],q[1],1]}
+ if(S.v=="m"){const k=mk(),a=mxy(wrap(ra-S.cx),dec),b=mxy(0,S.cy);return [W/2-a[0]*k,H/2-(a[1]-b[1])*k,1]}
+ if(S.v=="f"){const k=fk();return [W/2-wrap(ra-S.cx)*k,H/2-(dec-S.cy)*k,1]}
+ const m=Math.min(W,H),a=wrap(ra-S.cx)*D,d=dec*D,p=S.cy*D,cc=Math.sin(p)*Math.sin(d)+Math.cos(p)*Math.cos(d)*Math.cos(a),xo=Math.cos(d)*Math.sin(a),yo=Math.cos(p)*Math.sin(d)-Math.sin(p)*Math.cos(d)*Math.cos(a);
+ if(S.v=="o"){const R=m*.45*S.z,th=Math.acos(Math.max(-1,Math.min(1,cc))),sn=Math.hypot(xo,yo)||1,r=th*R/2.356;if(r>R)return null;return [W/2-r*xo/sn,H/2-r*yo/sn,1]}
+ if(cc<0)return null;const R=m*.42*S.z;return [W/2-R*xo,H/2-R*yo,cc]}
+const dpp=()=>S.v=="f"?1/fk():S.v=="m"?57/mk():S.v=="o"?57.3/(Math.min(W,H)*.45*S.z/2.356):57.3/(Math.min(W,H)*.42*S.z);
+function draw(){
+ c.clearRect(0,0,W,H);hipsSync();
+ if(S.v=="p"){const R=Math.min(W,H)*.42*S.z,g=c.createRadialGradient(W/2,H/2,R*.2,W/2,H/2,R);g.addColorStop(0,"rgba(14,22,52,.5)");g.addColorStop(1,"rgba(4,7,20,.55)");if(!S.bg){c.fillStyle=g;c.beginPath();c.arc(W/2,H/2,R,0,7);c.fill()}c.strokeStyle="#0b3d91";c.lineWidth=3;if(S.bg){c.shadowColor="#4aa3ff";c.shadowBlur=22}c.stroke();c.shadowBlur=0}
+ if(S.v=="m"){c.fillStyle="rgba(6,12,30,.5)";c.strokeStyle="#2f5fc4";c.lineWidth=3;c.beginPath();let m=0;const edge=(lon,t0,t1,st)=>{for(let t=t0;(st>0?t<=t1:t>=t1);t+=st){const q=proj((S.cx+lon+360)%360,t);if(!q){m=0;continue}m?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]);m=1}};edge(180,-90,90,3);edge(-180,90,-90,-3);c.closePath();if(!S.bg)c.fill();c.stroke()}
+ if(S.v=="o"){const R=Math.min(W,H)*.45*S.z;if(!S.bg){c.fillStyle="rgba(6,12,30,.5)";c.beginPath();c.arc(W/2,H/2,R,0,7);c.fill()}c.strokeStyle="#0b3d91";c.lineWidth=3;c.stroke()}
+ if(S.v=="f"){const k=fk(),x0=W/2-180*k,y0=H/2-(90-S.cy)*k;c.strokeStyle="#2f5fc4";c.lineWidth=3;if(!S.bg){c.fillStyle="rgba(8,20,58,.55)";c.fillRect(x0,y0,360*k,180*k);c.strokeRect(x0,y0,360*k,180*k)}else c.strokeRect(8,8,W-16,H-16)}
+ c.strokeStyle="rgba(91,134,224,.22)";c.lineWidth=1;
+ for(let r=0;r<360;r+=30){c.beginPath();let m=0;for(let d=-90;d<=90;d+=3){const p=proj(r,d);if(p&&(S.v=="p"||S.v=="o"||Math.abs(wrap(r-S.cx))<179)){m?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]);m=1}}c.stroke()}
+ for(let d=-60;d<=60;d+=30){c.beginPath();let m=0,px=0;for(let r=0;r<=360;r+=3){const p=proj(r,d);if(p&&(!m||Math.abs(p[0]-px)<W/2)){m?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]);m=1;px=p[0]}else m=0}c.stroke()}
+ if(S.fg){const cs=S.z>6?2:S.z>2.5?3:6;c.globalAlpha=.6;for(let a=0;a<360;a+=cs)for(let b=-90;b<90;b+=cs){const q=[[a,b],[a+cs,b],[a+cs,b+cs],[a,b+cs]].map(t=>proj(t[0],t[1]));if(q.some(t=>!t)||((S.v=="f"||S.v=="m")&&Math.abs(q[0][0]-q[1][0])>W/2))continue;c.fillStyle=hc(hv(a+cs/2,b+cs/2));c.beginPath();q.forEach((t,i)=>i?c.lineTo(t[0],t[1]):c.moveTo(t[0],t[1]));c.fill()}c.globalAlpha=1}
+ if(!S.bg)BG.forEach(s=>{const p=proj(s[0],s[1]);if(p){c.fillStyle="rgba(220,230,255,"+(.35+s[2]*.3)+")";c.fillRect(p[0],p[1],s[2],s[2])}});
+ c.font="12px Trebuchet MS,sans-serif";
+ if(S.lv<3)B.forEach(s=>{const p=proj(s[1],s[2]);if(!p)return;c.fillStyle="#fff";c.beginPath();c.arc(p[0],p[1],2.6,0,7);c.fill();if(S.z>.9){c.fillStyle="#9fb0d6";c.fillText(s[0],p[0]+7,p[1]+4)}});
+ if(S.lv<3)O.forEach(o=>{const p=proj(o.ra,o.dec);if(!p)return;c.strokeStyle=o.mv?"#f97316":"#2dd4bf";c.lineWidth=2.5;c.beginPath();c.arc(p[0],p[1],9,0,7);c.stroke();c.fillStyle="#fff";c.fillText(o.n,p[0]+13,p[1]+4)});
+ if(S.sel){const p=proj(S.sel.ra,S.sel.dec);if(p){c.strokeStyle="#ffffff";c.lineWidth=2;c.beginPath();c.moveTo(p[0]-18,p[1]);c.lineTo(p[0]-8,p[1]);c.moveTo(p[0]+8,p[1]);c.lineTo(p[0]+18,p[1]);c.moveTo(p[0],p[1]-18);c.lineTo(p[0],p[1]-8);c.moveTo(p[0],p[1]+8);c.lineTo(p[0],p[1]+18);c.stroke()}}
+ $("#hud").textContent=(S.lv>=3?"Center RA "+((S.cx+360)%360).toFixed(2)+"° · Dec "+S.cy.toFixed(2)+"° · ":"")+"Zoom ×"+S.z.toFixed(1)+(S.fg?" · Heat map: blue = faint, red = bright":"")+(S.bg?" · Fondo: CDS Aladin / HiPS":S.bgs?(HPE?" · Aladin did not load (offline or blocked)":" · Loading Aladin background…"):"")}
+const hms=ra=>{ra=(ra+360)%360/15;const h=Math.floor(ra),m=Math.floor((ra-h)*60);return h+"h "+m+"m "+(((ra-h)*60-m)*60).toFixed(1)+"s"};
+const dms=d=>{const s=d<0?"−":"+";d=Math.abs(d);const g=Math.floor(d),m=Math.floor((d-g)*60);return s+g+"° "+m+"′ "+(((d-g)*60-m)*60).toFixed(1)+"″"};
+function fly(ra,dec,z){const a=[S.cx,S.cy,S.z],t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/600),e=k*k*(3-2*k);S.cx=a[0]+wrap(ra-a[0])*e;S.cy=a[1]+(dec-a[1])*e;S.z=a[2]+(z-a[2])*e;draw();if(k<1)requestAnimationFrame(f)})(t0)}
+function show(o){S.sel=o;const L=S.lv,co=o.n=="Coordinates",fa=FA(o),i=(o.fi||0)%fa.length;o.fi=i;
+ if(ME&&o.n!="Coordinates"&&o.ra!=null)uu(u=>{u.hist=u.hist||[];if(!u.hist.some(x=>x.n==o.n))u.hist.unshift({n:o.n,t:o.t||"Bright star"});u.hist=u.hist.slice(0,8)});
+ const tl=(a,b)=>'<div><small>'+a+'</small><b>'+b+'</b></div>',row=(k,v)=>'<div class="pr2"><span>'+k+'</span><b>'+v+'</b></div>',mvT=o.mv?"It moves":o.mv==0?"Brightness changes":"Almost still";
+ let h='<button class="x" aria-label="Close" onclick="S.sel=null;$(\'#pop\').classList.add(\'hide\');draw()">×</button><div class="ph"><h3>'+o.n+'</h3><div class="t">'+(o.t||"Bright star")+'</div></div>';
+ const fc='<div class="fb"><small>'+(L==1?"Did you know?":"Fun fact")+'</small><p>'+fa[i]+'</p>'+(fa.length>1?'<button class="b" id="nf">Another fact ('+(i+1)+'/'+fa.length+')</button>':'')+'</div>';
+ if(L==1&&!co)h+='<div class="st">'+tl("Distance",o.d||"Very far")+tl("What it does",mvT)+'</div>'+fc;
+ else if(L==2&&!co)h+='<div class="st">'+tl("RA",o.ra.toFixed(2)+"°")+tl("Dec",o.dec.toFixed(2)+"°")+tl("Distance",o.d||"—")+tl("Proper mot.",o.pm||mvT)+'</div>'+fc;
+ else{h+='<div class="sec2">Parameters</div><dl><dt>RA</dt><dd>'+o.ra.toFixed(3)+'° · '+hms(o.ra)+'</dd><dt>Dec</dt><dd>'+o.dec.toFixed(3)+'° · '+dms(o.dec)+'</dd><dt>Type</dt><dd>'+(o.t||"Star")+'</dd>';
+  if(L>=3){h+='<dt>Distance</dt><dd>'+(o.d||"—")+'</dd><dt>Proper mot.</dt><dd>'+(o.pm||"—")+'</dd><dt>Catalogs</dt><dd>'+(o.cat||"2MASS")+'</dd><dt>Magnitud</dt><dd>'+(o.mv==1?"Bright (highlighted data)":o.mv==0?"Variable":"—")+'</dd>'}
+  h+='</dl><div class="sec2">Simulated spectrum · 0.75–5 µm</div><canvas id="ppc" width="330" height="130"></canvas><div class="src2">Brightness curve by band. The drop at 2.7 µm reveals water ice; at 4.26 µm, CO₂.</div>'+fc}
+ if(o.mv!=null)h+='<button class="b tq" onclick="visor()">Zoom in →</button>';
+ const p=$("#pop");p.innerHTML=h;p.classList.remove("hide");const nf=$("#nf");if(nf)nf.onclick=()=>{o.fi=i+1;show(o)};draw();
+ if(L>=3&&!co){try{const pl=plot("#ppc",[spec(o)],{z:ZN,c:["#f97316"],xl:"µm",yl:"mJy"});const x=$("#ppc").getContext("2d");x.strokeStyle="#2dd4bf";x.setLineDash([3,3]);x.beginPath();x.moveTo(pl.X(2.7),6);x.lineTo(pl.X(2.7),118);x.moveTo(pl.X(4.26),6);x.lineTo(pl.X(4.26),118);x.stroke();x.setLineDash([])}catch(e){}}}
+function pick(x,y){if(S.lv>=3)return null;let best=null,bd=18;[...O,...BS].forEach(o=>{const p=proj(o.ra,o.dec);if(p){const d=Math.hypot(p[0]-x,p[1]-y);if(d<bd){bd=d;best=o}}});return best}
+function unproj(x,y){
+ if(HPA&&S.bgs){if(S.v=="p"||S.v=="o"){const R=S.v=="p"?Math.min(W,H)*.42*S.z:Math.min(W,H)*.45*S.z;if(Math.hypot(x-W/2,y-H/2)>R)return null}try{const q=HPA.pix2world(x,y);if(q&&isFinite(q[0])&&isFinite(q[1])&&Math.abs(q[1])<=90)return [(q[0]+360)%360,q[1]]}catch(e){}return null}
+ if(S.v=="f"){const k=fk(),ra=S.cx-(x-W/2)/k,dec=S.cy+(H/2-y)/k;if(Math.abs(dec)>90||Math.abs(ra-S.cx)>180)return null;return [(ra+360)%360,dec]}
+ if(S.v=="m"){const k=mk(),b=mxy(0,S.cy)[1],X=(W/2-x)/k,Y=(H/2-y)/k+b;if(Math.abs(Y)>Math.SQRT2)return null;const t=Math.asin(Y/Math.SQRT2),dec=Math.asin((2*t+Math.sin(2*t))/Math.PI)/D,l=X*Math.PI/(2*Math.SQRT2*Math.cos(t))/D;if(Math.abs(l)>180)return null;return [(S.cx+l+720)%360,dec]}
+ const m=Math.min(W,H),dx=W/2-x,dy=H/2-y,r=Math.hypot(dx,dy);let xo,yo,cc;
+ if(S.v=="o"){const R=m*.45*S.z,th=r*2.356/R;if(th>2.356)return null;const sn=r||1;xo=Math.sin(th)*dx/sn;yo=Math.sin(th)*dy/sn;cc=Math.cos(th)}
+ else{const R=m*.42*S.z;xo=dx/R;yo=dy/R;const q=xo*xo+yo*yo;if(q>1)return null;cc=Math.sqrt(1-q)}
+ const p=S.cy*D,sd=Math.max(-1,Math.min(1,cc*Math.sin(p)+yo*Math.cos(p))),a=Math.atan2(xo,cc*Math.cos(p)-yo*Math.sin(p));
+ return [(S.cx+a/D+720)%360,Math.asin(sd)/D]}
+function skyInfo(x,y){const q=unproj(x,y);if(!q)return;const ra=q[0],dec=q[1];S.sel={ra,dec,n:"Point"};
+ const rad=Math.max(.0008,dpp()*14),ok=rad<=.05;
+ let h='<button class="x" aria-label="Close" onclick="S.sel=null;$(\'#pop\').classList.add(\'hide\');draw()">×</button><div class="ph"><h3>Sky point</h3><div class="t">CDS data (SIMBAD)</div></div><div class="sec2">Coordinates</div><dl><dt>RA</dt><dd>'+ra.toFixed(4)+'° · '+hms(ra)+'</dd><dt>Dec</dt><dd>'+dec.toFixed(4)+'° · '+dms(dec)+'</dd></dl><div class="sec2">Nearest object</div><div id="sbr" class="src2">'+(ok?"Querying SIMBAD…":"Zoom in further to query objects at this point.")+'</div>'+
+ '<a class="b tq" target="_blank" rel="noopener" href="https://aladin.cds.unistra.fr/AladinLite/?target='+encodeURIComponent(ra.toFixed(5)+" "+(dec>=0?"+":"")+dec.toFixed(5))+'&fov=0.5&survey=P%2FDSS2%2Fcolor">Open in Aladin Lite →</a>';
+ const pp=$("#pop");pp.innerHTML=h;pp.classList.remove("hide");draw();if(!ok)return;
+ const qy="SELECT TOP 30 main_id,otype,ra,dec,plx_value,pmra,pmdec FROM basic WHERE CONTAINS(POINT('ICRS',ra,dec),CIRCLE('ICRS',"+ra.toFixed(6)+","+dec.toFixed(6)+","+rad.toFixed(5)+"))=1";
+ fetch("https://simbad.cds.unistra.fr/simbad/sim-tap/sync?request=doQuery&lang=adql&format=json&query="+encodeURIComponent(qy)).then(r=>r.json()).then(j=>{
+  const el=$("#sbr");if(!el||S.sel==null||S.sel.ra!=ra)return;const d=(j.data||[]).map(r=>({r,s:Math.hypot((r[2]-ra)*Math.cos(dec*D),r[3]-dec)})).sort((a,b)=>a.s-b.s)[0];
+  if(!d){el.textContent="SIMBAD has no cataloged objects at this point.";return}
+  const r=d.r,f=(v,n)=>v==null?"—":(+v).toFixed(n);el.className="";el.innerHTML="";const dl=document.createElement("dl");
+  [["Name",r[0]],["Type",r[1]],["RA / Dec",f(r[2],4)+"° / "+f(r[3],4)+"°"],["Parallax",r[4]==null?"—":f(r[4],2)+" mas"+(r[4]>0?" (~"+(3261.56/r[4]).toFixed(1)+" light-years)":"")],["Proper mot.",r[5]==null?"—":f(r[5],1)+", "+f(r[6],1)+" mas/yr"],["Separation",(d.s*3600).toFixed(1)+"″"]].forEach(a=>{const t=document.createElement("dt"),u=document.createElement("dd");t.textContent=a[0];u.textContent=a[1];dl.append(t,u)});el.appendChild(dl)
+ }).catch(()=>{const el=$("#sbr");if(el)el.textContent="Could not query SIMBAD (offline?)."})}
+let dr=null,mv=0,clickTimer=null;
+cv.onpointerdown=e=>{dr={x:e.clientX,y:e.clientY};mv=0;cv.setPointerCapture(e.pointerId);cv.style.cursor="grabbing"};
+cv.onpointermove=e=>{if(!dr)return;const dx=e.clientX-dr.x,dy=e.clientY-dr.y;dr={x:e.clientX,y:e.clientY};mv+=Math.abs(dx)+Math.abs(dy);const k=dpp();S.cx=(S.cx+dx*k+360)%360;S.cy=Math.max(-89,Math.min(89,S.cy+dy*k));draw()};
+cv.onpointerup=e=>{cv.style.cursor="grab";const tap=dr&&mv<6,x=e.clientX,y=e.clientY;dr=null;if(!tap)return;if(clickTimer){clearTimeout(clickTimer);clickTimer=null;const r=cv.getBoundingClientRect(),q=unproj(x-r.left,y-r.top);if(!q)return;S.sel=null;$("#pop").classList.add("hide");fly(q[0],q[1],Math.min(40,S.z*2));return}clickTimer=setTimeout(()=>{clickTimer=null;const r=cv.getBoundingClientRect(),px=x-r.left,py=y-r.top,o=pick(px,py);if(o)show(o);else if(S.fg)finfo(px,py);else skyInfo(px,py)},280)};
+cv.ondblclick=e=>e.preventDefault();
+cv.onwheel=e=>{e.preventDefault();zoom(e.deltaY<0?1.2:1/1.2)};
+function zoom(f){S.z=Math.max(.6,Math.min(40,S.z*f));draw()}
+$("#zi").onclick=()=>zoom(1.5);$("#zo").onclick=()=>zoom(1/1.5);
+const VN={p:"Globe",f:"Flat map",o:"Fisheye",m:"Planisphere"};
+function mfLabel(){$("#mfl").textContent=VN[S.v]+(S.fg?" + heat":"")}
+function mfClose(){$("#mfm").classList.add("hide");$("#mf").setAttribute("aria-expanded","false")}
+function view(v){S.v=v;if(v=="f"||v=="m"){S.z=1;S.cy=0}else S.z=Math.max(1,Math.min(S.z,3));[["vp","p"],["vm","f"],["vo","o"],["vn","m"]].forEach(a=>$("#"+a[0]).classList.toggle("on",v==a[1]));mfLabel();mfClose();draw()}
+$("#mf").onclick=e=>{e.stopPropagation();const h=$("#mfm").classList.toggle("hide");$("#mf").setAttribute("aria-expanded",!h)};
+addEventListener("click",e=>{if(!e.target.closest(".mapfmt"))mfClose()});
+document.querySelectorAll("[data-bg]").forEach(b=>b.onclick=()=>{S.bgs=b.dataset.bg;document.querySelectorAll("[data-bg]").forEach(x=>x.classList.toggle("on",x==b));draw()});
+$("#vp").onclick=()=>view("p");$("#vm").onclick=()=>view("f");$("#vo").onclick=()=>view("o");$("#vn").onclick=()=>view("m");
+const norm=s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[’']/g,"").trim();
+function search(){const q=$("#q").value;if(!q.trim())return;
+ let o=[...O,...BS].find(x=>norm(x.n).includes(norm(q))||norm(q).includes(norm(x.n)));
+ if(!o&&/\bnarn?ard\b/i.test(q))o=O.find(x=>norm(x.n).includes("barnard"));
+ if(!o){let m=q.replace(/−/g,"-").match(/(\d+)h\s*(\d+)m\s*([\d.]+)s\s*([+-]?)\s*(\d+)d\s*(\d+)m\s*([\d.]+)s?/i);
+  if(m)o={n:"Coordinates",t:"Sky point",ra:15*(+m[1]+m[2]/60+m[3]/3600),dec:(m[4]=="-"?-1:1)*(+m[5]+m[6]/60+m[7]/3600)};
+  else{m=q.replace(/−/g,"-").match(/(-?[\d.]+)[\s,]+(-?[\d.]+)/);if(m)o={n:"Coordinates",t:"Sky point",ra:+m[1],dec:+m[2]}}}
+ if(!o){$("#hud").textContent="I could not find that object. Try a shortcut below or enter RA and Dec in degrees.";return}
+ fly(o.ra,o.dec,Math.max(S.z,3));show(o)}
+$("#go").onclick=search;$("#q").onkeydown=e=>{if(e.key=="Enter")search()};
+$("#chips").innerHTML=O.map((o,i)=>'<button data-i="'+i+'">'+o.n+'</button>').join("");
+$("#chips").onclick=e=>{const i=e.target.dataset.i;if(i!=null){const o=O[i];fly(o.ra,o.dec,4);show(o)}};
+function setLv(n){S.lv=+n;document.body.className="l"+n;$("#lvl").value=n;uu(u=>{u.lv=+n});if(S.sel)show(S.sel);else draw()}
+$("#lvl").onchange=e=>setLv(e.target.value);
+const NM={1:"Beginner",2:"Standard",3:"Professional"};let chosen=0;
+const scr=id=>{["landing","levels"].forEach(x=>$("#"+x).classList.toggle("hide",x!=id));if(id=="levels")preLevel()};
+$("#start").onclick=$("#nv1").onclick=e=>{e&&e.preventDefault&&e.preventDefault();scr("levels")};
+$("#lt").onclick=$("#nv2").onclick=e=>{e&&e.preventDefault&&e.preventDefault();tut(0)};
+$("#back").onclick=()=>scr("landing");
+function selLv(n,rem){chosen=n;document.querySelectorAll(".opt").forEach(o=>o.setAttribute("aria-pressed",+o.dataset.n==n));$("#enter").disabled=false;$("#enter").textContent="Enter as "+NM[n];$("#hint").textContent=(rem?"Saved mode: ":"Selected mode: ")+NM[n]+"."}
+function preLevel(){const u=usr();if(u&&u.lv&&!chosen)selLv(u.lv,1)}
+document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>selLv(+b.dataset.n));
+function enterApp(n,noTut){$("#landing").classList.add("hide");$("#levels").classList.add("hide");$("#app").classList.remove("hide");tab("mapa");setLv(n);size();if(!noTut&&!skipT())tut(0)}
+$("#enter").onclick=()=>{if(chosen)enterApp(chosen)};
+const T=[["Welcome to the explorer","This viewer shows a demonstration sky with simulated data. Drag the map with the pointer or your finger to rotate the celestial sphere and get familiar with the interface."],["Finding sources","Type an identifier (for example, WISE 0855) or coordinates in the search field; the camera will animate to that position."],["Object cards","Select a star or a colored circle to open its data panel on the right. Red marks objects with noticeable proper motion; teal marks sources whose brightness varies with time."],["Scale control","The + and − buttons change the zoom level. You can also use the mouse wheel or pinch on touch screens."],["Time inspection","Zoom in → plays the observed-patch video. Compare dates to see the object shift against the background stars."],["Available sections","The top tabs group the tools for your usage level. The box under the search field accepts coordinates in degrees or sexagesimal format. The H key returns to the home page."],["Changing level","You can switch anytime among Beginner, Standard, and Professional from the top menu. Standard adds the Compare section; Professional adds bands, spectrum, charts, images, and alerts, and removes preset objects from the map."]];
+let ti=0;
+function tut(i){ti=i||0;$("#tut").classList.remove("hide");rt()}
+function rt(){$("#th").textContent=T[ti][0];$("#tp").textContent=T[ti][1];$("#td").innerHTML=T.map((_,j)=>'<i class="'+(j<=ti?"a":"")+'"></i>').join("");$("#tb").style.visibility=ti?"visible":"hidden";$("#tn").textContent=ti==T.length-1?"Start exploring":"Next"}
+$("#tb").onclick=()=>{ti--;rt()};$("#tn").onclick=()=>{ti==T.length-1?$("#tut").classList.add("hide"):(ti++,rt())};$("#help").onclick=()=>tut(0);$("#tsk").onclick=()=>{setSkip(true);$("#tut").classList.add("hide")};
+let vt=null;
+function visor(){const o=S.sel;if(!o)return;$("#vm2").classList.remove("hide");$("#vt").textContent=o.n+" · 2′ patch";
+ const x=$("#vis").getContext("2d"),ds=["May 2025","Aug 2025","Nov 2025","Feb 2026","Jun 2026","Nov 2026"];let f=0;const st=Array.from({length:30},()=>[rnd()*320,rnd()*240,rnd()*1.5+.5]);
+ $("#vi").textContent=o.mv?"Orange: the object moved relative to the fixed stars between the first and last date.":"This object does not shift, but its brightness changes with time.";
+ clearInterval(vt);vt=setInterval(()=>{x.fillStyle="#05060c";x.fillRect(0,0,320,240);for(let i=0;i<500;i++){x.fillStyle="rgba(150,170,220,"+rnd()*.25+")";x.fillRect(rnd()*320,rnd()*240,1.5,1.5)}
+  x.fillStyle="#cdd8ff";st.forEach(s=>{x.beginPath();x.arc(s[0],s[1],s[2],0,7);x.fill()});
+  const px=o.mv?60+f*40:160,r=o.mv?5:4+3*Math.sin(f*1.3);x.fillStyle="#f97316";x.beginPath();x.arc(px,o.mv?150-f*14:120,Math.abs(r),0,7);x.fill();x.strokeStyle="#fc3d21";x.strokeRect(px-14,(o.mv?150-f*14:120)-14,28,28);
+  x.fillStyle="#fff";x.font="14px sans-serif";x.fillText(ds[f],10,20);f=(f+1)%6},650)}
+$("#vc").onclick=()=>{clearInterval(vt);$("#vm2").classList.add("hide")};
+
+const R={},P=h=>{$("#pn").innerHTML=h},cur=()=>S.sel&&S.sel.t?S.sel:O[2],kind=o=>/brown|marr/.test((o.t||"").toLowerCase())?"bd":/variable/.test((o.t||"").toLowerCase())?"var":"st";
+const DS=["May 2025","Aug 2025","Nov 2025","Feb 2026","Jun 2026","Nov 2026"],SP=Array.from({length:40},()=>[rnd()*320,rnd()*240,rnd()*1.6+.6]);
+const ld=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},ALD=()=>({c:"F97316",s:5,on:1,fr:"hora",mov:1,br:1,mm:1,mb:5,only:0,ex:[],kx:[]});
+const V={m:"v",f:0,fov:2,det:"Σ",s:.5,l:{gaia:1}},AL=Object.assign(ALD(),ld("cem_al",{}));let tm=null,tabNow="mapa";
+const ZN=[[1.4,.12,"#38bdf8"],[1.9,.15,"#38bdf8"],[2.7,.25,"#38bdf8"],[4.26,.1,"#f472b6"],[4.67,.1,"#a78bfa"]];
+function spec(o){const k=kind(o);return Array.from({length:102},(_,i)=>{const l=.75*Math.pow(5/.75,i/101);let f=k=="bd"?4+22*Math.exp(-Math.pow((l-4.5)/.7,2))+6*Math.exp(-Math.pow((l-1.25)/.15,2)):k=="var"?30*Math.exp(-Math.pow((l-1.6)/1.1,2))+3:26/(l*l)+1;[[1.4,.08],[1.9,.1],[2.7,.2]].forEach(z=>f*=1-.35*Math.exp(-Math.pow((l-z[0])/z[1],2)));f*=1-.5*Math.exp(-Math.pow((l-4.26)/.07,2));f*=1-.3*Math.exp(-Math.pow((l-4.67)/.06,2));return [l,f*(1+.03*Math.sin(i*7.3)),i]})}
+function plot(id,ser,o){let cv=$(id),x=cv.getContext("2d"),k=Math.min(2,devicePixelRatio||1)||1,w0=+cv.dataset.w||cv.width,h0=+cv.dataset.h||cv.height;if(o.fit){const bw=Math.round(cv.getBoundingClientRect().width);if(bw>200){w0=bw;h0=Math.round(Math.max(280,Math.min(440,bw*.3)))}}cv.dataset.w=w0;cv.dataset.h=h0;cv.width=Math.round(w0*k);cv.height=Math.round(h0*k);cv.style.aspectRatio=w0+"/"+h0;x.setTransform(k,0,0,k,0,0);const w=w0,h=h0,m=40,xs=ser.flatMap(s=>s.map(p=>p[0])),x0=Math.min(...xs),x1=Math.max(...xs),y1=Math.max(...ser.flatMap(s=>s.map(p=>p[1])))*1.1,X=v=>m+(v-x0)/(x1-x0)*(w-m-8),Y=v=>h-m+4-v/y1*(h-m-10);
+ const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,"#07102a");g.addColorStop(1,"#030816");x.fillStyle=g;x.fillRect(0,0,w,h);
+ (o.z||[]).forEach(z=>{x.fillStyle=z[2]+"33";x.fillRect(X(z[0]-z[1]),6,X(z[0]+z[1])-X(z[0]-z[1]),h-m-2);x.fillStyle=z[2]+"99";x.fillRect(X(z[0]-z[1]),6,X(z[0]+z[1])-X(z[0]-z[1]),2)});
+ const fs=o.fit?14:12,F=fs+'px "Segoe UI",system-ui,sans-serif',yb=h-m+4;x.font=F;x.lineWidth=1;
+ for(let i=0;i<=4;i++){const v=y1*i/4,yy=Y(v);x.strokeStyle=i?"rgba(91,134,224,.16)":"#3d5288";x.beginPath();x.moveTo(m,yy);x.lineTo(w-8,yy);x.stroke();x.fillStyle="#9fb0d6";x.textAlign="right";x.textBaseline="middle";x.fillText(v>=10?v.toFixed(0):v.toFixed(1),m-6,yy)}
+ for(let i=0;i<=4;i++){const v=x0+(x1-x0)*i/4,xx=X(v);x.strokeStyle="rgba(91,134,224,.12)";x.beginPath();x.moveTo(xx,6);x.lineTo(xx,yb);x.stroke();x.strokeStyle="#3d5288";x.beginPath();x.moveTo(xx,yb);x.lineTo(xx,yb+4);x.stroke();x.fillStyle="#9fb0d6";x.textAlign="center";x.textBaseline="top";x.fillText(v.toFixed(o.d||1),xx,yb+7)}
+ x.strokeStyle="#5b86e0";x.lineWidth=1.5;x.beginPath();x.moveTo(m,6);x.lineTo(m,yb);x.lineTo(w-8,yb);x.stroke();
+ x.fillStyle="#c6d3f2";x.font='600 '+fs+'px "Segoe UI",system-ui,sans-serif';x.textBaseline="alphabetic";x.textAlign="center";x.fillText(o.xl,(m+w-8)/2,h-4);x.textAlign="left";x.fillText(o.yl,m+4,16);
+ ser.forEach((s,j)=>{const c=o.c[j],pth=()=>{s.forEach((p,i)=>i?x.lineTo(X(p[0]),Y(p[1])):x.moveTo(X(p[0]),Y(p[1])))};
+  if(ser.length==1||j==0){const f=x.createLinearGradient(0,6,0,yb);f.addColorStop(0,c+"55");f.addColorStop(1,c+"05");x.fillStyle=f;x.beginPath();pth();x.lineTo(X(s[s.length-1][0]),yb);x.lineTo(X(s[0][0]),yb);x.closePath();x.fill()}
+  x.strokeStyle=c;x.lineWidth=o.fit?2.75:2.25;x.lineJoin="round";x.lineCap="round";x.beginPath();pth();x.stroke()});
+ (o.leg||[]).slice(0,ser.length).forEach((n,j)=>{const lx=w-8-(ser.length-j)*(fs*9.5);x.fillStyle=o.c[j];x.fillRect(lx,12,14,3);x.fillStyle="#c6d3f2";x.font=fs+'px "Segoe UI",system-ui,sans-serif';x.textAlign="left";x.textBaseline="alphabetic";x.fillText(n,lx+19,17)});
+ x.textAlign="start";x.textBaseline="alphabetic";return {X,x0,x1,m,w,h}}
+function tab(t){clearInterval(tm);tabNow=t;$("#stage").classList.toggle("sec",t!="mapa");const vs=$("#vseg");if(vs)vs.classList.toggle("hide",t!="mapa");const tl=$("#tools");if(tl)tl.innerHTML=(typeof TOOLS!="undefined"&&TOOLS[t])?TOOLS[t]():"";if(t=="mapa")size();document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.t==t));const p=$("#pn");if(t=="mapa"){p.classList.add("hide");return}p.classList.remove("hide");R[t]();p.scrollTop=0}
+const TB=[["mapa","Map","123"],["visor","Viewer","123"],["datos","SPHEREx Data","123"],["reto","Mini challenge","2"],["aprende","Learn","1"],["comparar","Compare","23"],["movimiento","Real motion","23"],["lab","Practice","2"],["bandas","Bands","3"],["espectro","Spectrum","3"],["graficos","Charts","3"],["imagenes","Images","3"],["alertas","Alerts","3"],["compartir","Share","13"]];
+const okTab=t=>TB.some(x=>x[0]==t&&x[2].includes(S.lv));
+function renderTabs(){$("#tabs").innerHTML=TB.filter(t=>t[2].includes(S.lv)).map(t=>'<button data-t="'+t[0]+'"'+(t[0]==tabNow?' class="on"':'')+'>'+t[1]+'</button>').join("")}
+renderTabs();
+$("#tabs").onclick=e=>{if(e.target.dataset.t)tab(e.target.dataset.t)};
+/* ---------- Light and dark theme ---------- */
+const setTheme=t=>{t=t||(document.documentElement.dataset.theme=="light"?"dark":"light");document.documentElement.dataset.theme=t;try{localStorage.setItem("cem_theme",t)}catch(e){}const s=t=="dark"?"Light theme":"Dark theme";const a=$("#thm");if(a)a.textContent=s;const b=$("#tthm");if(b)b.textContent=s};
+$("#thm").onclick=()=>setTheme();
+const nthm=$("#tthm");if(nthm)nthm.onclick=e=>{if(e&&e.preventDefault)e.preventDefault();setTheme()};
+setTheme(document.documentElement.dataset.theme||"dark");
+visor=function(){tab("visor")};
+const sl0=setLv;setLv=n=>{sl0(n);renderTabs();if(!okTab(tabNow))tab("mapa");else if(tabNow!="mapa")tab(tabNow)};
+function home(){clearInterval(tm);$("#app").classList.add("hide");scr("landing")}
+$("#home").onclick=home;
+addEventListener("keydown",e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||$("#app").classList.contains("hide"))return;const k=e.key.toLowerCase();if(k=="h")home();if(k=="b"&&okTab("alertas")){tab("alertas");trail("estela")}});
+const nm=(s,r)=>{s=s.replace(/−/g,"-");const n=(s.match(/\d+(?:\.\d+)?/g)||[]).map(Number);if(!n.length)return NaN;const g=/^\s*-/.test(s)?-1:1;if(n.length==1)return g*n[0]*(r&&/h/i.test(s)?15:1);const v=n[0]+(n[1]||0)/60+(n[2]||0)/3600;return g*(r?v*15:v)};
+function goRD(){const ra=nm($("#ra").value,1),de=nm($("#de").value,0);if(isNaN(ra)||isNaN(de)||Math.abs(de)>90||ra<0||ra>=360){$("#cm").textContent="Check: RA between 0° and 360° (or 0h–24h) and Dec between −90° and +90°.";return}$("#cm").textContent="RA "+ra.toFixed(3)+"° · Dec "+de.toFixed(3)+"°";tab("mapa");fly(ra,de,Math.max(S.z,4));show({n:"Coordinates",t:"Sky point",ra,dec:de})}
+$("#cg").onclick=goRD;$("#ra").onkeydown=$("#de").onkeydown=e=>{if(e.key=="Enter")goRD()};
+/* ---------- Viewer ---------- */
+const pos=(f,o)=>o.mv?[50+f*44,175-f*20]:[160,120];
+function patch(){const o=cur(),x=$("#pv").getContext("2d"),sn=Math.sqrt(V.det=="Σ"?10:4),P0=pos(0,o),P5=pos(5,o),L=V.l;x.fillStyle=V.m=="r"?"#3a3a3a":"#05060c";x.fillRect(0,0,320,240);
+ for(let i=0;i<900/sn;i++){x.fillStyle="rgba(170,185,230,"+rnd()*.25+")";x.fillRect(rnd()*320,rnd()*240,1.5,1.5)}
+ if(V.m!="r"){x.fillStyle="#cdd8ff";SP.forEach(s=>{x.beginPath();x.arc(s[0],s[1],s[2],0,7);x.fill()})}
+ const dot=(f,c,a)=>{const p=pos(f,o);x.globalAlpha=a;x.fillStyle=c;x.beginPath();x.arc(p[0],p[1],o.mv?6:5+2*Math.sin(f*1.3),0,7);x.fill();x.globalAlpha=1};
+ if(V.m=="v"){dot(V.f,"#f97316",1);const p=pos(V.f,o);x.strokeStyle="#fc3d21";x.strokeRect(p[0]-14,p[1]-14,28,28)}else if(V.m=="a"){dot(0,"#f97316",1-V.s);dot(5,"#f97316",V.s)}else{dot(0,"#fff",1);dot(5,"#000",1)}
+ x.lineWidth=1.5;if(L.gaia){x.strokeStyle="#2dd4bf";x.setLineDash([4,3]);x.beginPath();x.moveTo(P0[0],P0[1]);x.lineTo(P5[0],P5[1]);x.stroke();x.setLineDash([])}
+ if(L.wise){x.strokeStyle="#facc15";x.strokeRect(SP[0][0]-8,SP[0][1]-8,16,16)}
+ if(L.simbad){x.strokeStyle="#a78bfa";x.beginPath();x.moveTo(SP[1][0]-8,SP[1][1]);x.lineTo(SP[1][0]+8,SP[1][1]);x.moveTo(SP[1][0],SP[1][1]-8);x.lineTo(SP[1][0],SP[1][1]+8);x.stroke()}
+ if(L.mask){x.fillStyle="rgba(252,61,33,.35)";x.fillRect(250,0,70,50)}
+ x.fillStyle="#fff";x.font="13px sans-serif";if(L.orf)x.fillText("no 2MASS counterpart",P5[0]-45,P5[1]-20);
+ x.fillText(V.m=="v"?DS[V.f]:V.m=="a"?"A "+DS[0]+" ↔ B "+DS[5]:"A − B ("+DS[0]+" − "+DS[5]+")",8,18)}
+R.visorPro=()=>{const o=cur();if(S.lv==1)V.m="v";P('<h2>Patch viewer · '+o.n+'</h2><div class="g2"><div><canvas id="pv" width="320" height="240"></canvas><p id="pi"></p><input type="range" id="ts" min="0" max="100" value="50" aria-label="Between date A and B"></div><div><h3 class="n2">Mode</h3><div class="row2 n2"><button class="b" data-m="v">Video</button><button class="b n2" data-m="a">Before/after</button><button class="b n2" data-m="r">Subtract</button></div><div class="n1"><h3>Patch size</h3><div class="row2"><button class="b" data-f="1">Small</button><button class="b" data-f="2">Medium</button><button class="b" data-f="4">Large</button></div><p id="fi1"></p></div><div class="n2"><h3>Field of view</h3><input type="range" id="fv" min="1" max="10" value="'+V.fov+'"><p id="fi"></p><h3>Detector</h3><div class="row2">'+["D1","D2","D3","D4","D5","D6","Σ"].map(d=>'<button class="b" data-d="'+d+'">'+d+'</button>').join("")+'</div><p>Signal/noise: <b id="sn"></b></p><h3>Layers</h3>'+[["gaia","Expected path"],["wise","WISE"],["simbad","2MASS"],["mask","Quality mask"],["orf","Only without a 2MASS counterpart"]].map(l=>'<label><input type="checkbox" data-l="'+l[0]+'"'+(V.l[l[0]]?" checked":"")+'> '+l[1]+'</label>').join("")+'</div><p class="n2">Orange = what moves. Red = bad-data region.</p></div></div>');
+ const q=a=>[...$("#pn").querySelectorAll(a)],upd=()=>{q("[data-m]").forEach(b=>b.classList.toggle("on",b.dataset.m==V.m));q("[data-d]").forEach(b=>b.classList.toggle("on",b.dataset.d==V.det));const n=V.det=="Σ"?10:4;$("#fi1").textContent="A wider patch helps see fast-moving objects, but takes longer to load (≈ "+(.75*V.fov*V.fov).toFixed(1)+" MB).";q("[data-f]").forEach(b=>b.classList.toggle("on",+b.dataset.f==V.fov));$("#fi").textContent=V.fov+"′ ≈ "+(.75*V.fov*V.fov).toFixed(1)+" MB · ~"+Math.ceil(V.fov*V.fov/2)+" s · wider = slower";$("#sn").textContent="×"+Math.sqrt(n).toFixed(1)+" ("+n+" images)";$("#pi").textContent=S.lv==1?(o.mv?"Watch the colored point: it changes place from one date to another, which is how we know it moves.":"This object does not change place, but its brightness rises and falls with time."):(o.mv?"Moved 3.2″ (0.5 px) · no 2MASS counterpart":"Brightness changed +8% between dates");$("#ts").style.visibility=V.m=="a"?"visible":"hidden";patch()};
+ q("[data-m]").forEach(b=>b.onclick=()=>{V.m=b.dataset.m;upd()});q("[data-d]").forEach(b=>b.onclick=()=>{V.det=b.dataset.d;upd()});q("[data-l]").forEach(b=>b.onchange=()=>{V.l[b.dataset.l]=b.checked;upd()});$("#fv").oninput=e=>{V.fov=+e.target.value;upd()};q("[data-f]").forEach(b=>b.onclick=()=>{V.fov=+b.dataset.f;upd()});$("#ts").oninput=e=>{V.s=e.target.value/100;patch()};
+ upd();tm=setInterval(()=>{if(V.m=="v"){V.f=(V.f+1)%6;patch()}},700)};
+ R.visorK=()=>{clearInterval(tm);
+  const movers=O,defaultIndex=Math.max(0,movers.findIndex(o=>o.n==="WISE 0855"));let selected=defaultIndex,frame=0,playing=true;
+  P('<h2>Viewer · Motion of celestial bodies</h2><p>Watch how an object’s position changes against the background stars. WISE 0855 is selected when you enter; you can choose another body from the list.</p><div class="g2"><div><canvas id="pv" width="640" height="390" aria-label="Schematic animation of celestial motion"></canvas><div class="row2"><button class="b tq" id="trackPlay">Pause</button><button class="b" id="trackReset">Back to start</button></div><label>Time path · <b id="trackDate">May 2025</b><input type="range" id="trackFrame" min="0" max="5" value="0" step="1" aria-label="Observation date"></label></div><div><h3>Select a celestial body</h3><select id="bodyTrack" aria-label="Celestial body">'+movers.map((o,i)=>'<option value="'+i+'"'+(i===defaultIndex?' selected':'')+'>'+esc(o.n)+' · '+esc(o.t)+'</option>').join('')+'</select><div id="trackInfo" class="res" style="margin-top:12px"></div><h3>How to read the viewer</h3><p>The orange point is the selected object. The bluish stars are a reference: if the point shifts relative to them, there is apparent motion.</p><p class="mut">The path is a teaching visualization with amplified displacement so it is visible. It is not a FITS photograph or a direct SPHEREx astrometric measurement.</p></div></div>');
+  const dates=["May 2025","August 2025","November 2025","February 2026","May 2026","November 2026"];
+  const drawTrack=()=>{const o=movers[selected],cvv=$("#pv"),x=cvv.getContext("2d"),w=cvv.width,h=cvv.height,rate=pmv(o),moving=rate>0;
+   x.fillStyle="#030817";x.fillRect(0,0,w,h);for(let i=0;i<180;i++){const xx=(i*97)%w,yy=(i*193)%h;x.fillStyle="rgba(190,210,255,"+(.22+(i%5)*.1)+")";x.beginPath();x.arc(xx,yy,(i%4)+.7,0,Math.PI*2);x.fill()}
+   const x0=100,y0=260,travel=moving?Math.min(310,Math.max(24,rate*15)):0,px=x0+travel*(frame/5),py=y0-(moving?travel*.42*(frame/5):0);
+   x.strokeStyle="#2dd4bf";x.setLineDash([7,7]);x.lineWidth=2;x.beginPath();x.moveTo(x0,y0);x.lineTo(x0+travel,y0-travel*.42);x.stroke();x.setLineDash([]);
+   x.fillStyle="#9fb0d6";x.font="16px system-ui";x.fillText("Reference stars",18,30);x.fillStyle="#f97316";x.beginPath();x.arc(px,py,9,0,Math.PI*2);x.fill();x.strokeStyle="#fc3d21";x.lineWidth=2;x.beginPath();x.arc(px,py,17,0,Math.PI*2);x.stroke();
+   x.fillStyle="#fff";x.font="bold 18px system-ui";x.fillText(o.n,px+18,py-16);x.fillStyle="#9db0d4";x.font="14px system-ui";x.fillText(dates[frame],18,h-22);x.fillText(moving?"Illustrative displacement: "+rate.toFixed(1)+"″/yr":"No notable proper motion in this example",18,h-48);
+   $("#trackDate").textContent=dates[frame];$("#trackFrame").value=frame;
+   $("#trackInfo").innerHTML='<b>'+esc(o.n)+'</b><br>'+esc(o.t)+'<br>Approximate coordinates: RA '+o.ra.toFixed(3)+'° · Dec '+o.dec.toFixed(3)+'°<br>Reference proper motion: '+esc(o.pm)+'<br>Approximate distance: '+esc(o.d)+'<br><br>'+esc(o.f);
+  };
+  $("#bodyTrack").onchange=e=>{selected=+e.target.value;frame=0;drawTrack()};$("#trackFrame").oninput=e=>{frame=+e.target.value;drawTrack()};
+  $("#trackPlay").onclick=()=>{playing=!playing;$("#trackPlay").textContent=playing?"Pause":"Play";if(playing)runTrack();else clearInterval(tm)};
+  $("#trackReset").onclick=()=>{frame=0;drawTrack()};
+  const runTrack=()=>{clearInterval(tm);if(playing)tm=setInterval(()=>{frame=(frame+1)%6;drawTrack()},850)};
+  drawTrack();runTrack();
+ };
+R.visor=()=>S.lv==1?R.visorK():R.visorPro();
+
+R.datos=()=>{clearInterval(tm);
+ if(typeof hipsLoad==="function"&&!HPT){HPT=1;hipsLoad()}
+ const movers=O,selected=cur(),defaultIndex=Math.max(0,movers.findIndex(o=>o.n===selected.n)),pick=movers[defaultIndex]||movers[0];
+ P('<h2>SPHEREx data · Aladin and IRSA archive</h2>'+
+  '<p class="cem-live-intro">This tab uses sky coordinates to request real observations. Aladin shows the context map. The API downloads the NASA/IPAC-IRSA FITS file and turns it into an image overlaid on the map.</p>'+
+  '<div class="cem-live-controls">'+
+   '<label>Reference celestial body<select id="cemBody">'+movers.map((o,i)=>'<option value="'+i+'" data-ra="'+o.ra+'" data-dec="'+o.dec+'"'+(i===defaultIndex?' selected':'')+'>'+esc(o.n)+'</option>').join('')+'</select></label>'+
+   '<label>Right ascension · degrees<input id="cemRa" type="number" min="0" max="359.999999" step="0.000001" value="'+pick.ra.toFixed(6)+'"></label>'+
+   '<label>Declination · degrees<input id="cemDec" type="number" min="-90" max="90" step="0.000001" value="'+pick.dec.toFixed(6)+'"></label>'+
+   '<label>Search radius<select id="cemRadius"><option value="0.1">0.1°</option><option value="0.25" selected>0.25°</option><option value="0.5">0.5°</option><option value="1">1°</option><option value="2">2°</option></select></label>'+
+   '<label>SPHEREx data<select id="cemCollection"><option value="current" selected>DR1 + QR3 · Wide</option><option value="deep">DR1 + QR3 · Deep Fields</option><option value="spherex_dr1">DR1 only</option><option value="spherex_qr3">QR3 only</option></select></label>'+
+   '<button class="b" id="cemFromSky" type="button">Take coordinates from the map</button>'+
+   '<button class="b" id="cemCenter" type="button">Use Aladin center</button>'+
+   '<button class="b tq" id="cemSearch" type="button">Search observations</button>'+
+  '</div>'+
+  '<div id="cemAladin" role="application" aria-label="Interactive Aladin Lite sky map"></div>'+
+  '<p class="cem-live-map-note">The Aladin background is context (DSS2, 2MASS, or WISE). The SPHEREx image appears when you pick a result: each observation is a FITS file.</p>'+
+  '<div id="cemLiveStatus" role="status" aria-live="polite">Preparing the astronomical map…</div>'+
+  '<h3>SPHEREx observations found</h3><div id="cemLiveResults"><p>Press Search observations to query IRSA with these coordinates.</p></div>'+
+  '<p class="cem-live-foot">If there are no results, increase the radius or move the map. The search needs the backend running (locally, the same address as this page).</p>');
+ const sky=$("#cemFromSky");
+ if(sky)sky.onclick=()=>{const ra=((S.cx%360)+360)%360,dec=+S.cy;$("#cemRa").value=ra.toFixed(6);$("#cemDec").value=dec.toFixed(6);$("#cemRa").dispatchEvent(new Event("change"))};
+ document.dispatchEvent(new CustomEvent("cem:live-viewer-ready"));
+};
+
+
+/* ---------- NASA images (loaded from NASA servers) ---------- */
+const NA=id=>"https://images-assets.nasa.gov/image/"+id+"/"+id+"~medium.jpg",NW=u=>"https://science.nasa.gov/wp-content/uploads/"+u+"?w=900&format=jpeg";
+const NIMG={sol:[NA("GSFC_20171208_Archive_e001435"),"NASA/SDO","The Sun"],mercurio:[NW("2024/03/pia15162-mercury-basins-messenger-16x9-1.jpg"),"NASA/JHUAPL/Carnegie · MESSENGER","Mercury"],venus:[NA("PIA00271"),"NASA/JPL · Magellan","Venus"],tierra:[NA("as17-148-22727"),"NASA · Apollo 17","Earth"],luna:[NA("PIA00405"),"NASA/JPL · Galileo","The Moon"],marte:[NW("2024/03/mars-full-globe-16x9-1.jpg"),"NASA","Mars"],jupiter:[NA("PIA21778"),"NASA/JPL-Caltech/SwRI/MSSS · Juno","Jupiter"],saturno:[NA("PIA21345"),"NASA/JPL-Caltech/SSI · Cassini","Saturn"],urano:[NA("PIA18182"),"NASA/JPL-Caltech · Voyager 2","Uranus"],neptuno:[NA("PIA02205"),"NASA/JPL · Voyager 2","Neptune"],cometa:[NA("PIA13571"),"NASA/JPL-Caltech/UMD · EPOXI","Comet Hartley 2"]};
+NIMG.universo=[NA("PIA26280"),"NASA/JPL-Caltech · SPHEREx","The sky as seen by SPHEREx"];NIMG.spherex=[NA("PIA26531"),"NASA/JPL-Caltech","SPHEREx observatory (artist concept)"];
+NIMG.pipeline=[NA("PIA26351"),"NASA/JPL-Caltech · SPHEREx","Large Magellanic Cloud in infrared"];NIMG.fits=[NA("PIA26352"),"NASA/JPL-Caltech · SPHEREx","Dust cloud in infrared"];
+NIMG.fuentes=[NA("PIA26535"),"NASA/JPL-Caltech","SPHEREx and other NASA telescopes"];NIMG.trivia=[NA("PIA03153"),"NASA/JPL","Solar System montage"];
+NIMG.paralaje=[NA("PIA26352"),"NASA/JPL-Caltech · SPHEREx","Star field in infrared"];NIMG.pixeles=[NA("PIA26351"),"NASA/JPL-Caltech · SPHEREx","Stellar field measured in pixels"];
+NIMG.asteroide=[NA("PIA02923"),"NASA/JHUAPL · NEAR Shoemaker","Asteroid Eros"];
+const artG=z=>'<svg viewBox="0 0 200 200" width="'+z+'" height="'+z+'" aria-hidden="true"><circle cx="100" cy="100" r="46" fill="#14285e"/><ellipse cx="100" cy="100" rx="88" ry="26" fill="none" stroke="#5b86e0" stroke-width="3" transform="rotate(-20 100 100)"/><circle cx="168" cy="72" r="6" fill="#f97316"/><circle cx="34" cy="40" r="3" fill="#fff"/><circle cx="52" cy="160" r="2.5" fill="#fff"/><circle cx="150" cy="168" r="3" fill="#fff"/></svg>';
+const artS=(k,z)=>{try{const s=PLK.includes(k)?art(k,z):"";return s||artG(z)}catch(e){return artG(z)}};
+const PLK=["sol","mercurio","venus","tierra","luna","marte","jupiter","saturno","urano","neptuno"];
+const nimg=(k,cls)=>{if(!k)return"";const n=NIMG[k]||[0,"Data: NASA","Illustration"];return '<figure class="nf '+(cls||"")+'"><div class="nfb">'+artS(k,150)+(n[0]?'<img class="pimg" loading="lazy" decoding="async" src="'+n[0]+'" alt="'+n[2]+' · NASA image" onerror="this.remove()">':'')+'</div><figcaption><b>'+n[2]+'</b><span>'+(n[0]?'Image: ':'')+n[1]+'</span></figcaption></figure>'};
+const lvt=(k,z)=>{const n=NIMG[k];return artS(k,z)+(n?'<img class="pimg" loading="lazy" src="'+n[0]+'" alt="" onerror="this.remove()">':'')};
+const TK=["sol","mercurio","venus","tierra","luna","marte","jupiter","saturno","urano","neptuno","cometa","universo","spherex"];
+const nasaGallery=()=>'<h3>Trivia celestial bodies</h3><div class="ng">'+TK.map(k=>nimg(k)).join("")+'</div>';
+
+/* ---------- Bands ---------- */
+const FL=["#22c55e","#facc15","#fc3d21"],FN=["● good: reliable datum","▲ warning: near a flagged pixel, could be an artifact","■ bad: contaminated, do not trust"];
+R.bandas=()=>{const o=cur(),sp=spec(o);let md=BMOD,bn=40,sel=null;
+ P('<h2>Bands and data quality</h2><div class="g2"><div><div class="row2" id="bm"></div><canvas id="cb" width="360" height="360"></canvas><label>Band <b id="bt"></b><input type="range" id="bs" min="1" max="102" value="40" aria-label="Band"></label></div><div><h3>Pixel card</h3><div id="bi"><p>Tap a pixel to see its data. Move the band slider to see what changes.</p></div><canvas id="px" width="480" height="180"></canvas><h3>Main elements</h3>'+[["H₂O  Water","#38bdf8"],["CO₂  Carbon dioxide","#f472b6"],["CO  Carbon monoxide","#a78bfa"],["Ice and others","#e5e7eb"]].map(e=>'<p style="margin:3px 0"><span style="color:'+e[1]+'">●</span> '+e[0]+'</p>').join("")+'<h3>Flags</h3><p><span style="color:#22c55e">●</span> good · <span style="color:#facc15">▲</span> warning · <span style="color:#fc3d21">■</span> bad</p><h3>The 102 bands (0.75–5 µm)</h3><canvas id="cr" width="480" height="64"></canvas></div></div>');
+ const fl=(i,j)=>{const q=((i*73+j*151)%97)/97+Math.hypot(i-11.5,j-11.5)/80,f=q>1?2:q>.88?1:0;return S.lv==1&&f==1?0:f},br=(i,j,b)=>3+25*Math.exp(-(Math.pow(i-11.5,2)+Math.pow(j-11.5,2))/18)*sp[b][1]/30+2*Math.sin(i*3.1+j*1.7+b*.2),cv=$("#cb"),x=cv.getContext("2d");
+ const dr=()=>{x.fillStyle="#000";x.fillRect(0,0,360,360);for(let i=0;i<24;i++)for(let j=0;j<24;j++){const d=Math.hypot(i*15-172,j*15-172);if(d>172)continue;const v=Math.min(1,br(i,j,bn-1)/30);x.fillStyle=md=="f"?FL[fl(i,j)]:md=="b"?"hsl("+(260-v*260)+" 80% "+(12+v*48)+"%)":md=="l"?"hsl(0 0% "+(35+(i*j*7)%25)+"%)":"hsl("+(205+d/6)+" 70% "+(55-d/6)+"%)";x.fillRect(i*15,j*15,14,14)}if(sel){x.strokeStyle="#fff";x.lineWidth=2;x.strokeRect(sel[0]*15-1,sel[1]*15-1,16,16)}};
+ const info=()=>{if(!sel)return;const i=sel[0],j=sel[1],f=fl(i,j),v=br(i,j,bn-1),ch=Math.round(((i*31+j*17)%21-10)+(Math.hypot(i-11.5,j-11.5)<2?25:0)),la=sp[bn-1][0].toFixed(2),cs=Math.cos(o.dec*D)||1;
+  $("#bi").innerHTML=S.lv==1?'<p>'+(f?"■ Do not trust this pixel.":"● You can trust this pixel.")+' '+(Math.abs(ch)>15?"Something changed here.":"Almost nothing changed here.")+'</p>':'<p>Pixel ('+i+', '+j+') · RA '+(o.ra+(11.5-i)*6/3600/cs).toFixed(4)+'° · Dec '+(o.dec+(11.5-j)*6/3600).toFixed(4)+'°<br><span style="color:'+FL[f]+'">'+FN[f]+'</span><br>Band '+bn+' ('+la+' µm): <b style="color:var(--txt)">'+v.toFixed(1)+' mJy</b><br>Change A→B: <b style="color:'+(Math.abs(ch)>15?"#fc3d21":"#22c55e")+'">'+(ch>0?"+":"")+ch+' %</b>'+(S.lv>=3?' · S/N ×'+(v/2.2).toFixed(1)+' · 1-pixel aperture (6″)':'')+'</p>';
+  const pl=plot("#px",[sp.map(p=>[p[0],br(i,j,p[2])])],{z:ZN,c:["#f97316"],xl:"µm",yl:"mJy"}),c=$("#px").getContext("2d");c.strokeStyle="#fff";c.beginPath();c.moveTo(pl.X(sp[bn-1][0]),6);c.lineTo(pl.X(sp[bn-1][0]),140);c.stroke()};
+ $("#bm").innerHTML=[["f","Flags"],["b","Brightness"],["p","Globe"],["l","Moon"]].map(m=>'<button class="b'+(m[0]=="f"?" on":"")+'" data-k="'+m[0]+'">'+m[1]+'</button>').join("");
+ $("#bm").onclick=e=>{const k=e.target.dataset.k;if(!k)return;md=k;BMOD=k;[...$("#bm").children].forEach(b=>b.classList.toggle("on",b.dataset.k==k));dr()};
+ $("#bt").textContent="40 · "+sp[39][0].toFixed(2)+" µm";$("#bs").oninput=e=>{bn=+e.target.value;$("#bt").textContent=bn+" · "+sp[bn-1][0].toFixed(2)+" µm";dr();info()};
+ cv.onclick=e=>{const r=cv.getBoundingClientRect(),i=Math.floor((e.clientX-r.left)*24/r.width),j=Math.floor((e.clientY-r.top)*24/r.height);if(i<0||j<0||i>23||j>23||Math.hypot(i*15-172,j*15-172)>172)return;sel=[i,j];dr();info()};
+ dr();const y=$("#cr").getContext("2d");for(let i=0;i<102;i++){y.fillStyle="hsl("+(270-i*2.6)+" 80% 55%)";y.fillRect(i*480/102,0,5,40)}y.fillStyle="#fff";y.font="12px sans-serif";for(let d=0;d<6;d++){y.fillText("D"+(d+1),d*80+30,56);y.fillRect(d*80,40,1,6)}};
+/* ---------- Spectrum ---------- */
+R.espectro=()=>{const o=cur(),sp=spec(o),k=kind(o);P('<h2>Spectrum · '+o.n+'</h2><p>'+({bd:"It looks like a brown dwarf: it shines mostly in the infrared.",var:"It looks like a red variable star.",st:"It looks like a normal star."})[k]+'</p><canvas id="cs" width="720" height="280"></canvas><div class="cd"><div>Brightness<b id="sb">—</b></div><div>30 d change<b>+8 %</b></div><div>S/N<b>×3.1</b></div></div><p id="sl">Move the mouse over the spectrum to see the band.</p><div class="n2"><p><span style="color:#38bdf8">■ H₂O</span> <span style="color:#f472b6">■ CO₂</span> <span style="color:#a78bfa">■ CO</span> · a dip in a region suggests that molecule.</p><label><input type="checkbox" id="cm2"> Compare with a normal star</label><button class="b" id="cc">Copy CSV</button></div>');
+ let pl;const dr=()=>{pl=plot("#cs",$("#cm2")&&$("#cm2").checked?[sp,spec({t:"star"})]:[sp],{fit:1,leg:["Object","Normal star"],z:ZN,c:["#f97316","#2dd4bf"],xl:"Wavelength (µm)",yl:"Brightness (mJy)"})};dr();
+ const cv=$("#cs");cv.onpointermove=e=>{const r=cv.getBoundingClientRect(),xp=(e.clientX-r.left)*(+cv.dataset.w)/r.width,l=pl.x0+(xp-pl.m)/(pl.w-pl.m-8)*(pl.x1-pl.x0);let i=0;sp.forEach((p,j)=>{if(Math.abs(p[0]-l)<Math.abs(sp[i][0]-l))i=j});dr();const c=cv.getContext("2d");c.strokeStyle="#f97316";c.beginPath();c.moveTo(pl.X(sp[i][0]),6);c.lineTo(pl.X(sp[i][0]),pl.h-pl.m+4);c.stroke();$("#sl").textContent="λ = "+sp[i][0].toFixed(2)+" µm · banda "+(i+1)+" of 102 · brightness "+sp[i][1].toFixed(1)+" mJy";$("#sb").textContent=sp[i][1].toFixed(1)+" mJy"};
+ if($("#cm2"))$("#cm2").onchange=dr;if($("#cc"))$("#cc").onclick=()=>{try{navigator.clipboard.writeText("band,lambda_um,brightness_mJy\n"+sp.map(p=>(p[2]+1)+","+p[0].toFixed(3)+","+p[1].toFixed(2)).join("\n"));$("#cc").textContent="Copied ✓"}catch(e){$("#cc").textContent="Could not copy"}}};
+/* ---------- Charts ---------- */
+R.graficos=()=>{const o=kind(cur())=="var"?cur():O[3],dra=/Dra/.test(o.n),lc=Array.from({length:60},(_,i)=>[i*10,dra?18+9*Math.sin(i*.256)+Math.sin(i*3.1):14+4*Math.sin(i*.3)-(i%23<3?6:0)]);
+ P('<h2>Charts</h2><div class="cd"><div>Current brightness<b>12.4 mJy</b>▲ trend</div><div>30 d change<b>+8 %</b>▲</div><div>S/N<b>×3.1</b>▬</div></div><h3>Light curve · '+o.n+'</h3><canvas id="g1" width="720" height="240"></canvas><div class="n2"><h3>Compare spectra: normal star and brown dwarf</h3><canvas id="g2" width="720" height="240"></canvas></div><p>Use it to see how brightness changes with time and how two object types compare.</p>');
+ plot("#g1",[lc],{fit:1,c:["#f97316"],xl:"Days",yl:"Brightness (mJy)",d:0});plot("#g2",[spec({t:"star"}),spec({t:"brown dwarf"})],{fit:1,leg:["Normal star","Brown dwarf"],c:["#60a5fa","#f97316"],xl:"Wavelength (µm)",yl:"Brightness (mJy)"})};
+/* ---------- Images ---------- */
+R.imagenes=()=>{const q=[["#22c55e","● good"],["#22c55e","● good"],["#facc15","▲ warning"],["#22c55e","● good"],["#fc3d21","■ bad"],["#22c55e","● good"]];
+ P('<h2>Image collection</h2><p>Something changed since your last visit: new datum from 09 Nov 2026.</p><table><tr><th>Date</th><th>Detectors</th><th>Images</th><th>Quality</th></tr>'+DS.map((d,i)=>'<tr><td>'+d+(i==5?' <span class="new">NEW</span>':"")+'</td><td>D1–D6</td><td>'+(12+i*3)+'</td><td style="color:'+q[i][0]+'">'+q[i][1]+'</td></tr>').join("")+'</table><h3>Data sources</h3><p>✓ SPHEREx (NASA IRSA) · ✓ WISE/NEOWISE · ✓ 2MASS — in this demonstration they are local test data.</p><details class="n2" open><summary>What are the 6 detectors and signal/noise?</summary><p>SPHEREx has 6 arrays (D1–D6) covering 0.75–5 µm; each image is a color “slice” and the 102 bands are completed with many exposures. <b>Signal</b> is the object’s light and <b>noise</b> is random variation. When stacking, signal adds and noise partly cancels: S/N improves with the square root of the images (1→×1, 4→×2, 9→×3, 16→×4, 36→×6).</p><p>Stacking is per detector so colors are not mixed, and Σ (all six) gives the cleanest image. If the object moves, it smears: that is why nearby dates are stacked and Subtract uses distant dates on purpose.</p></details><h3>Export</h3><p class="n2">GIF/MP4 of the video, spectrum CSV, and PDF report with QR: coming soon.</p>')};
+/* ---------- Alerts ---------- */
+/* ---------- Alerts and watchlist ---------- */
+const ALS=[[5.2,1.2,9.1,1.1],[2.4,3,4.2,2],[4.1,8,6.3,3.9],[0,42,0,7],[0,31,0,5.6]],als=o=>{const i=O.findIndex(x=>x.n==o.n);return i<0?[0,0,0,0]:ALS[i]},AD="09 Nov 2026";
+const WL=ld("cem_wl",null)||[{n:"WISE 0855",ra:133.795,dec:-7.245,t:"Brown dwarf · very fast",mv:1}],HS=ld("cem_hs",[]),HK=ld("cem_hk",[]);
+const FR={ahora:"Instantly",hora:"Every hour",dia:"Once a day (08:00)",sem:"Once a week (Monday 08:00)"},KT={bd:"Brown dwarfs",st:"Stars",var:"Variable stars"},KN={mov:"motion",br:"brightness"};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const saveAL=()=>sv("cem_al",AL),isOff=(n,k)=>AL.ex.includes(n)||AL.ex.includes(n+"|"+k),tg=(a,v,on)=>{const i=a.indexOf(v);if(on&&i<0)a.push(v);if(!on&&i>=0)a.splice(i,1)};
+let CA=[],WC=[],TRM="estela";
+function alerts(){const wl=WL.map(w=>w.n),out=[];if(!AL.on)return out;
+ O.forEach(o=>{if(AL.kx.includes(kind(o))||(AL.only&&!wl.includes(o.n)))return;const a=als(o);
+  if(AL.mov&&a[0]>=AL.mm&&a[2]>=AL.s&&!isOff(o.n,"mov"))out.push({o,n:o.n,k:"mov",txt:"moved "+a[0].toFixed(1)+"″",sig:a[2]});
+  if(AL.br&&a[1]>=AL.mb&&a[3]>=AL.s&&!isOff(o.n,"br"))out.push({o,n:o.n,k:"br",txt:"brightness changed +"+a[1]+" %",sig:a[3]})});
+ return out.sort((x,y)=>y.sig-x.sig)}
+function logA(l){const t=new Date().toLocaleString("en",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});let ch=0;
+ l.forEach(a=>{const key=a.n+"|"+a.k+"|"+AD;if(!HK.includes(key)){HK.push(key);HS.unshift({d:t,n:a.n,k:a.k,txt:a.txt,sig:a.sig});ch=1}});
+ if(HS.length>60)HS.length=60;if(ch){sv("cem_hs",HS);sv("cem_hk",HK)}}
+function nxt(){const n=new Date(),d=new Date(n);if(AL.fr=="ahora")return"You are notified as soon as new data arrive.";
+ if(AL.fr=="hora")d.setHours(n.getHours()+1,0,0,0);else if(AL.fr=="dia"){d.setHours(8,0,0,0);if(d<=n)d.setDate(d.getDate()+1)}else{d.setHours(8,0,0,0);d.setDate(d.getDate()+(((1-n.getDay()+7)%7)||7))}
+ return"Next summary: "+d.toLocaleString("en",{weekday:"long",hour:"2-digit",minute:"2-digit"})+"."}
+function addW(x){if(WL.some(w=>w.n==x.n))return x.n+" is already on your list.";WL.push({n:x.n,ra:x.ra,dec:x.dec,t:x.t,mv:x.mv});sv("cem_wl",WL);ua();return"Now following "+x.n+"."}
+function delW(i){WL.splice(i,1);sv("cem_wl",WL);ua()}
+const goO=o=>{tab("mapa");fly(o.ra,o.dec,Math.max(S.z,4));show(o)};
+function ua(){const l=alerts();CA=l;logA(l);
+ $("#asum").textContent=AL.on?" · "+FR[AL.fr].toLowerCase()+" · "+AL.s+" σ":" · off";
+ $("#al").innerHTML=!AL.on?'<div class="okb">Alerts are off. Turn them on in Settings.</div>':l.length?l.map((a,i)=>'<div class="alr"><b>'+esc(a.n)+'</b> '+a.txt+'<br><span class="mut">'+a.sig.toFixed(1)+' σ · '+AD+'</span><div class="row2"><button class="b" data-v="'+i+'">View on map</button><button class="b" data-mu="'+i+'">Mute</button></div></div>').join(""):'<div class="okb">No sudden changes with these settings.</div>';
+ $("#wl").innerHTML=WL.length?WL.map((w,i)=>{const n=l.filter(a=>a.n==w.n).length;return'<div class="wr"><button class="b" data-g="'+i+'">'+esc(w.n)+'</button><span class="'+(n?"new":"mut")+'">'+(n?n+" alert"+(n>1?"s":""):"no changes")+'</span><button class="b" data-d="'+i+'" aria-label="Unfollow '+esc(w.n)+'">✕</button></div>'}).join(""):"<p>You are not following any object yet.</p>";
+ WC=[cur(),...O].filter((x,i,a)=>a.findIndex(y=>y.n==x.n)==i&&!WL.some(w=>w.n==x.n));
+ $("#ws").innerHTML=WC.map((x,i)=>'<option value="'+i+'">'+esc(x.n)+'</option>').join("");$("#wa").disabled=!WC.length;
+ $("#hl").innerHTML=HS.length?'<table>'+HS.slice(0,12).map(h=>'<tr><td>'+h.d+'</td><td>'+esc(h.n)+'</td><td>'+KN[h.k]+' · '+h.txt+'</td></tr>').join("")+'</table>':"<p>No alerts recorded yet.</p>"}
+function sync(){const g=i=>$("#"+i);g("ao").checked=!!AL.on;g("af").value=AL.fr;g("as").value=AL.s;g("sv").textContent=AL.s;g("amo").checked=!!AL.mov;g("amm").value=AL.mm;g("mmv").textContent=AL.mm;g("abr").checked=!!AL.br;g("amb").value=AL.mb;g("mbv").textContent=AL.mb;g("aon").checked=!!AL.only;
+ $("#alroot").querySelectorAll("[data-x]").forEach(q=>q.checked=AL.ex.includes(O[q.dataset.x].n));$("#alroot").querySelectorAll("[data-kx]").forEach(q=>q.checked=AL.kx.includes(q.dataset.kx));
+ if(g("ac"))g("ac").value="#"+AL.c;g("nx").textContent=AL.on?nxt():"Alerts are off.";
+ const mu=AL.ex.filter(e=>e.includes("|"));g("mu").innerHTML=mu.length?"<p>Muted (tap to unmute)</p><div class=\"row2\">"+mu.map(e=>'<button class="b" data-um="'+esc(e)+'">'+esc(e.split("|")[0])+" · "+KN[e.split("|")[1]]+" ✕</button>").join("")+"</div>":"";ua()}
+const CH=[["estela","Object trail"],["brillo","Brightness by date"],["desplazamiento","How far it moved"],["seguir","Follow the current object"],["olvidar","Unfollow it"],["historial","Go to history"],["limpiar","Clear history"],["ayuda","Command list"]];
+function cmd(s){const m=s.trim().replace(/^\//,"").match(/^(\S+)\s*(.*)$/),say=t=>{$("#ao2").textContent=t};if(!m){say("Type a command, for example /estela or /ayuda.");return}
+ const k=norm(m[1]),a=m[2].trim(),o=cur(),fo=n=>O.find(x=>norm(x.n).includes(norm(n)));
+ if(["estela","brillo","desplazamiento","mov","movimiento"].includes(k)){const t=k=="brillo"?"brillo":k=="estela"?"estela":"desplazamiento";trail(t);say("Showing "+{estela:"trail",brillo:"brightness",desplazamiento:"displacement"}[t]+" of "+o.n+".")}
+ else if(k=="seguir"){const x=a?fo(a):o;if(!x)return say("I could not find “"+a+"».");say(addW(x))}
+ else if(k=="olvidar"){const i=WL.findIndex(w=>norm(w.n).includes(norm(a||o.n)));if(i<0)return say("That object is not on your list.");const n=WL[i].n;delW(i);say("You unfollowed "+n+".")}
+ else if(k=="sens"){const v=parseFloat(a);if(!(v>=3&&v<=10))return say("Use a value between 3 and 10, for example /sens 6.");AL.s=v;saveAL();sync();say("Threshold: "+v+" σ.")}
+ else if(k=="frecuencia"){const f=norm(a);if(!FR[f])return say("Options: ahora, hora, dia, sem.");AL.fr=f;saveAL();sync();say("Frequency: "+FR[f]+".")}
+ else if(k=="color"){const v=a.replace("#","");if(!/^[0-9a-f]{6}$/i.test(v))return say("Enter a hexadecimal color, for example /color 2DD4BF.");AL.c=v.toUpperCase();saveAL();sync();trail();say("Trail color changed.")}
+ else if(k=="historial"){$("#hl").scrollIntoView({behavior:"smooth"});say("")}
+ else if(k=="limpiar"){HS.splice(0);sv("cem_hs",HS);ua();say("History cleared.")}
+ else if(k=="ayuda")say("Commands: "+CH.map(c=>"/"+c[0]).join(" ")+" /sens N /frecuencia x /color HEX");
+ else say("I do not know “/"+m[1]+"». Type /ayuda.")}
+function trail(m){if(m)TRM=m;const c=$("#ct");if(!c)return;document.querySelectorAll("#tm button").forEach(b=>b.classList.toggle("on",b.dataset.t==TRM));
+ const x=c.getContext("2d"),o=cur(),col=/^[0-9a-f]{6}$/i.test(AL.c)?"#"+AL.c:"#f97316",W=c.width,H=c.height,a=als(o),mvO=pmv(o)>0,mo=[0,3,6,9,13,18];
+ x.font="13px sans-serif";
+ if(TRM=="desplazamiento"&&a[0]){plot("#ct",[mo.map(t=>[t,a[0]*t/18])],{c:[col],xl:"Months since May 2025",yl:"Displacement (″)"});x.fillStyle="#fff";x.fillText(o.n+": "+a[0].toFixed(1)+"″ in 18 months",60,22);return}
+ x.fillStyle="#000";x.fillRect(0,0,W,H);x.fillStyle="#cdd8ff";SP.forEach(s=>{x.beginPath();x.arc(s[0]*1.5,s[1]*1.08,s[2],0,7);x.fill()});x.fillStyle="#fff";
+ if(TRM=="brillo"){const v=DS.map((_,f)=>12.4*(1+a[1]/100*(Math.sin(f*1.3)*.5+.5*f/5))),mx=Math.max(...v,12.4*(1+AL.mb/100))*1.15,Y=t=>H-40-t/mx*(H-80);
+  v.forEach((t,f)=>{const bx=40+f*72;x.fillStyle=col;x.fillRect(bx,Y(t),44,H-40-Y(t));x.fillStyle="#fff";x.fillText(t.toFixed(1),bx+4,Y(t)-6);x.fillStyle="#9fb0d6";x.fillText(DS[f],bx-2,H-20)});
+  x.strokeStyle="#facc15";x.setLineDash([5,4]);x.beginPath();x.moveTo(30,Y(12.4*(1+AL.mb/100)));x.lineTo(W-10,Y(12.4*(1+AL.mb/100)));x.stroke();x.setLineDash([]);x.fillStyle="#facc15";x.fillText("brightness threshold ("+AL.mb+" %)",W-170,Y(12.4*(1+AL.mb/100))-6);
+  x.fillStyle="#fff";x.fillText(o.n+" · brightness by date (mJy)",10,20);return}
+ const p=f=>mvO?[50+f*74,205-f*30]:[W/2,H/2+10];
+ if(mvO){x.strokeStyle=col;x.lineWidth=2;x.globalAlpha=.45;x.beginPath();for(let f=0;f<6;f++){const q=p(f);f?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1])}x.stroke();x.globalAlpha=1;
+  for(let f=0;f<6;f++){const q=p(f);x.globalAlpha=.3+f*.14;x.fillStyle=col;x.beginPath();x.arc(q[0],q[1],7,0,7);x.fill()}x.globalAlpha=1;
+  const q0=p(4),q1=p(5),an=Math.atan2(q1[1]-q0[1],q1[0]-q0[0]);x.fillStyle=col;x.beginPath();x.moveTo(q1[0]+Math.cos(an)*16,q1[1]+Math.sin(an)*16);x.lineTo(q1[0]+Math.cos(an+2.4)*12,q1[1]+Math.sin(an+2.4)*12);x.lineTo(q1[0]+Math.cos(an-2.4)*12,q1[1]+Math.sin(an-2.4)*12);x.fill();
+  x.fillStyle="#9fb0d6";x.fillText(DS[0],p(0)[0]-20,p(0)[1]+24);x.fillText(DS[5],q1[0]-30,q1[1]+30);x.fillStyle="#fff";x.fillText(o.n+" · trail: "+a[0].toFixed(1)+"″ in 18 months",10,20)}
+ else{for(let r=40;r>=8;r-=8){x.globalAlpha=.12+(40-r)/60;x.fillStyle=col;x.beginPath();x.arc(W/2,H/2+10,r,0,7);x.fill()}x.globalAlpha=1;x.fillStyle="#fff";x.fillText(o.n+" · fixed object: the trail is a single point",10,20);x.fillStyle="#9fb0d6";x.fillText("Try /brillo to see how it changes with time.",10,H-14)}}
+R.alertas=()=>{let last="12 Jun 2026";try{last=localStorage.getItem("cem_last")||last}catch(e){}
+ P('<div id="alroot"><div class="g2"><div><details class="dd" id="dd"><summary>⚙ Alert settings<span id="asum"></span></summary><div class="ddp">'
+ +'<label><input type="checkbox" id="ao"> Alerts on</label>'
+ +'<h3>How often should they arrive?</h3><select id="af" aria-label="Frequency">'+Object.keys(FR).map(k=>'<option value="'+k+'">'+FR[k]+'</option>').join("")+'</select><p id="nx"></p>'
+ +'<h3>Under which parameters?</h3><label>Change threshold: <b id="sv" style="color:var(--txt)"></b> σ (lower = more alerts)<input type="range" id="as" min="3" max="10" step=".5"></label>'
+ +'<label><input type="checkbox" id="amo"> Alert if something moves</label><label>Minimum motion: <b id="mmv" style="color:var(--txt)"></b> ″<input type="range" id="amm" min=".5" max="5" step=".5"></label>'
+ +'<label><input type="checkbox" id="abr"> Alert if brightness changes</label><label>Minimum brightness: <b id="mbv" style="color:var(--txt)"></b> %<input type="range" id="amb" min="1" max="20"></label>'
+ +'<label><input type="checkbox" id="aon"> Only objects on my watchlist</label>'
+ +'<h3>What to exclude?</h3><p>Objects</p>'+O.map((o,i)=>'<label><input type="checkbox" data-x="'+i+'"> '+esc(o.n)+'</label>').join("")+'<p>Object types</p>'+Object.keys(KT).map(k=>'<label><input type="checkbox" data-kx="'+k+'"> '+KT[k]+'</label>').join("")+'<div id="mu"></div>'
+ +'<div class="n3"><h3>Color-code filter</h3><input id="ac" aria-label="Color"></div><div class="row2"><button class="b" id="ar">Reset settings</button></div></div></details>'
+ +'<h3>Notifications</h3><div class="cd"><div>Last datum seen<b id="lv">'+last+'</b></div><div>Most recent datum<b>'+AD+'</b></div></div><div id="al"></div><button class="b tq" id="am">Mark as seen</button>'
+ +'</div><div><h3>Watchlist</h3><div id="wl"></div><div class="row2"><select id="ws" aria-label="Object to follow"></select><button class="b tq" id="wa">Follow</button></div>'
+ +'<h3>History</h3><div id="hl"></div><div class="row2"><button class="b" data-c="limpiar">Clear history</button></div></div></div>'
+ +'<h3>Trail and commands</h3><div class="row2" id="tm">'+[["estela","Trail"],["brillo","Brightness"],["desplazamiento","Displacement"]].map(m=>'<button class="b" data-t="'+m[0]+'">'+m[1]+'</button>').join("")+'</div>'
+ +'<canvas id="ct" width="480" height="260"></canvas><input id="ak" placeholder="Type a command: /estela, /brillo, /ayuda…" aria-label="Command" style="margin-top:8px"><div class="row2">'+CH.map(c=>'<button class="b" data-c="'+c[0]+'" title="'+c[1]+'">/'+c[0]+'</button>').join("")+'</div><p id="ao2" aria-live="polite"></p></div>');
+ const r=$("#alroot");
+ r.addEventListener("input",e=>{const t=e.target,i=t.id;
+  if(i=="ao")AL.on=t.checked?1:0;else if(i=="af")AL.fr=t.value;else if(i=="as")AL.s=+t.value;else if(i=="amo")AL.mov=t.checked?1:0;else if(i=="amm")AL.mm=+t.value;else if(i=="abr")AL.br=t.checked?1:0;else if(i=="amb")AL.mb=+t.value;else if(i=="aon")AL.only=t.checked?1:0;
+  else if(t.dataset.x!=null)tg(AL.ex,O[t.dataset.x].n,t.checked);else if(t.dataset.kx)tg(AL.kx,t.dataset.kx,t.checked);else return;saveAL();sync()});
+ r.addEventListener("change",e=>{if(e.target.id=="ac"){const v=e.target.value.replace("#","").toUpperCase();if(/^[0-9A-F]{6}$/.test(v)){AL.c=v;saveAL();trail()}else sync()}});
+ r.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)return;const d=t.dataset,i=t.id;
+  if(d.v!=null)goO(CA[+d.v].o);else if(d.mu!=null){const a=CA[+d.mu];tg(AL.ex,a.n+"|"+a.k,true);saveAL();sync()}
+  else if(d.g!=null){const w=WL[+d.g];goO(O.find(x=>x.n==w.n)||w)}else if(d.d!=null)delW(+d.d);else if(d.um!=null){tg(AL.ex,d.um,false);saveAL();sync()}
+  else if(d.t)trail(d.t);else if(d.c)cmd(d.c);
+  else if(i=="wa"){const x=WC[+$("#ws").value];if(x)$("#ao2").textContent=addW(x)}
+  else if(i=="am"){try{localStorage.setItem("cem_last",AD)}catch(e){}$("#lv").textContent=AD}
+  else if(i=="ar"){Object.assign(AL,ALD());saveAL();sync()}});
+ $("#ak").onkeydown=e=>{if(e.key=="Enter"){cmd(e.target.value);e.target.value=""}};
+ sync();trail()};
+
+/* ---------- Share ---------- */
+const SH={t:"mapa"},BU=()=>/^https?:/.test(location.protocol)?location.origin+location.pathname:"https://cielo-en-movimiento.app/",VW={p:"Globe",f:"Flat map",o:"Fisheye",m:"Planisphere"},MD={v:"video",a:"before/after",r:"subtract"};
+function slink(emb){const o=cur(),p=new URLSearchParams({ra:o.ra.toFixed(3),dec:o.dec.toFixed(3),obj:o.n,fov:V.fov,modo:{v:"video",a:"antesdespues",r:"resta"}[V.m],vista:{p:"planeta",f:"plano",o:"ojo",m:"planisferio"}[S.v],det:V.det=="Σ"?"sum":V.det,nivel:S.lv});
+ if(AL.c!="F97316")p.set("color",AL.c);if(AL.s!=5)p.set("sens",AL.s);if(SH.t!="mapa")p.set("pestana",SH.t);if(emb)p.set("embed","1");return BU()+"?"+p}
+function cp(t){return new Promise(r=>{const f=()=>{try{const a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();const k=document.execCommand("copy");a.remove();r(k)}catch(e){r(false)}};
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(()=>r(true),f);else f()})}
+const flash=(b,t)=>{const o=b.dataset.o||(b.dataset.o=b.textContent);b.textContent=t;clearTimeout(b._t);b._t=setTimeout(()=>b.textContent=o,1800)};
+function dl(name,blob){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(a.href)},800)}
+const fn=o=>norm(o.n).replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"cielo";
+function snap(w){const s=document.createElement("canvas"),k=$("#sky");s.width=w;s.height=Math.max(1,Math.round(w*k.height/Math.max(1,k.width)));s.getContext("2d").drawImage(k,0,0,s.width,s.height);return s}
+/* ---------- QR codes (byte mode, versions 1–10, correction M or L) ---------- */
+function qrEnc(text){const by=Array.from(new TextEncoder().encode(text)),EC={L:[7,10,15,20,26,18,20,24,30,18],M:[10,16,26,18,24,16,18,22,22,26]},BK={L:[1,1,1,1,1,2,2,2,2,4],M:[1,1,1,2,2,4,4,4,5,5]};
+ const raw=v=>{let r=(16*v+128)*v+64;if(v>=2){const n=Math.floor(v/7)+2;r-=(25*n-10)*n-55;if(v>=7)r-=36}return r},cap=(v,l)=>Math.floor(raw(v)/8)-EC[l][v-1]*BK[l][v-1];
+ let lv="",ver=0;for(const l of["M","L"]){for(let v=1;v<=10;v++)if(4+(v<10?8:16)+8*by.length<=cap(v,l)*8){ver=v;lv=l;break}if(ver)break}if(!ver)return null;
+ const bb=[],put=(a,n)=>{for(let i=n-1;i>=0;i--)bb.push((a>>>i)&1)};put(4,4);put(by.length,ver<10?8:16);by.forEach(b=>put(b,8));const cb=cap(ver,lv)*8;put(0,Math.min(4,cb-bb.length));while(bb.length%8)bb.push(0);for(let p=236;bb.length<cb;p^=236^17)put(p,8);
+ const data=[];for(let i=0;i<bb.length;i+=8){let v=0;for(let j=0;j<8;j++)v=v<<1|bb[i+j];data.push(v)}
+ const gm=(x,y)=>{let z=0;for(let i=7;i>=0;i--){z=(z<<1)^((z>>>7)*285);z^=((y>>>i)&1)*x}return z},dv=n=>{const r=[];for(let i=0;i<n-1;i++)r.push(0);r.push(1);let t=1;for(let i=0;i<n;i++){for(let j=0;j<r.length;j++){r[j]=gm(r[j],t);if(j+1<r.length)r[j]^=r[j+1]}t=gm(t,2)}return r},rm=(d,v)=>{const r=v.map(()=>0);d.forEach(b=>{const f=b^r.shift();r.push(0);v.forEach((c,i)=>r[i]^=gm(c,f))});return r};
+ const nb=BK[lv][ver-1],eb=EC[lv][ver-1],rw=Math.floor(raw(ver)/8),ns=nb-rw%nb,sl=Math.floor(rw/nb),D=dv(eb),bl=[];
+ for(let i=0,k=0;i<nb;i++){const d=data.slice(k,k+sl-eb+(i<ns?0:1));k+=d.length;const e=rm(d,D);if(i<ns)d.push(0);bl.push(d.concat(e))}
+ const all=[];for(let i=0;i<bl[0].length;i++)bl.forEach((b,j)=>{if(i!=sl-eb||j>=ns)all.push(b[i])});
+ const n=ver*4+17,M=Array.from({length:n},()=>Array(n).fill(false)),F=Array.from({length:n},()=>Array(n).fill(false)),st=(x,y,d)=>{M[y][x]=d;F[y][x]=true};
+ for(let i=0;i<n;i++){st(6,i,i%2==0);st(i,6,i%2==0)}
+ const fd=(cx,cy)=>{for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const d=Math.max(Math.abs(dx),Math.abs(dy)),x=cx+dx,y=cy+dy;if(x>=0&&x<n&&y>=0&&y<n)st(x,y,d!=2&&d!=4)}};fd(3,3);fd(n-4,3);fd(3,n-4);
+ const ap=[];if(ver>1){const na=Math.floor(ver/7)+2,sp=Math.ceil((ver*4+4)/(na*2-2))*2;ap.push(6);for(let p=n-7;ap.length<na;p-=sp)ap.splice(1,0,p)}
+ ap.forEach((ax,i)=>ap.forEach((ay,j)=>{if((i==0&&j==0)||(i==0&&j==ap.length-1)||(i==ap.length-1&&j==0))return;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)st(ax+dx,ay+dy,Math.max(Math.abs(dx),Math.abs(dy))!=1)}));
+ const fmt=m=>{const d=((lv=="L"?1:0)<<3)|m;let r=d;for(let i=0;i<10;i++)r=(r<<1)^((r>>>9)*1335);const b=((d<<10)|r)^21522,g=i=>((b>>>i)&1)!=0;
+  for(let i=0;i<=5;i++)st(8,i,g(i));st(8,7,g(6));st(8,8,g(7));st(7,8,g(8));for(let i=9;i<15;i++)st(14-i,8,g(i));
+  for(let i=0;i<8;i++)st(n-1-i,8,g(i));for(let i=8;i<15;i++)st(8,n-15+i,g(i));st(8,n-8,true)};fmt(0);
+ if(ver>=7){let r=ver;for(let i=0;i<12;i++)r=(r<<1)^((r>>>11)*7973);const b=(ver<<12)|r;for(let i=0;i<18;i++){const c=((b>>>i)&1)!=0,a=n-11+i%3,q=Math.floor(i/3);st(a,q,c);st(q,a,c)}}
+ let i=0;for(let right=n-1;right>=1;right-=2){if(right==6)right=5;for(let v=0;v<n;v++)for(let j=0;j<2;j++){const x=right-j,y=((right+1)&2)==0?n-1-v:v;if(!F[y][x]&&i<all.length*8){M[y][x]=((all[i>>>3]>>>(7-(i&7)))&1)!=0;i++}}}
+ const mk=m=>{for(let y=0;y<n;y++)for(let x=0;x<n;x++){const iv=[(x+y)%2==0,y%2==0,x%3==0,(x+y)%3==0,(Math.floor(x/3)+Math.floor(y/2))%2==0,x*y%2+x*y%3==0,(x*y%2+x*y%3)%2==0,((x+y)%2+x*y%3)%2==0][m];if(!F[y][x]&&iv)M[y][x]=!M[y][x]}};
+ const pen=()=>{let s=0,dk=0;for(let y=0;y<n;y++){let ry=1,cx=1;for(let x=0;x<n;x++){if(M[y][x])dk++;if(x>0){if(M[y][x]==M[y][x-1]){ry++;if(ry==5)s+=3;else if(ry>5)s++}else ry=1;if(M[x][y]==M[x-1][y]){cx++;if(cx==5)s+=3;else if(cx>5)s++}else cx=1}
+   if(y>0&&x>0&&M[y][x]==M[y][x-1]&&M[y][x]==M[y-1][x]&&M[y][x]==M[y-1][x-1])s+=3}}return s+10*(Math.ceil(Math.abs(dk*20-n*n*10)/(n*n))-1)};
+ let bm=0,bs=1e9;for(let m=0;m<8;m++){mk(m);fmt(m);const p=pen();if(p<bs){bs=p;bm=m}mk(m)}mk(bm);fmt(bm);return{n,M}}
+function qrCv(text,px){const q=qrEnc(text);if(!q)return null;const m=q.n+8,c=document.createElement("canvas"),x=c.getContext("2d");c.width=c.height=m*px;x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.fillStyle="#000";
+ for(let y=0;y<q.n;y++)for(let i=0;i<q.n;i++)if(q.M[y][i])x.fillRect((i+4)*px,(y+4)*px,px,px);return c}
+function report(){const o=cur(),sp=spec(o),r=$("#rep"),q=qrCv(slink(),6),hd=(S.lv>=3&&o.d)?'<tr><td>Distance</td><td>'+esc(o.d)+'</td></tr><tr><td>Proper motion</td><td>'+esc(o.pm||"—")+'</td></tr><tr><td>Catalogs</td><td>'+esc(o.cat||"SIMBAD")+'</td></tr>':"";
+ r.innerHTML='<div class="rb no"><button class="b tq" id="rpp">Print / save as PDF</button> <button class="b" id="rpx">Close</button></div><h1>'+esc(o.n)+'</h1><p>'+esc(o.t||"")+' · Report generated on '+new Date().toLocaleDateString("en",{day:"numeric",month:"long",year:"numeric"})+' · Made On Earth Team (NASA Space Apps 2026)</p>'
+  +'<table><tr><td>RA</td><td>'+o.ra.toFixed(3)+'° · '+hms(o.ra)+'</td></tr><tr><td>Dec</td><td>'+o.dec.toFixed(3)+'° · '+dms(o.dec)+'</td></tr>'+hd+'</table>'
+  +'<h2>Sky view</h2><img src="'+snap(720).toDataURL("image/png")+'" alt="Sky view"><h2>Spectrum (demonstration data)</h2><canvas id="rpc" width="720" height="280"></canvas>'
+  +(q?'<h2>Open this view</h2><img class="rq" src="'+q.toDataURL("image/png")+'" alt="QR code">':"");
+ r.classList.remove("hide");plot("#rpc",[sp],{z:ZN,c:["#f97316"],xl:"Wavelength (µm)",yl:"Brightness (mJy)"});
+ $("#rpp").onclick=()=>window.print();$("#rpx").onclick=()=>r.classList.add("hide")}
+R.compartir=()=>{const o=cur(),L=[["Easy to update with new data","imagenes",1],["Show the 102 bands","bandas",1],["Spectra on the fly","espectro",1],["Stack to improve S/N","comparar",1],["Add or subtract dates","comparar",1],["Choose the field of view","visor",1],["Overlay other telescopes (layers)","visor",1],["Coordinates in the URL","",1],["Metadata and quality flags","bandas",1],["Aladin and Astropy with real data","datos",1]],ok=L.filter(l=>l[2]).length,
+ TT=[["mapa","Map"],["visor","Viewer"],["espectro","Spectrum"],["comparar","Compare"]];
+ P('<div id="shr"><div class="g2"><div class="shc"><img id="shi" alt="Current sky view"><div class="shm"><h3 style="margin-top:0">'+esc(o.n)+'</h3><div class="chp"><span>'+VW[S.v]+'</span><span>Level '+["","Beginner","Standard","Professional"][S.lv]+'</span><span>Field '+V.fov+'′</span><span>Mode '+MD[V.m]+'</span><span>RA '+o.ra.toFixed(2)+'° · Dec '+o.dec.toFixed(2)+'°</span></div></div></div>'
+ +'<div><h3 style="margin-top:0">Link</h3><div class="row2"><button class="b tq" id="cl">Copy link</button><button class="b'+(navigator.share?"":" hide")+'" id="sn">Share…</button><button class="b" id="ml">Email</button></div>'
+ +'<h3>When opening the link, show</h3><div class="row2" id="sw2">'+TT.map(t=>'<button class="b'+(SH.t==t[0]?" on":"")+'" data-w="'+t[0]+'">'+t[1]+'</button>').join("")+'</div>'
+ +'<h3>QR code</h3><div class="qrb"><div id="qb"></div><div class="row2"><button class="b" id="qd">Download QR</button></div></div><p id="qm"></p>'
+ +'<h3>Embed on another page</h3><button class="b" id="ie">Copy embed code</button>'
+ +'<h3>Export</h3><div class="row2"><button class="b" id="x1">Spectrum (CSV)</button><button class="b" id="x2">View (PNG)</button><button class="b" id="x3">Printable report</button></div></div></div>'
+ +'<h3>Plan challenges</h3><div class="pr"><b>'+ok+' of '+L.length+'</b><div class="pbar" role="progressbar" aria-valuenow="'+ok+'" aria-valuemin="0" aria-valuemax="'+L.length+'"><i style="width:'+ok/L.length*100+'%"></i></div></div>'
+ +'<div class="rg">'+L.map(l=>l[2]?(l[1]?'<button class="rc" data-go="'+l[1]+'"><span>✓</span><div>'+l[0]+'<small>Open '+l[1]+'</small></div></button>':'<div class="rc"><span>✓</span><div>'+l[0]+'<small>Works in this link</small></div></div>'):'<div class="rc pe"><span>◔</span><div>'+l[0]+'<small>Requires connecting real data</small></div></div>').join("")+'</div></div>');
+ const r=$("#shr");$("#shi").src=snap(640).toDataURL("image/png");
+ const qu=()=>{const c=qrCv(slink(),8);$("#qb").innerHTML="";if(c){$("#qb").appendChild(c);$("#qm").textContent="";$("#qd").disabled=false}else{$("#qm").textContent="The link is too long for a QR code.";$("#qd").disabled=true}};qu();
+ r.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)return;const i=t.id;
+  if(t.dataset.go){tab(t.dataset.go)}
+  else if(t.dataset.w){SH.t=t.dataset.w;r.querySelectorAll("[data-w]").forEach(b=>b.classList.toggle("on",b==t));qu()}
+  else if(i=="cl")cp(slink()).then(k=>flash(t,k?"Copied ✓":"Could not copy"));
+  else if(i=="ie")cp('<iframe src="'+slink(1)+'" width="100%" height="640" style="border:0" loading="lazy" title="Sky in Motion"></iframe>').then(k=>flash(t,k?"Copied ✓":"Could not copy"));
+  else if(i=="sn"){try{navigator.share({title:"Sky in Motion · "+o.n,text:"See "+o.n+" in the sky",url:slink()})}catch(e){}}
+  else if(i=="ml"){const a=document.createElement("a");a.href="mailto:?subject="+encodeURIComponent("Sky in Motion · "+o.n)+"&body="+encodeURIComponent("See "+o.n+" in Sky in Motion:\n"+slink());a.click()}
+  else if(i=="qd"){const c=qrCv(slink(),10);if(c)c.toBlob(b=>dl("qr-"+fn(o)+".png",b))}
+  else if(i=="x1"){const sp=spec(o);dl("spectrum-"+fn(o)+".csv",new Blob(["band,lambda_um,brightness_mJy\n"+sp.map(p=>(p[2]+1)+","+p[0].toFixed(3)+","+p[1].toFixed(2)).join("\n")],{type:"text/csv"}))}
+  else if(i=="x2")$("#sky").toBlob(b=>b&&dl("sky-"+fn(o)+".png",b));
+  else if(i=="x3")report()})};
+
+const hv=(a,b)=>{const d=b*D,g=27.128*D,bl=Math.asin(Math.sin(d)*Math.sin(g)+Math.cos(d)*Math.cos(g)*Math.cos((a-192.859)*D))/D,gc=Math.acos(Math.max(-1,Math.min(1,-Math.sin(d)*.4848+Math.cos(d)*.8746*Math.cos((a-266.4)*D))))/D;return Math.min(1,.12+.7*Math.exp(-Math.pow(bl/9,2))+.5*Math.exp(-Math.pow(gc/28,2))+.05*Math.sin(a*.7)*Math.cos(b*.9))},hc=v=>"hsl("+(240-240*v)+" 90% "+(22+32*v)+"%)";
+$("#vg").onclick=()=>{S.fg=!S.fg;$("#vg").classList.toggle("on",S.fg);$("#vg").setAttribute("aria-pressed",!!S.fg);mfLabel();draw()};
+function finfo(x,y){const cs=S.z>6?2:S.z>2.5?3:6;let best=null,bd=1e9;for(let a=0;a<360;a+=cs)for(let b=-90;b<90;b+=cs){const p=proj(a+cs/2,b+cs/2);if(!p)continue;const d=Math.hypot(p[0]-x,p[1]-y);if(d<bd){bd=d;best=[a+cs/2,b+cs/2]}}if(!best)return;const v=hv(best[0],best[1]);
+ $("#pop").innerHTML='<button class="x" aria-label="Close" onclick="$(\'#pop\').classList.add(\'hide\')">×</button><h3>Heat map</h3><div class="t">'+(S.lv>=2?"RA "+best[0].toFixed(1)+"° · Dec "+best[1].toFixed(1)+"°":"Sky region")+'</div><p style="margin:8px 0"><span style="color:'+hc(v)+'">■</span> Relative infrared brightness: <b>'+v.toFixed(2)+'</b> (0 to 1)<br>'+(v>.65?"High: near the plane of the Milky Way.":v<.3?"Low: deep sky, ideal for seeing faint sources.":"Medium.")+'</p>';$("#pop").classList.remove("hide")}
+/* ---------- Compare dates ---------- */
+const MS="May Jun Jul Aug Sep Oct Nov Dec Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov".split(" ").map((m,i)=>m+" "+(i<8?2025:2026)),QL=[0,0,1,0,0,2,0,0,0,1,0,2,0,0,0,1,0,0,0],QS=["● good","▲ warning","■ bad"],QC=["#22c55e","#facc15","#fc3d21"];
+const C={m:"s",sel:[1,2,5,8],s:.5,k:0,min:0,fov:2,det:"Σ",skip:1,op:"-"},has=i=>i%4!=3,bv=t=>12.4*(1+.01*t),mp=(t,o)=>o.mv?[40+t*13,185-t*5.5]:[160,120],ym=i=>(2025+Math.floor((4+i)/12))+"-"+String((4+i)%12+1).padStart(2,"0");
+const pmv=o=>{const n=(o.pm||"").match(/\d+(?:\.\d+)?/);return n&&o.mv?+n[0]:0},fr=()=>C.sel.filter(i=>has(i)&&(!C.skip||QL[i]<2)).sort((a,b)=>a-b),snr=n=>Math.sqrt(Math.max(1,n)*(C.det=="Σ"?2.5:1));
+const CM=[["v","Video","Play the chosen dates in order."],["b","Blink","Alternate A and B. That is how Pluto was discovered."],["a","Before/after","Slide to go from date A to date B."],["r","Subtract A−B","What is fixed turns gray; what moves leaves a bright (+) and a dark (−) blob."],["u","Sum Σ","Add the dates to raise signal/noise (√N). If the object moves, it smears: stack nearby dates."],["s","No fixed sky","Subtract the median of all frames: only moving objects remain. This is the recommended mode."],["e","Trail","Stack the maximum: each object draws its path."]];
+function cpatch(){const o=cur(),x=$("#cv2").getContext("2d"),f=fr(),n=f.length,m=C.m,a=n?f[0]:0,b=n?f[n-1]:0,A=mp(a,o),B=mp(b,o),sn=snr(n),hid=o.mv&&pmv(o)*(b-a)/12/6<C.min,T=p=>[160+(p[0]-160)*2/C.fov,120+(p[1]-120)*2/C.fov];
+ x.fillStyle=m=="r"?"#3a3a3a":"#05060c";x.fillRect(0,0,320,240);for(let i=0;i<900/sn;i++){x.fillStyle="rgba(170,185,230,"+rnd()*.25+")";x.fillRect(rnd()*320,rnd()*240,1.5,1.5)}
+ if(m!="r"&&m!="s"){x.fillStyle="#cdd8ff";SP.forEach(t=>{const p=T(t);x.beginPath();x.arc(p[0],p[1],t[2],0,7);x.fill()})}
+ const dot=(p,c,al,r)=>{p=T(p);x.globalAlpha=al;x.fillStyle=c;x.beginPath();x.arc(p[0],p[1],r||6,0,7);x.fill();x.globalAlpha=1};
+ if(!hid&&n){if(m=="v")dot(mp(f[C.k%n],o),"#f97316",1);if(m=="b")dot(C.k%2?B:A,"#f97316",1);if(m=="a"){dot(A,"#f97316",1-C.s);dot(B,"#f97316",C.s)}if(m=="r"){dot(A,"#fff",1,7);dot(B,"#000",1,7)}
+  if(m=="u")f.forEach(t=>dot(mp(t,o),"#f97316",.45,6));if(m=="s")for(let t=0;t<19;t++)dot(mp(t,o),"#f97316",f.includes(t)?1:.2,4);
+  if(m=="e"){x.strokeStyle="#f97316";x.beginPath();for(let t=0;t<19;t++){const p=T(mp(t,o));t?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])}x.stroke();f.forEach(t=>dot(mp(t,o),"#f97316",.7,3))}}
+ x.lineWidth=1.5;const L=V.l;if(L.gaia){const p=T(A),q=T(B);x.strokeStyle="#2dd4bf";x.setLineDash([4,3]);x.beginPath();x.moveTo(p[0],p[1]);x.lineTo(q[0],q[1]);x.stroke();x.setLineDash([])}
+ if(L.wise){const p=T(SP[0]);x.strokeStyle="#facc15";x.strokeRect(p[0]-8,p[1]-8,16,16)}if(L.simbad){const p=T(SP[1]);x.strokeStyle="#a78bfa";x.beginPath();x.moveTo(p[0]-8,p[1]);x.lineTo(p[0]+8,p[1]);x.moveTo(p[0],p[1]-8);x.lineTo(p[0],p[1]+8);x.stroke()}
+ x.fillStyle="#fff";x.font="13px sans-serif";x.fillText(!n?"Choose at least one date with data":hid?"Hidden by the minimum-motion filter":m=="v"?MS[f[C.k%n]]+" "+QS[QL[f[C.k%n]]][0]:m=="b"?MS[C.k%2?b:a]:m=="a"?"A "+MS[a]+" ↔ B "+MS[b]:m=="r"?"A − B":m=="u"?"Σ "+n+" dates · S/N ×"+sn.toFixed(1):m=="s"?"No fixed sky":"Trail",8,18)}
+R.comparar=()=>{if(S.lv==2)return comparar2();P('<h2>Compare dates and find motion</h2><div class="g2"><div><canvas id="cv2" width="320" height="240"></canvas><input type="range" id="cs2" min="0" max="100" value="50" aria-label="Between date A and B"><p id="cp">Tap the image to extract the spectrum at that point.</p><canvas id="csp" width="480" height="150" class="hide"></canvas></div><div><h3>Calendar (teal = data available; tap several months to stack them)</h3><div class="row2" id="cal"></div><p id="ct2"></p><h3>Comparison mode</h3><div class="row2" id="cm3">'+CM.map(m=>'<button class="b" data-k="'+m[0]+'">'+m[1]+'</button>').join("")+'</div><p id="cd"></p><h3>Field of view</h3><input type="range" id="cfv" min="1" max="10" value="'+C.fov+'"><p id="cfi"></p><h3>Detector</h3><div class="row2" id="cdt">'+["D1","D2","D3","D4","D5","D6","Σ"].map(d=>'<button class="b" data-d="'+d+'">'+d+'</button>').join("")+'</div><p>Signal/noise: <b id="csn" style="color:var(--txt)"></b></p><label><input type="checkbox" id="csk" checked> Skip poor-quality frames</label><h3>Overlay other telescopes</h3><label><input type="checkbox" data-l="gaia"'+(V.l.gaia?" checked":"")+'> Expected path</label><label><input type="checkbox" data-l="wise"'+(V.l.wise?" checked":"")+'> WISE</label><label><input type="checkbox" data-l="simbad"'+(V.l.simbad?" checked":"")+'> 2MASS</label><h3>Minimum-motion filter</h3><input type="range" id="cmn" min="0" max="3" step=".1" value="'+C.min+'"><p id="cmv"></p></div></div><h3>Chosen frames: metadata and flags</h3><table id="ctb"></table><h3>Automatic detection and motion meter</h3><p id="mm"></p><h3>Image calculator</h3><div class="row2" id="cop"><button class="b" data-o="+">A+B</button><button class="b" data-o="-">A−B</button><button class="b" data-o="/">(A−B)/(A+B)</button></div><p id="co"></p><h3>Link to this comparison</h3><pre id="clk"></pre><button class="b tq" id="ccp">Copy link</button><p class="n3">Parallax: nearby objects draw a small loop; proper motion plus parallax estimates distance (WISE 0855 is the ideal example). Coming soon.</p><p style="color:var(--warn)">Caution: wavelength changes with position on the detector. Compare the same band or detector.</p>');
+
+ const upd=()=>{const o=cur(),f=fr(),n=f.length,a=n?f[0]:0,b=n?f[n-1]:0,yr=(b-a)/12,ds=pmv(o)*yr,A=bv(a),B=bv(b),r=C.op=="+"?A+B:C.op=="-"?A-B:(A-B)/(A+B),sn=snr(n);
+  $("#cal").innerHTML=MS.map((m,i)=>'<button class="b'+(C.sel.includes(i)?" on":"")+'" data-i="'+i+'"'+(has(i)?' style="border-color:var(--tq)"':" disabled")+'>'+m+(QL[i]?(QL[i]==1?" ▲":" ■"):"")+'</button>').join("");
+  $("#ct2").textContent=n+" valid frames · A = "+MS[a]+" · B = "+MS[b]+(C.sel.length>n?" · "+(C.sel.length-n)+" excluded":"");
+  [...$("#cm3").children].forEach(q=>q.classList.toggle("on",q.dataset.k==C.m));[...$("#cdt").children].forEach(q=>q.classList.toggle("on",q.dataset.d==C.det));$("#cd").textContent=CM.find(q=>q[0]==C.m)[2];$("#cs2").style.visibility=C.m=="a"?"visible":"hidden";
+  $("#cfi").textContent=C.fov+"′ ≈ "+(.75*C.fov*C.fov).toFixed(1)+" MB · ~"+Math.ceil(C.fov*C.fov/2)+" s · wider = slower";$("#csn").textContent="×"+sn.toFixed(1)+" ("+n+" dates · "+(C.det=="Σ"?"6 detectors":"detector "+C.det)+")";$("#cmv").textContent="Show only what moves more than "+C.min+" px";
+  $("#ctb").innerHTML='<tr><th>Date</th><th>Detectors</th><th>Quality</th><th>Status</th></tr>'+C.sel.slice().sort((x,y)=>x-y).map(i=>'<tr><td>'+MS[i]+'</td><td>D1–D6</td><td style="color:'+QC[QL[i]]+'">'+QS[QL[i]]+'</td><td>'+(!has(i)?"no data":C.skip&&QL[i]==2?"excluded":"included")+'</td></tr>').join("");
+  $("#mm").textContent=!n?"Choose dates with data.":o.mv?"Moved "+ds.toFixed(1)+"″ ("+(ds/6).toFixed(2)+" px of 6″) between "+MS[a]+" and "+MS[b]+" → proper motion ≈ "+pmv(o)+"″/yr. "+(o.n=="WISE 0855"?"No 2MASS counterpart: possible cold object. ":"Has a 2MASS counterpart. ")+(o.n=="ε Indi B"?"Limit: SPHEREx cannot separate the brown-dwarf pair. ":"")+(n<2?"Choose another distant date to measure.":""):"No measurable motion; brightness change of "+(((B-A)/A)*100).toFixed(1)+" %.";
+  $("#co").textContent="A = "+A.toFixed(2)+" · B = "+B.toFixed(2)+" mJy · "+(C.op=="+"?"A+B":C.op=="-"?"A−B":"(A−B)/(A+B)")+" = "+r.toFixed(3);
+  $("#clk").textContent="cielo-en-movimiento.app/?ra="+o.ra.toFixed(3)+"&dec="+o.dec.toFixed(3)+"&fov="+C.fov+"&modo="+{v:"video",b:"blink",a:"antesdespues",r:"resta",u:"suma",s:"sinfijas",e:"estela"}[C.m]+"&t1="+ym(a)+"&t2="+ym(b)+"&det="+(C.det=="Σ"?"sum":C.det)+"&nivel="+S.lv;cpatch()};
+ $("#cal").onclick=e=>{const i=e.target.dataset.i;if(i==null)return;const k=C.sel.indexOf(+i);k<0?C.sel.push(+i):C.sel.length>1&&C.sel.splice(k,1);upd()};
+ $("#cm3").onclick=e=>{if(e.target.dataset.k){C.m=e.target.dataset.k;upd()}};$("#cdt").onclick=e=>{if(e.target.dataset.d){C.det=e.target.dataset.d;upd()}};$("#cop").onclick=e=>{if(e.target.dataset.o){C.op=e.target.dataset.o;upd()}};
+ $("#pn").querySelectorAll("[data-l]").forEach(q=>q.onchange=()=>{V.l[q.dataset.l]=q.checked;cpatch()});
+ $("#cs2").oninput=e=>{C.s=e.target.value/100;cpatch()};$("#cmn").oninput=e=>{C.min=+e.target.value;upd()};$("#cfv").oninput=e=>{C.fov=+e.target.value;upd()};$("#csk").onchange=e=>{C.skip=e.target.checked?1:0;upd()};
+ $("#ccp").onclick=()=>{try{navigator.clipboard.writeText("https://"+$("#clk").textContent);$("#ccp").textContent="Copied ✓"}catch(e){$("#ccp").textContent="Could not copy"}};
+ $("#cv2").onclick=e=>{const o=cur(),r=e.target.getBoundingClientRect(),u=160+((e.clientX-r.left)*320/r.width-160)*C.fov/2,w=120+((e.clientY-r.top)*240/r.height-120)*C.fov/2;
+  $("#cp").innerHTML="Point: RA "+(o.ra+(160-u)*.375/3600/(Math.cos(o.dec*D)||1)).toFixed(4)+"° · Dec "+(o.dec+(120-w)*.375/3600).toFixed(4)+"° <button class='b tq' id='cgo'>See full spectrum →</button>";$("#cgo").onclick=()=>tab("espectro");$("#csp").classList.remove("hide");plot("#csp",[spec(o)],{z:ZN,c:["#f97316"],xl:"µm",yl:"mJy"})};
+ upd();tm=setInterval(()=>{if(C.m=="v"||C.m=="b"){C.k++;cpatch()}},700)};
+R.movimiento=()=>{clearInterval(tm);
+ const o=O.find(item=>item.n==="WISE 0855")||cur(),names=["WISE 0855","Barnard\u2019s Star","\u03b5 Indi B","RW Aur","R Dra"],known=names.includes(o.n);
+ P('<h2>Real motion · FITS file sequence</h2><p class="cem-live-intro">WISE 0855 opens with SPHEREx images already saved on this computer, so the demo does not wait on NASA. Search sequence still downloads a new patch for any other coordinates.</p>'+
+  '<div class="cem-live-controls" style="grid-template-columns:repeat(auto-fit,minmax(145px,1fr))">'+
+  '<label>Celestial object<select id="cemTrackObject">'+names.map(n=>'<option value="'+n+'"'+(n===o.n?' selected':'')+'>'+n+'</option>').join('')+'<option value="custom"'+(known?'':' selected')+'>Custom coordinates</option></select></label>'+
+  '<label>Right ascension (RA °)<input id="cemTrackRa" type="number" min="0" max="359.999999" step="0.000001" value="'+o.ra.toFixed(6)+'"></label>'+
+  '<label>Declination (Dec °)<input id="cemTrackDec" type="number" min="-90" max="90" step="0.000001" value="'+o.dec.toFixed(6)+'"></label>'+
+  '<label>Search radius (°)<input id="cemTrackRadius" type="number" min="0.01" max="0.5" step="0.01" value="0.04"></label>'+
+  '<label>Maximum images<select id="cemTrackMax"><option>12</option><option selected>24</option><option>36</option></select></label>'+
+  '<button class="b" id="cemTrackFromSky" type="button">Take coordinates from the map</button>'+
+  '<button class="b tq" id="cemTrackSearch">Search sequence</button></div>'+
+  '<div id="cemTrackStatus" class="cem-track-status" role="status" aria-live="polite">Opening the preloaded SPHEREx sequence for WISE 0855…</div>'+
+  '<div class="g2 cem-track-layout"><div><div class="cem-track-image-wrap"><canvas id="cemTrackCanvas" width="480" height="480" aria-label="Selected SPHEREx image"></canvas><div class="cem-track-image-caption" id="cemTrackCaption">The first processed image will appear here.</div></div>'+
+  '<label class="cem-track-slider-label">Step through the sequence<input id="cemTrackFrame" type="range" min="0" max="0" value="0" disabled></label><div class="row2"><button class="b" id="cemTrackPrev" disabled>Previous</button><button class="b" id="cemTrackPlay" disabled>Play</button><button class="b" id="cemTrackNext" disabled>Next</button></div></div>'+
+  '<div><h3>Comparison tools</h3><div class="row2" id="cemTrackModes"><button class="b on" data-mode="blink">Blink</button><button class="b" data-mode="slider">Slider</button><button class="b" data-mode="difference">Image subtraction</button></div>'+
+  '<p id="cemTrackModeHelp" class="cem-live-foot">Switch between two dates to see if something moved.</p>'+
+  '<label>Detector / banda<select id="cemTrackDetector" disabled><option value="all">All (separated by detector)</option></select></label>'+
+  '<label>Date A<select id="cemTrackA" disabled></select></label><label>Date B<select id="cemTrackB" disabled></select></label>'+
+  '<label id="cemTrackBlendLabel" class="hide">Slide between A and B<input id="cemTrackBlend" type="range" min="0" max="100" value="50"></label>'+
+  '<div class="res" id="cemTrackAnalysis">When observations load, metadata will appear here.</div></div></div>'+
+  '<h3>Observation sequence</h3><div id="cemTrackFrames" class="cem-track-frames"></div>'+
+  '<h3>Metadata and quality</h3><div class="cem-track-table-wrap"><table id="cemTrackTable"><tbody><tr><td>No observations loaded.</td></tr></tbody></table></div>'+
+  '<p class="cem-live-foot">Images from the same detector are compared so a wavelength change is not mistaken for motion. The Compare tab remains the practice area with demonstration data.</p>');
+ const sky=$("#cemTrackFromSky");
+ if(sky)sky.onclick=()=>{const ra=((S.cx%360)+360)%360,dec=+S.cy;$("#cemTrackRa").value=ra.toFixed(6);$("#cemTrackDec").value=dec.toFixed(6);const sel=$("#cemTrackObject");if(sel)sel.value="custom";$("#cemTrackStatus").textContent="Coordinates taken from the map. Press Search sequence to download the FITS files."};
+ document.dispatchEvent(new CustomEvent("cem:comparison-ready"));
+};
+/* ---------- Toolbar for the active tab ---------- */
+let BMOD="f";
+const TOOLS={
+ visor:()=>S.lv==1?"":'<label class="tl">Mode</label><select onchange="toolGo(\'m\',this.value)" aria-label="Viewer mode"><option value="v"'+(V.m=="v"?" selected":"")+'>Video</option><option value="a"'+(V.m=="a"?" selected":"")+'>Before/after</option><option value="r"'+(V.m=="r"?" selected":"")+'>Subtract</option></select><label class="tl">Detector</label><select onchange="toolGo(\'d\',this.value)" aria-label="Detector">'+["D1","D2","D3","D4","D5","D6","Σ"].map(d=>'<option'+(V.det==d?" selected":"")+'>'+d+'</option>').join("")+'</select>',
+ comparar:()=>S.lv!=3?"":'<label class="tl">Mode</label><select onchange="toolGo(\'cm\',this.value)" aria-label="Comparison mode">'+CM.map(m=>'<option value="'+m[0]+'"'+(C.m==m[0]?" selected":"")+'>'+m[1]+'</option>').join("")+'</select><label class="tl">Detector</label><select onchange="toolGo(\'cd\',this.value)" aria-label="Detector">'+["D1","D2","D3","D4","D5","D6","Σ"].map(d=>'<option'+(C.det==d?" selected":"")+'>'+d+'</option>').join("")+'</select>',
+ bandas:()=>'<label class="tl">Visualization</label><select onchange="toolGo(\'bmd\',this.value)" aria-label="Band visualization">'+[["f","Flags"],["b","Brightness"],["p","Globe"],["l","Moon"]].map(m=>'<option value="'+m[0]+'"'+(BMOD==m[0]?" selected":"")+'>'+m[1]+'</option>').join("")+'</select>',
+ espectro:()=>'<button class="b'+($("#cm2")&&$("#cm2").checked?" on":"")+'" onclick="toolGo(\'cmp\')">Compare with a normal star</button>'
+};
+function toolGo(k,v){
+ if(k=="m")V.m=v;else if(k=="d")V.det=v;
+ else if(k=="cm")C.m=v;else if(k=="cd")C.det=v;
+ else if(k=="bmd")BMOD=v;
+ else if(k=="cmp"){const c=$("#cm2");if(c){c.checked=!c.checked;c.dispatchEvent(new Event("change"))}const b=$("#tools button");if(b)b.classList.toggle("on",c&&c.checked);return}
+ tab(tabNow);
+}
+/* ---------- Quiz, challenges, and lessons ---------- */
+function quiz(sel,qs){let i=0,s=0;const el=$(sel),r=()=>{if(i>=qs.length){el.innerHTML='<p><b>Score: '+s+' of '+qs.length+'</b>'+(s==qs.length?' · Perfect!':' · Nice try!')+'</p><button class="b tq" id="qr">Play again</button>';$("#qr").onclick=()=>{i=0;s=0;r()};return}
+ const q=qs[i];el.innerHTML='<b>'+(i+1)+'/'+qs.length+'</b> '+q[0]+(q[4]?nimg(q[4],"nq"):"")+'<div class="row2">'+q[1].map((o,j)=>'<button class="b" data-j="'+j+'">'+o+'</button>').join("")+'</div><p id="qf" aria-live="polite"></p>';
+ el.querySelectorAll("[data-j]").forEach(b=>b.onclick=()=>{if(b.parentNode.dataset.d)return;b.parentNode.dataset.d=1;const ok=+b.dataset.j==q[2];if(ok)s++;b.style.background=ok?"#166534":"#7f1d1d";$("#qf").innerHTML=(ok?"Correct! ":"Close. ")+q[3]+' <button class="b tq" id="qn">Next →</button>';$("#qn").onclick=()=>{i++;r()}})};r()}
+const RK={a:0,k:0,sc:0,done:0,f:0};
+function ob(x,p,k){if(k==0){const g=x.createLinearGradient(p[0],p[1],p[0]-80,p[1]+40);g.addColorStop(0,"rgba(190,235,255,.95)");g.addColorStop(1,"rgba(190,235,255,0)");x.strokeStyle=g;x.lineWidth=12;x.lineCap="round";x.beginPath();x.moveTo(p[0],p[1]);x.lineTo(p[0]-80,p[1]+40);x.stroke();x.fillStyle="#fff";x.beginPath();x.arc(p[0],p[1],9,0,7);x.fill()}
+ else if(k==1){x.fillStyle="#fb923c";x.beginPath();x.arc(p[0],p[1],14,0,7);x.fill();x.strokeStyle="#fcd34d";x.lineWidth=3;x.beginPath();x.ellipse(p[0],p[1],26,7,-.3,0,7);x.stroke()}
+ else{x.fillStyle="#9ca3af";x.beginPath();x.arc(p[0],p[1],11,0,7);x.fill();x.fillStyle="#6b7280";x.beginPath();x.arc(p[0]-3,p[1]-2,3,0,7);x.arc(p[0]+4,p[1]+3,2.5,0,7);x.fill()}}
+function retoK(){clearInterval(tm);RK.a=Math.floor(rnd()*2);RK.k=Math.floor(rnd()*3);RK.done=0;const nm=["comet","planet","asteroid"][RK.k];
+ P('<h2>Mini challenge: which one moves?</h2><p>Look at the two sky photos. In one, the <b>'+nm+'</b> travels. In the other, it stays still. Tap the photo you choose.</p><div class="row2"><span class="new" style="font-size:16px">Stars earned: <b id="rs">'+RK.sc+'</b></span></div><div class="cd" id="rc" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">'+[0,1].map(i=>'<div><button class="b" data-i="'+i+'" style="border-radius:18px;padding:8px;width:100%" aria-label="Choose photo '+(i+1)+'"><canvas id="rt'+i+'" width="260" height="195"></canvas></button><b style="font-size:20px;margin-top:6px">Foto '+(i+1)+'</b></div>').join("")+'</div><p id="rm" style="font-size:18px" aria-live="polite">Tap the photo you choose.</p><button class="b tq" id="rn">Another challenge</button>');
+ const dr=()=>{for(let i=0;i<2;i++){const x=$("#rt"+i).getContext("2d"),f=RK.f,mv=i==RK.a;x.fillStyle="#05060c";x.fillRect(0,0,260,195);x.fillStyle="#cdd8ff";SP.forEach(t=>{x.beginPath();x.arc((t[0]*.8+i*40)%260,(t[1]*.8+i*20)%195,t[2],0,7);x.fill()});
+  const p=mv?[50+f*32,150-f*18]:[130,95];ob(x,p,RK.k);if(RK.done&&mv){x.strokeStyle="#22c55e";x.lineWidth=3;x.strokeRect(p[0]-30,p[1]-30,60,60)}
+  x.fillStyle="#9fb0d6";x.font="14px sans-serif";x.fillText("Day "+(f+1),8,20)}};
+ dr();tm=setInterval(()=>{RK.f=(RK.f+1)%6;dr()},700);
+ $("#rc").onclick=e=>{const b=e.target.closest("button[data-i]");if(!b||RK.done)return;if(+b.dataset.i==RK.a){RK.done=1;RK.sc++;$("#rs").textContent=RK.sc;$("#rm").textContent="Great! The "+nm+" changed place between the days and the stars stayed still. That is how astronomers discover new things.";dr()}else $("#rm").textContent="Close! There the "+nm+" stays still. Try the other photo!"};
+ $("#rn").onclick=retoK}
+const CS={a:0,b:0,m:"b",s:.5,k:0};
+function comparar2(){clearInterval(tm);const o=cur(),V2=MS.map((m,i)=>i).filter(i=>has(i)&&QL[i]<2);if(!V2.includes(CS.a)||CS.a==CS.b){CS.a=V2[0];CS.b=V2[8]}
+ const op=v=>V2.map(i=>'<option value="'+i+'"'+(i==v?" selected":"")+'>'+MS[i]+'</option>').join(""),MD=[["b","Blink","Switch from A to B again and again. What jumps in place is moving."],["a","Deslizar","Move the bar to go from A to B little by little."],["r","Only what changed","The still stars disappear. What moved leaves a bright blob and a dark one."]];
+ P('<h2>Compare two dates</h2><p>Choose two dates and see if something changed place between the two photos. Object: <b>'+o.n+'</b>.</p><div class="g2"><div><canvas id="cv2" width="320" height="240"></canvas><input type="range" id="cs2" min="0" max="100" value="50" aria-label="Between A and B"></div><div><h3>Step 1: choose the dates</h3><label>Photo A (before)<select id="sa">'+op(CS.a)+'</select></label><label>Photo B (after)<select id="sb2">'+op(CS.b)+'</select></label><h3>Step 2: choose how to look</h3><div class="row2" id="cm3">'+MD.map(m=>'<button class="b" data-k="'+m[0]+'">'+m[1]+'</button>').join("")+'</div><p id="cx"></p><h3>Result</h3><p class="res" id="cr2" style="background:var(--pan2);border:1px solid var(--tq);border-radius:12px;padding:10px 12px;color:var(--txt)"></p></div></div>');
+ const dw=()=>{const x=$("#cv2").getContext("2d"),A=mp(CS.a,o),B=mp(CS.b,o),m=CS.m,dot=(p,c,al)=>{x.globalAlpha=al;x.fillStyle=c;x.beginPath();x.arc(p[0],p[1],7,0,7);x.fill();x.globalAlpha=1};x.fillStyle=m=="r"?"#3a3a3a":"#05060c";x.fillRect(0,0,320,240);
+  if(m!="r"){x.fillStyle="#cdd8ff";SP.forEach(t=>{x.beginPath();x.arc(t[0],t[1],t[2],0,7);x.fill()})}
+  if(m=="b")dot(CS.k%2?B:A,"#f97316",1);if(m=="a"){dot(A,"#f97316",1-CS.s);dot(B,"#f97316",CS.s)}if(m=="r"){dot(A,"#fff",1);dot(B,"#000",1)}
+  x.fillStyle="#fff";x.font="14px sans-serif";x.fillText(m=="b"?(CS.k%2?"Photo B · ":"Photo A · ")+MS[CS.k%2?CS.b:CS.a]:m=="a"?"A "+MS[CS.a]+" ↔ B "+MS[CS.b]:"A − B",8,20)};
+ const up=()=>{const ds=pmv(o)*(CS.b-CS.a)/12;[...$("#cm3").children].forEach(q=>q.classList.toggle("on",q.dataset.k==CS.m));$("#cx").textContent=MD.find(q=>q[0]==CS.m)[2];$("#cs2").style.visibility=CS.m=="a"?"visible":"hidden";
+  $("#cr2").textContent=CS.b<=CS.a?"Choose a date B later than date A.":o.mv?"Between "+MS[CS.a]+" and "+MS[CS.b]+" it moved about "+ds.toFixed(1)+"″, almost "+(ds/6.15).toFixed(1)+" SPHEREx pixels.":"This object did not change place. Only its brightness changes.";dw()};
+ $("#sa").onchange=e=>{CS.a=+e.target.value;up()};$("#sb2").onchange=e=>{CS.b=+e.target.value;up()};$("#cm3").onclick=e=>{if(e.target.dataset.k){CS.m=e.target.dataset.k;up()}};$("#cs2").oninput=e=>{CS.s=e.target.value/100;dw()};
+ up();tm=setInterval(()=>{if(CS.m=="b"){CS.k++;dw()}},700)}
+const RN={sc:0,st:0,k:0,done:0,bad:0,f:0};
+const TY=[["Globe","It looks like a bright disk and moves slowly and evenly among the stars.",[16,-4]],["Comet","It moves fast and leaves a trail (tail) of gas and dust.",[28,-12]],["Asteroid","It moves, is small and rocky, and has no tail.",[26,-10]],["Brown dwarf","It barely shines in visible light, is very red in infrared, and moves little but measurably.",[8,-2]],["Variable star","It does not change place, but its brightness rises and falls.",[0,0]]];
+function retoN(){clearInterval(tm);RN.k=Math.floor(rnd()*5);RN.done=0;RN.bad=0;const t=TY[RN.k],op=[RN.k];while(op.length<4){const j=Math.floor(rnd()*5);if(!op.includes(j))op.push(j)}op.sort(()=>rnd()-.5);
+ const mvl=t[2][0]==0?"none":t[2][0]<10?"little":t[2][0]<20?"moderate":"a lot";
+ P('<h2>Identify the object</h2><p>Watch how this object changes over 6 dates and read the clues. What is it?</p><div class="row2"><span class="new" style="font-size:15px">Points <b id="rs">'+RN.sc+'</b></span><span class="new" style="font-size:15px;background:var(--tq)">Streak <b id="rk">'+RN.st+'</b></span></div><div class="g2"><div><canvas id="rtn" width="320" height="220"></canvas></div><div><h3>Clues</h3><ul><li>Motion: '+mvl+'</li><li>Brightness: '+["constant","constant","constant","very low in visible light","rises and falls"][RN.k]+'</li><li>Shape: '+["disk with a ring","point with a tail","rocky point with no tail","very faint reddish point","point that changes size"][RN.k]+'</li></ul><h3>What is it?</h3><div class="row2" id="ro">'+op.map(j=>'<button class="b" data-j="'+j+'">'+TY[j][0]+'</button>').join("")+'</div><p id="rm" aria-live="polite"></p><button class="b tq" id="rn">Another object</button></div></div>');
+ const dr=()=>{const x=$("#rtn").getContext("2d"),f=RN.f;x.fillStyle="#05060c";x.fillRect(0,0,320,220);x.fillStyle="#cdd8ff";SP.forEach(q=>{x.beginPath();x.arc(q[0],q[1]*.9,q[2],0,7);x.fill()});
+  const p=[60+f*t[2][0],150+f*t[2][1]*1.2],k=RN.k;if(k==0)ob(x,p,1);else if(k==1)ob(x,p,0);else if(k==2)ob(x,p,2);else if(k==3){x.globalAlpha=.35;x.fillStyle="#f97316";x.beginPath();x.arc(p[0],p[1],10,0,7);x.fill();x.globalAlpha=1;x.fillStyle="#b91c1c";x.beginPath();x.arc(p[0],p[1],3,0,7);x.fill()}else{x.fillStyle="#fff";x.beginPath();x.arc(160,110,3+4*Math.abs(Math.sin(f*.9)),0,7);x.fill()}
+  x.fillStyle="#9fb0d6";x.font="13px sans-serif";x.fillText(DS[f],8,18)};
+ dr();tm=setInterval(()=>{RN.f=(RN.f+1)%6;dr()},650);
+ $("#ro").onclick=e=>{const j=e.target.dataset.j;if(j==null||RN.done)return;if(+j==RN.k){RN.done=1;const g=!RN.bad;RN.sc+=g?1:0;RN.st=g?RN.st+1:0;$("#rs").textContent=RN.sc;$("#rk").textContent=RN.st;$("#rm").textContent="Correct: "+t[0]+". "+t[1]}else{RN.bad++;RN.st=0;$("#rk").textContent=0;$("#rm").textContent="Not "+TY[j][0].toLowerCase()+". Check the clues and try again."}};
+ $("#rn").onclick=retoN}
+const KIND={"The Sun":"sol","Mercury":"mercurio","Venus":"venus","Earth":"tierra","The Moon":"luna","Mars":"marte","Jupiter":"jupiter","Saturn":"saturno","Uranus":"urano","Neptune":"neptuno","Comets and asteroids":"cometa","The universe":"universo","The SPHEREx mission":"spherex","102 bands and 6 detectors":"spherex","What the mission seeks":"universo","Trails and comets":"cometa","Asteroids":"asteroide","Brown dwarfs":"enana","Variable stars":"variable","Data collection":"spherex","Data processing":"pipeline","The FITS format":"fits","The infrared sky":"enana"};Object.assign(KIND,{"How SPHEREx observes":"spherex","Trivia":"trivia","Official sources":"fuentes","How far away is it?":"paralaje","Would SPHEREx see it?":"pixeles","Test what you learned":"trivia"});
+function art(k,z){const PL={sol:["#fff7c2","#fbbf24","#b45309"],mercurio:["#e7e5e4","#78716c","#1c1917"],venus:["#fef3c7","#d97706","#78350f"],tierra:["#7dd3fc","#1d4ed8","#0b1e4a"],luna:["#fafaf9","#a8a29e","#44403c"],marte:["#fdba74","#c2410c","#431407"],jupiter:["#fed7aa","#b45309","#431407"],saturno:["#fef3c7","#ca8a04","#422006"],urano:["#cffafe","#22b8c7","#134e4a"],neptuno:["#bfdbfe","#2563eb","#172554"]},p=PL[k],W=b=>'<svg viewBox="0 0 200 200" width="'+z+'" height="'+z+'" role="img" aria-label="Illustration: '+k+'">'+b+'</svg>',C=(x,y,r,c,a)=>'<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+c+'" opacity="'+(a||1)+'"/>',E=(x,y,a,b,c,o)=>'<ellipse cx="'+x+'" cy="'+y+'" rx="'+a+'" ry="'+b+'" fill="'+c+'" opacity="'+(o||1)+'"/>';
+ if(p){let d='<defs><radialGradient id="g'+k+'" cx=".35" cy=".3" r=".85"><stop offset="0" stop-color="'+p[0]+'"/><stop offset=".55" stop-color="'+p[1]+'"/><stop offset="1" stop-color="'+p[2]+'"/></radialGradient><clipPath id="c'+k+'"><circle cx="100" cy="100" r="62"/></clipPath></defs>',x="";
+  if(k=="sol")d+=C(100,100,90,"#f59e0b",.22)+C(100,100,76,"#f59e0b",.3);
+  if(k=="jupiter"||k=="saturno"||k=="urano"||k=="neptuno")for(let i=0;i<6;i++)x+='<rect x="30" y="'+(44+i*20)+'" width="140" height="'+(6+(i%3)*4)+'" fill="'+(i%2?"#7c2d12":"#fff7ed")+'" opacity="'+(k=="jupiter"||k=="saturno"?.28:.12)+'"/>';
+  if(k=="jupiter")x+=E(120,126,13,7,"#c2410c",.9);
+  if(k=="tierra")x+=E(84,86,22,15,"#16a34a")+E(120,122,16,22,"#16a34a")+E(96,108,24,4,"#fff",.7)+E(112,70,20,4,"#fff",.6);
+  if(k=="luna"||k=="mercurio")x+=C(80,80,9,"#000",.25)+C(120,95,12,"#000",.22)+C(95,130,7,"#000",.25)+C(130,60,5,"#000",.2);
+  if(k=="marte")x+=E(100,44,22,7,"#fff",.85)+E(80,100,18,10,"#7c2d12",.45)+E(122,118,14,8,"#7c2d12",.4);
+  if(k=="venus")x+=E(100,80,60,6,"#fff",.25)+E(100,110,60,8,"#7c2d12",.2);
+  const ring=k=="saturno";return W(d+(ring?'<g transform="rotate(-18 100 100)"><path d="M10 100A90 24 0 0 1 190 100" fill="none" stroke="#d6b36a" stroke-width="10" opacity=".85"/>':"")+C(100,100,62,"url(#g"+k+")")+'<g clip-path="url(#c'+k+')">'+x+'</g>'+(ring?'<path d="M10 100A90 24 0 0 0 190 100" fill="none" stroke="#e7c982" stroke-width="10"/></g>':"")+(k=="urano"?'<ellipse cx="100" cy="100" rx="12" ry="82" fill="none" stroke="#a5f3fc" stroke-width="2" opacity=".6"/>':""))}
+ if(k=="cometa")return W('<path d="M150 70L18 160L40 176Z" fill="#bae6fd" opacity=".35"/><path d="M150 70L40 120L55 140Z" fill="#e0f2fe" opacity=".5"/>'+C(150,70,16,"#fff")+C(150,70,26,"#bae6fd",.35));
+ if(k=="asteroide")return W('<path d="M52 98L74 62L118 54L152 84L146 126L108 148L66 138Z" fill="#78716c"/><path d="M74 62L118 54L108 98Z" fill="#a8a29e"/>'+C(100,112,9,"#44403c")+C(128,90,6,"#44403c")+C(80,120,5,"#44403c"));
+ if(k=="enana")return W(C(100,100,70,"#f97316",.15)+C(100,100,48,"#f97316",.25)+C(100,100,26,"#7f1d1d")+C(94,94,8,"#b91c1c",.7));
+ if(k=="variable")return W(C(100,100,84,"#fde68a",.12)+C(100,100,62,"#fde68a",.22)+C(100,100,40,"#fbbf24")+C(100,100,20,"#fff"));
+ if(k=="universo")return W('<g transform="rotate(-25 100 100)">'+E(100,100,84,28,"#a78bfa",.25)+E(100,100,60,18,"#60a5fa",.4)+E(100,100,32,10,"#fde68a",.8)+'</g>'+[[30,40],[160,30],[170,150],[40,160],[120,174],[24,100],[176,96]].map(q=>C(q[0],q[1],2,"#fff")).join(""));
+ if(k=="pipeline")return W([["PHOTONS",4,"light"],["TELEMETRY",58,"link"],["CALIBRATION",112,"correction"],["PRODUCT",166,"maps"]].map((b,i)=>'<rect x="'+b[1]+'" y="84" width="42" height="36" fill="#0b3d91" stroke="#5b86e0"/><text x="'+(b[1]+21)+'" y="99" text-anchor="middle" font-family="monospace" font-size="7" fill="#dbe4f8">'+b[0]+'</text><text x="'+(b[1]+21)+'" y="112" text-anchor="middle" font-family="monospace" font-size="6" fill="#9db0d4">'+b[2]+'</text>'+(i<3?'<path d="M'+(b[1]+43)+' 102 h6" stroke="#7fa6f0" stroke-width="1.5"/><path d="M'+(b[1]+49)+' 99 l6 3 l-6 3 z" fill="#7fa6f0"/>':'')).join("")+'<text x="100" y="52" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#9db0d4">PROCESSING CHAIN</text><text x="100" y="156" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#66799f">raw data become science</text>');
+ if(k=="fits")return W('<rect x="12" y="26" width="176" height="148" fill="#101a30" stroke="#5b86e0"/><text x="24" y="48" font-family="monospace" font-size="10.5" fill="#7fd4c4">SIMPLE  =                    T</text><text x="24" y="63" font-family="monospace" font-size="10.5" fill="#cfe0ff">BITPIX  =                  -32</text><text x="24" y="78" font-family="monospace" font-size="10.5" fill="#cfe0ff">NAXIS   =                    2</text><text x="24" y="93" font-family="monospace" font-size="10.5" fill="#cfe0ff">NAXIS1  =                 2048</text><text x="24" y="108" font-family="monospace" font-size="10.5" fill="#cfe0ff">NAXIS2  =                 2048</text><text x="24" y="123" font-family="monospace" font-size="10.5" fill="#cfe0ff">BUNIT   = \'MJy/sr\'</text><text x="24" y="138" font-family="monospace" font-size="10.5" fill="#cfe0ff">BAND    =                   17</text><text x="24" y="160" font-family="monospace" font-size="10.5" fill="#7fa6f0">END</text><text x="100" y="192" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#66799f">FITS HEADER · 80 CHARACTERS PER LINE</text>');
+ return W(C(100,100,70,"#0b3d91",.5)+'<ellipse cx="100" cy="100" rx="70" ry="22" fill="none" stroke="#5b86e0"/><ellipse cx="100" cy="100" rx="30" ry="70" fill="none" stroke="#5b86e0"/><path d="M30 100H170M100 30V170" stroke="#5b86e0"/>'+C(130,70,6,"#fc3d21"))}
+function lv(h,lead,arr){P('<h2>'+h+'</h2><p>'+lead+'</p><div class="lvs">'+arr.map((a,i)=>'<div class="lvc"><button class="lvh" aria-expanded="false">'+'<span class="lvi">'+lvt(KIND[a[0]]||"x",64)+'</span>'+'<span><b>'+a[0]+'</b><br><small>'+a[1]+'</small></span></button><div class="lvb hide">'+nimg(KIND[a[0]]||"x")+a[2]+'</div></div>').join("")+'</div>');
+ const cs=[...document.querySelectorAll("#pn .lvc")];cs.forEach((c,i)=>c.querySelector(".lvh").onclick=()=>{const b=c.querySelector(".lvb"),was=!b.classList.contains("hide");cs.forEach(d=>{d.classList.remove("open");d.querySelector(".lvb").classList.add("hide");d.querySelector(".lvh").setAttribute("aria-expanded","false")});if(!was){c.classList.add("open");b.classList.remove("hide");c.querySelector(".lvh").setAttribute("aria-expanded","true");if(!c.dataset.d){c.dataset.d=1;arr[i][3]()}}})}
+const RT={a:0,done:0,f:0,sc:0,st:0,hint:0,t0:0,bad:0};
+R.reto=()=>{if(S.lv==2)return retoN();clearInterval(tm);const K=0,N=K?3:4;RT.a=Math.floor(rnd()*N);RT.done=0;RT.hint=0;RT.bad=0;RT.t0=Date.now();
+ P('<h2>'+(K?'Mini challenge: catch the traveling dot!':'Motion hunter')+'</h2><p>'+(K?'Each patch shows the sky on 6 dates. The stars stay still, but ONE little dot travels. Tap the patch where you see it.':'There are '+N+' patches. Only one has an object with proper motion; the others have a variable that only changes brightness. Using a hint awards no point.')+'</p><div class="row2"><span class="new" style="font-size:15px">Points <b id="rs">'+RT.sc+'</b></span><span class="new" style="font-size:15px;background:var(--tq)">Streak <b id="rk">'+RT.st+'</b></span></div><div class="cd" id="rc" style="grid-template-columns:repeat(auto-fit,minmax('+(K?240:190)+'px,1fr))">'+Array.from({length:N},(_,i)=>'<div><button class="b" data-i="'+i+'" style="border-radius:14px;padding:6px;width:100%" aria-label="Choose patch '+"ABCD"[i]+'"><canvas id="rt'+i+'" width="220" height="165"></canvas></button><b style="font-size:16px;margin-top:6px">Patch '+"ABCD"[i]+'</b></div>').join("")+'</div><p id="rm" aria-live="polite">Tap the patch you choose.</p><button class="b tq" id="rn">New challenge</button> <button class="b" id="rh">Hint</button>');
+ const dr=()=>{for(let i=0;i<N;i++){const x=$("#rt"+i).getContext("2d"),f=RT.f,mv=i==RT.a;x.fillStyle="#05060c";x.fillRect(0,0,220,165);
+  for(let k=0;k<250;k++){x.fillStyle="rgba(170,185,230,"+rnd()*.22+")";x.fillRect(rnd()*220,rnd()*165,1.4,1.4)}
+  x.fillStyle="#cdd8ff";SP.forEach(t=>{x.beginPath();x.arc(((t[0]*.6875+i*57)%220),((t[1]*.6875+i*31)%165),t[2]*.8,0,7);x.fill()});
+  const p=mv?[30+f*(K?32:12),125-f*(K?16:6)]:[70+i*35,60+i*12];x.fillStyle="#fff";x.beginPath();x.arc(p[0],p[1],mv?(K?5:3.2):(K?4:2+1.4*Math.abs(Math.sin(f*1.3+i))),0,7);x.fill();
+  if(mv&&(RT.done||RT.hint)){x.strokeStyle="#fc3d21";x.lineWidth=2;x.strokeRect(p[0]-14,p[1]-14,28,28)}
+  x.fillStyle="#9fb0d6";x.font="13px sans-serif";x.fillText(DS[f],8,18)}};
+ dr();tm=setInterval(()=>{RT.f=(RT.f+1)%6;dr()},K?800:600);
+ $("#rc").onclick=e=>{const b=e.target.closest("button[data-i]");if(!b||RT.done)return;const i=+b.dataset.i;
+  if(i==RT.a){RT.done=1;const s=Math.round((Date.now()-RT.t0)/1000),g=!RT.hint&&!RT.bad;RT.sc+=g?1:0;RT.st=g?RT.st+1:0;$("#rs").textContent=RT.sc;$("#rk").textContent=RT.st;
+   $("#rm").textContent=K?"You found it! The little dot in patch "+"ABCD"[RT.a]+" changed place and the stars did not. That is how asteroids, comets, and brown dwarfs are discovered!":"Correct in "+s+" s. Proper motion: the point changes position between dates; the variable only changes size (brightness). "+(g?"+1 point.":"No point: you used a hint or missed earlier.")}
+  else{RT.bad++;RT.st=0;$("#rk").textContent=0;$("#rm").textContent=K?"Close! That little dot stays put. Look again!":"That point does not shift: only its brightness varies. Compare its position between dates."}dr()};
+ $("#rn").onclick=R.reto;$("#rh").onclick=()=>{RT.hint=1;$("#rm").textContent=K?"Hint: look at the patch with the red square!":"Hint used: no point awarded.";dr()}};
+let COLLECT_LEARN_QUIZ=false,AP_TRIVIA=[];
+ function tema(id,lead,facts,qs,extra,ini){const collect=COLLECT_LEARN_QUIZ;if(collect)AP_TRIVIA.push(...qs);return ['<p>'+lead+'</p>'+(extra||'')+facts.map(c=>'<details class="kc"><summary>'+c[0]+'</summary><p>'+c[1]+'</p></details>').join("")+(collect?'':'<div id="'+id+'" class="kc"></div>'),()=>{if(ini)ini();if(!collect)quiz("#"+id,qs)}]}
+const fsx=a=>'<div class="fs">'+a.map(t=>'<div><small>'+t[0]+'</small><b>'+t[1]+'</b></div>').join("")+'</div>';
+const PLN=[
+["The Sun","Our star","The Sun is the star at the center of the Solar System. It gives us light and heat.",[["Type","Star"],["Age","4.6 billion years"],["Its light takes","8 min to arrive"]],[["Huge","The Sun has 99.8% of all the mass in the Solar System."],["Hot","Its surface is about 5500 °C."]],["What is the Sun?",["A star","A planet","A moon"],0,"It is the star of our system."]],
+["Mercury","Closest to the Sun","Mercury is the smallest planet and the closest to the Sun.",[["Year","88 days"],["Moons","0"],["Temperature","−180 to 430 °C"]],[["Very fast","It orbits the Sun in only 88 Earth days."],["No air","It has almost no atmosphere, so nights get extremely cold."]],["Which planet is closest to the Sun?",["Mercury","Neptune","Mars"],0,"Mercury is first from the Sun."]],
+["Venus","The hottest","Venus is almost Earth’s size, but a very different place.",[["Year","225 days"],["Moons","0"],["Temperature","465 °C"]],[["Hottest","Its thick atmosphere traps heat: it is hotter than Mercury."],["Spins backward","It rotates opposite most planets and its day is longer than its year."]],["Which is the hottest planet?",["Venus","Mercury","Jupiter"],0,"Its atmosphere traps heat."]],
+["Earth","Our home","Earth is the third planet from the Sun and our home.",[["Year","365 days"],["Moons","1"],["Water","71% of the surface"]],[["Day and night","It spins like a top every 24 hours."],["With life","It is the only place we know has life."]],["Why is there day and night?",["Earth spins","The Sun turns off","The Moon covers it"],0,"When your side faces the Sun it is day."]],
+["The Moon","Our neighbor","The Moon is Earth’s natural satellite and orbits around it.",[["Distance","384 400 km"],["Size","1/4 of Earth"],["Gravity","1/6 of Earth"]],[["Always the same face","It takes as long to spin as to orbit Earth, so we always see the same face."],["Back to the Moon","NASA’s Artemis program aims to return people to the Moon."]],["How many faces of the Moon do we see from Earth?",["Always the same","All of them","None"],0,"We always see the same face."]],
+["Mars","The red planet","Mars is a cold, rocky planet, fourth from the Sun.",[["Year","687 days"],["Moons","2"],["Day","24 h 37 min"]],[["Red planet","It looks red from iron oxide (rust) in its soil."],["Robots","NASA’s Curiosity and Perseverance rovers explore its surface."]],["Why does Mars look red?",["Iron oxide","Fire","Paint"],0,"It is like rust."]],
+["Jupiter","The giant","Jupiter is the largest planet in the Solar System.",[["Year","12 years"],["Moons","more than 90"],["Day","10 hours"]],[["Giant","More than 1300 Earths would fit inside Jupiter."],["Great Red Spot","It is a huge storm that has lasted for centuries."]],["Which is the largest planet?",["Jupiter","Earth","Mercury"],0,"Jupiter is the giant."]],
+["Saturn","The ringed one","Saturn is famous for its bright rings.",[["Year","29 years"],["Moons","more than 200"],["Day","10.7 hours"]],[["Rings","They are made of ice and rock chunks."],["Very light","It is less dense than water: it would float in a giant bathtub."]],["What are Saturn’s rings made of?",["Ice and rock","Gas","Metal"],0,"They are chunks of ice and rock."]],
+["Uranus","The one that rolls on its side","Uranus is a blue-green ice giant.",[["Year","84 years"],["Moons","28"],["Tilt","98°"]],[["Rolls on its side","It is almost lying down, like a rolling ball."],["One visit","Only NASA’s Voyager 2 visited it, in 1986."]],["How does Uranus spin?",["On its side","Backward","It does not spin"],0,"It is tilted almost 98°."]],
+["Neptune","The farthest","Neptune is a blue ice giant, the planet farthest from the Sun.",[["Year","165 years"],["Moons","16"],["Wind","up to 2000 km/h"]],[["Fast winds","It has the fastest winds in the Solar System."],["One visit","NASA’s Voyager 2 visited it in 1989."]],["Which planet is farthest from the Sun?",["Neptune","Venus","Mars"],0,"Neptune is the eighth."]]];
+R.aprende=()=>{clearInterval(tm);AP_TRIVIA=[];COLLECT_LEARN_QUIZ=true;
+  const lessons=PLN.map((p,i)=>{const id="q"+i,h=fsx(p[3]),t=tema(id,p[2],p[4],[p[5]],h);return [p[0],p[1],t[0],t[1]]}).concat([
+   ["Comets and asteroids","Travelers of the Solar System",...tema("q10","Comets and asteroids are leftovers from the Solar System’s formation about 4.6 billion years ago. Comets keep ices; asteroids are mostly rocky.",[["Comets","As they approach the Sun, some ice turns directly into gas and drags dust, forming a coma and one or more tails."],["Asteroids","Most lie in the main belt between Mars and Jupiter. Sizes range from small rocks to bodies hundreds of kilometers across."],["Why study them","Their composition preserves clues about the materials that formed the planets."]],[["Where are most asteroids found?",["Between Mars and Jupiter","Beyond Neptune","Inside the Sun"],0,"The main belt lies between the orbits of Mars and Jupiter."]])],
+   ["The universe","Stars and galaxies",...tema("q11","The universe includes all matter, energy, space, and time. Our galaxy is the Milky Way, a barred spiral.",[["Our galactic neighborhood","The Sun sits in the Orion Arm, also called the Orion Spur, of the Milky Way."],["A huge scale","The Solar System takes about 230 million years to orbit the galactic center."],["Ancient light","When we observe very distant galaxies, we see light they emitted billions of years ago."]],[["Which galaxy is our Solar System in?",["Milky Way","Andromeda","Sombrero"],0,"The Sun is in the Orion Arm of the Milky Way."]])],
+   ["How SPHEREx observes","Infrared light as a tool",...tema("q12","SPHEREx observes near-infrared light, invisible to our eyes. Instead of one color image, it splits the light into 102 spectral bands.",[["A chemical fingerprint","Molecules absorb and emit light at specific wavelengths. Those patterns help recognize water, carbon dioxide, and other materials."],["A three-dimensional map","Combining spectra with distance measurements, scientists can study the distribution of hundreds of millions of galaxies."],["An open archive","Mission data are published so researchers, teachers, and the public can analyze them."]],[["What does spectroscopy reveal?",["The composition of objects","The sound of stars","The weight of planets"],0,"Each molecule leaves characteristic signals in the light spectrum."]])]
+  ]);
+  COLLECT_LEARN_QUIZ=false;AP_TRIVIA.forEach((q,i)=>{q[4]=TK[i]});
+  lessons.push(["Trivia","Check what you learned",'<p>Answer questions about the topics above. They are gathered here so you can read and explore first.</p>'+nasaGallery()+'<h3>Answer</h3><div id="triviaAll" class="kc"></div>',()=>quiz("#triviaAll",AP_TRIVIA)]);
+  lessons.push(['Official sources','NASA and JPL', '<p>Visit the original pages to go deeper and explore images, data, and missions.</p><ul><li><a href="https://science.nasa.gov/mission/spherex/" target="_blank" rel="noopener">NASA · SPHEREx Mission</a></li><li><a href="https://www.jpl.nasa.gov/press-kits/spherex/mission-overview/science/" target="_blank" rel="noopener">JPL · SPHEREx science goals</a></li><li><a href="https://science.nasa.gov/solar-system/solar-system-facts/" target="_blank" rel="noopener">NASA · Solar System facts</a></li><li><a href="https://science.nasa.gov/asteroids-comets-meteors/facts/" target="_blank" rel="noopener">NASA · Asteroids, comets, and meteors</a></li></ul>',()=>{}]);
+  lv('Learn about the universe and the SPHEREx mission','Explore each topic at your own pace. The information is expanded with official NASA and JPL science resources.',lessons);
+};
+
+R.lab=()=>{clearInterval(tm);const M=O.filter(o=>o.mv);
+ lv('Practice with the SPHEREx mission','Tap a level to open it. This is harder and talks about the NASA project.',[
+ ["The SPHEREx mission","A NASA observatory",...tema("m1","SPHEREx is a NASA space observatory that maps the whole sky in near-infrared light.",[["Launch","It launched in March 2025 and has returned data since May 2025."],["Whole sky","It maps the complete sky every six months."],["Open data","The data are published in the NASA IRSA archive for anyone to use."]],[["How often does SPHEREx map the whole sky?",["Every six months","Every day","Every ten years"],0,"That is how maps can be compared to see changes."]])],
+ ["102 bands and 6 detectors","How it sees colors",...tema("m2","SPHEREx splits infrared light into 102 color bands, from 0.75 to 5 microns.",[["Spectrum","The 102 bands build a spectrum: an object’s fingerprint."],["Six detectors","Adding the six arrays improves signal/noise."],["Caution","Wavelength changes with position on the detector: compare the same band."]],[["Why add the six detectors?",["Improve signal/noise","Enlarge the sky","Erase stars"],0,"Signal adds and noise partly cancels."]])],
+ ["What the mission seeks","Three big questions",...tema("m3","NASA designed SPHEREx to answer three big questions about the universe.",[["Beginning of the universe","It studies how the universe grew just after the Big Bang."],["Galaxies","It measures light from huge numbers of galaxies to learn how they formed."],["Ices","It looks for water and other ices in clouds where stars and planets are born."]],[["Which ice does SPHEREx seek?",["Water","Iron","Gold"],0,"Water is key to understanding planets."]])],
+ ["Trails and comets","Two tails, two origins",...tema("n1","A comet is a nucleus of ice and rock. Near the Sun, ice evaporates and forms a cloud (coma) and tails.",[["Two tails","The dust tail curves; the ionized-gas tail is straight, pushed by the solar wind."],["Always away from the Sun","The tails point away from the Sun, even when the comet is outbound."],["Seen by SPHEREx","Its infrared spectrum can show water, CO₂, and CO from the comet."]],[["Where does a comet’s gas tail point?",["Away from the Sun","Toward the Sun","Backward along its path"],0,"The solar wind pushes it away from the Sun."],["What can the spectrum of an active comet show?",["Water and CO₂","Only iron","Nothing"],0,"Those are molecules from evaporating ice."]])],
+ ["Asteroids","Rocks that give away their motion",...tema("n2","Asteroids are rocky leftovers of the Solar System. They almost never have active ice.",[["Main belt","Most orbit between Mars and Jupiter."],["How they are found","They move against the stars: they appear at different points in photos from different dates."],["No tail","They almost never have ice that evaporates, so they form neither coma nor tail."]],[["How does an asteroid give itself away in two photos?",["It changes position","It changes color","It always disappears"],0,"It moves against the star background."],["Why does it have no tail?",["Almost no active ice","It is very large","It is very far"],0,"Without evaporating ice there is no coma or tail."]])],
+ ["Brown dwarfs","Neither star nor planet",...tema("n3","Brown dwarfs are “almost stars”: they do not have enough mass to fuse hydrogen stably.",[["Between planet and star","They have about 13 to 80 times Jupiter’s mass."],["Cold and red","The coldest, like WISE 0855, are about −20 °C and shine almost only in infrared."],["How they are found","They are faint in visible light and move a lot. NASA’s Backyard Worlds citizen-science project looks for them in WISE photos."]],[["A brown dwarf shines mostly in...",["Infrared","X-rays","Visible light"],0,"It is cold: its light is in the infrared."],["What gives it away when comparing photos from different dates?",["Large proper motion","It explodes","It blinks every day"],0,"Being nearby, it shifts a measurable amount."]])],
+ ["Variable stars","Brightness that rises and falls",...tema("n4","A variable star does not change place, but its brightness changes with time.",[["Pulsating stars","R Dra, a Mira type, grows brighter and fainter in cycles of about 245 days."],["Dust that blocks","RW Aur fades when dust clouds pass in front."],["Light curve","It is a graph of brightness versus time. SPHEREx adds points every six months."]],[["A variable changes...",["Brightness, not place","Place, not brightness","Nothing"],0,"Its position is fixed; its brightness is not."],["What makes RW Aur vary?",["Dust passing in front","A comet","The Moon"],0,"Dust from its surroundings covers it at times."]])],
+ ["How far away is it?","Parallax: measuring distances",'<p class="ex">As Earth orbits the Sun, a nearby star seems to shift a little against the background. The more it shifts, the closer it is. This is measured in arcseconds (″; 1″ is 1/3600 of a degree).</p><div class="row2">'+[["Barnard",.547],["ε Indi",.275],["WISE 0855",.449]].map(q=>'<button class="b" data-p="'+q[1]*100+'">'+q[0]+'</button>').join("")+'</div><input type="range" id="lp" min="5" max="80" value="55" aria-label="How much the star moves"><p class="res" id="lo"></p>',()=>{const p1=()=>{const p=$("#lp").value/100,d=1/p;$("#lo").innerHTML="It moves "+p.toFixed(2)+"″ per year, so it is about <b>"+(d*3.262).toFixed(1)+" light-years</b> ("+d.toFixed(2)+" parsecs)."};$("#lp").oninput=p1;$("#pn").querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{$("#lp").value=b.dataset.p;p1()});p1()}],
+ ["Would SPHEREx see it?","Proper motion in pixels",'<p class="ex">An object with proper motion shifts every year. SPHEREx only notices it if the change is at least one-third of a pixel. Choose the object and the years between the two photos.</p><select id="ls" aria-label="Object">'+M.map((o,i)=>'<option value="'+i+'">'+o.n+'</option>').join("")+'</select><label>Years between the two photos: <b id="lyv"></b><input type="range" id="ly" min="1" max="10" value="4"></label><canvas id="lc" width="320" height="110"></canvas><p class="res" id="lm"></p>',()=>{const p2=()=>{const o=M[$("#ls").value],y=$("#ly").value/2,s=pmv(o)*y,px=s/6.15,x=$("#lc").getContext("2d");$("#lyv").textContent=y+(y==1?" year":" years");x.fillStyle="#05060c";x.fillRect(0,0,320,110);x.strokeStyle="#25397a";for(let g=20;g<320;g+=40){x.beginPath();x.moveTo(g,0);x.lineTo(g,110);x.stroke()}const e=Math.min(300,20+px*40);x.strokeStyle="#f97316";x.lineWidth=2;x.beginPath();x.moveTo(20,55);x.lineTo(e,55);x.stroke();x.fillStyle="#fff";x.beginPath();x.arc(20,55,4,0,7);x.fill();x.fillStyle="#f97316";x.beginPath();x.arc(e,55,5,0,7);x.fill();x.fillStyle="#9fb0d6";x.font="12px sans-serif";x.fillText("White: photo 1 · Orange: photo 2 · each square = 1 pixel",6,102);$("#lm").textContent=o.n+" shifts "+s.toFixed(1)+"″ in "+y+" years, about "+px.toFixed(1)+" pixels. "+(px>=.3?"SPHEREx does detect it.":"That is too little: it would not be noticed.")};$("#ls").onchange=$("#ly").oninput=p2;p2()}],
+ ["Data collection","From photons to bytes",'<p class="ex">An astronomical detector does not store photographs: it counts photons. Each photon that hits the sensor frees electrons and, at the end of the exposure, the electronics turn that charge into numbers. The quality of an observation depends on how many photons pile up and how much noise comes with them.</p><details class="kc"><summary>Why stack many exposures?</summary><p>Signal grows with the number of images (N), but random noise only with its square root (√N): 4 images give ×2, 9 give ×3, and 36 give ×6. SPHEREx stacks each detector separately so colors are not mixed, and its noise also depends on zodiacal background and the Milky Way.</p></details><label>Stacked images (N): <b id="dnv">4</b><input type="range" id="dn" min="1" max="36" value="4"></label><canvas id="dnc" width="720" height="240"></canvas><p class="res" id="dno"></p>',()=>{const p3=()=>{const N=+$("#dn").value;$("#dnv").textContent=N;const pl=plot("#dnc",[Array.from({length:36},(_,i)=>[i+1,Math.sqrt(i+1)])],{c:["#2dd4bf"],xl:"Stacked images (N)",yl:"Signal/noise (√N)",d:0});const x=$("#dnc").getContext("2d"),Y=v=>204-(v/6.6)*190;x.strokeStyle="#f97316";x.lineWidth=2;x.beginPath();x.moveTo(pl.X(N),204);x.lineTo(pl.X(N),Y(Math.sqrt(N)));x.stroke();x.fillStyle="#fff";x.beginPath();x.arc(pl.X(N),Y(Math.sqrt(N)),5,0,7);x.fill();$("#dno").innerHTML="With "+N+" image"+(N==1?"":"s")+", signal grows "+N+" times but noise only ×"+Math.sqrt(N).toFixed(2)+": quality improves ×"+Math.sqrt(N).toFixed(2)};$("#dn").oninput=p3;p3()}],
+ ["Data processing","From telescope to archive",'<p class="ex">The numbers that arrive from the telescope are not yet science. First they go through a processing chain: instrument corrections, sky-position calibration, and brightness calibration. Only then do they become maps and spectra anyone can download from a public archive.</p><details class="kc"><summary>Calibration steps</summary><p><b>1. Instrument correction:</b> subtract dark/bias readings and correct each pixel’s sensitivity with a flat.<br><b>2. Astrometry:</b> compute which sky point belongs to each pixel using reference stars.<br><b>3. Photometric calibration:</b> convert counts into physical brightness (MJy/sr).<br><b>4. Final products:</b> combine exposures by band and detector to build all-sky maps and spectra at each position.</p></details><p>In SPHEREx each processing level adds information: the final products give the exact wavelength of each pixel, because color changes with position on the detector.</p>',()=>{}],
+ ["The FITS format","The language of astronomical data",'<p class="ex">Flexible Image Transport System (FITS) has been astronomy’s standard format since 1981. It stores the image as a matrix of numbers and, before the data, a text header of 80-character lines that describes everything: size, brightness unit, observation date, spectral band, and how to project the sky onto the pixels.</p><pre>SIMPLE  =                    T / conforms to FITS standard\nBITPIX  =                  -32 / 32-bit real numbers\nNAXIS   =                    2 / number of dimensions\nNAXIS1  =                 2048 / width in pixels\nNAXIS2  =                 2048 / height in pixels\nCTYPE1  = \'GLON-CAR\'           / celestial projection\nBUNIT   = \'MJy/sr\'             / brightness unit\nBAND    =                   17 / SPHEREx spectral band\nEND                           / end of header</pre><details class="kc"><summary>Anatomy of a FITS file</summary><p>A FITS file is organized into <b>HDUs</b> (header-data units): the first holds the main image and later ones can store tables, quality masks, or spectra. Each header ends with the <code>END</code> card. Free tools such as SAOImageDS9, Aladin, or Astropy (Python) open this format and let you inspect the header and measure on the image.</p></details>',()=>{}],
+ ["The infrared sky","Light the eye cannot see",'<p class="ex">Infrared light has a longer wavelength than visible light. It passes through cosmic dust better and reveals cold objects: brown dwarfs, newborn stars, and distant galaxies shifted to the red. That is why infrared astronomy is done from space or from very dry mountain tops: our atmosphere and Earth’s own heat interfere.</p><details class="kc"><summary>Infrared windows</summary><p>The atmosphere only lets certain bands (“windows”) through; elsewhere it absorbs almost all the signal. A space observatory like SPHEREx always sees the 102 bands from 0.75 to 5 µm without atmospheric interference, with detectors cooled so the instrument’s own heat does not drown the signal.</p></details><details class="kc"><summary>Redshift</summary><p>The expansion of the universe stretches the light of distant galaxies: what started as visible arrives as infrared. Measuring that shift in millions of galaxies is one of SPHEREx’s science goals.</p></details>',()=>{}],
+ ["Test what you learned","4-question quiz",'<div id="lq" class="kc"></div>',()=>quiz("#lq",[["A point changes place between dates and is almost unseen in visible light. What could it be?",["A quasar","A nearby brown dwarf","A galaxy"],1,"Brown dwarfs are cold: they shine in infrared and move a lot because they are nearby."],["A star stays put but its brightness rises and falls over months. What is it?",["Variable","Asteroid","Comet"],0,"Like R Dra: its brightness pulses without changing position."],["In an A−B photo subtraction, what leaves a bright blob and a dark one?",["What is fixed","What moves","Noise"],1,"What is fixed cancels; what moves appears in two positions."],["Why does stacking images improve the image?",["Signal grows more than noise","It enlarges the sky","It removes stars"],0,"Signal adds and random noise partly cancels."]])]]);
+};
+
+/* ---------- Account panel ---------- */
+function updAcc(){const u=usr(),t=u?u.d:null;$("#nvu").textContent=t?"Account · "+t:"Create account · Sign in";$("#acl").textContent=t?"Account · "+t:"Create account · Sign in";$("#acb").textContent=t||"Sign in"}
+function acc(mode){
+ const a=$("#acc"),b=$("#ab2"),u=usr();a.classList.remove("hide");
+ if(!u){const nw=mode!="in";$("#ah").textContent=nw?"Create account":"Sign in";
+  b.innerHTML='<p>'+(nw?"Create an account to remember your level and the stars you look up.":"Sign in to restore your level and history.")+'</p><div class="row2"><button class="b'+(nw?" on":"")+'" data-m="new">Create account</button><button class="b'+(nw?"":" on")+'" data-m="in">I already have an account</button></div><label class="fld" for="au">Username</label><input type="text" id="au" autocomplete="username" maxlength="20"><label class="fld" for="ap">Password</label><input type="password" id="ap" autocomplete="'+(nw?"new-password":"current-password")+'"><div class="err" id="ae" role="alert"></div><div class="row2"><button class="b tq" id="as2">'+(nw?"Create account":"Sign in")+'</button></div><p class="note">Your account is stored only in this browser and is not sent to any server.</p>';
+  b.querySelectorAll("[data-m]").forEach(x=>x.onclick=()=>acc(x.dataset.m));
+  const go=async()=>{const nm=$("#au").value.trim(),pw=$("#ap").value,k=nm.toLowerCase(),us=US(),er=m=>{$("#ae").textContent=m};
+   if(!/^[\w.-]{3,20}$/.test(nm))return er("Username: 3 to 20 letters, numbers, period, hyphen, or underscore.");
+   if(pw.length<4)return er("The password needs at least 4 characters.");
+   const h=await hp(pw);
+   if(nw){if(us[k])return er("That username already exists. Try another or sign in.");
+    const app=!$("#app").classList.contains("hide");us[k]={d:nm,h,lv:app?S.lv:chosen||0,hist:[],skip:skipT()};saveUS(us)}
+   else{if(!us[k]||us[k].h!==h)return er("Incorrect username or password.")}
+   ME=k;LS.s("cem_session",k);chosen=0;updAcc();
+   if(!$("#app").classList.contains("hide")){if(us[k].lv)setLv(us[k].lv)}else if(!$("#levels").classList.contains("hide"))preLevel();
+   acc("me")};
+  $("#as2").onclick=go;$("#ap").onkeydown=e=>{if(e.key=="Enter")go()};setTimeout(()=>$("#au").focus(),0);return}
+ $("#ah").textContent="Hello, "+u.d;const h=u.hist||[];
+ b.innerHTML='<p>'+(u.lv?"Saved level: <b style='color:var(--txt)'>"+NM[u.lv]+"</b>":"No level saved yet.")+'</p><h3>Looked-up objects</h3>'+(h.length?'<div class="hl">'+h.map((x,i)=>'<button class="b" data-i="'+i+'">'+esc(x.n)+'<span>'+esc(x.t)+'</span></button>').join("")+'</div>':'<p>You have not looked up any object yet. Tap one on the map and it will appear here.</p>')+'<div class="row2">'+(u.skip?'<button class="b" id="ask">Show the tutorial again</button>':"")+(h.length?'<button class="b" id="ach">Clear history</button>':"")+'<button class="b" id="aso">Sign out</button></div><p class="note">Your account is stored only in this browser.</p>';
+ b.querySelectorAll(".hl .b").forEach(x=>x.onclick=()=>{const r=h[+x.dataset.i],f=O.find(o=>o.n==r.n)||r;$("#acc").classList.add("hide");if($("#app").classList.contains("hide"))enterApp(u.lv||1,1);fly(f.ra,f.dec,4);show(f)});
+ if($("#ask"))$("#ask").onclick=()=>{setSkip(false);acc("me")};
+ if($("#ach"))$("#ach").onclick=()=>{uu(x=>{x.hist=[]});acc("me")};
+ $("#aso").onclick=()=>{ME="";LS.r("cem_session");chosen=0;updAcc();$("#acc").classList.add("hide")}}
+$("#nvu").onclick=e=>{e.preventDefault();acc(usr()?"me":"new")};
+$("#acl").onclick=$("#acb").onclick=()=>acc(usr()?"me":"new");
+$("#ax").onclick=()=>$("#acc").classList.add("hide");
+addEventListener("keydown",e=>{if(e.key=="Escape"){$("#acc").classList.add("hide");mfClose()}});
+updAcc();
+addEventListener("resize",size);
+function openLink(){const q=new URLSearchParams(location.search);if(!q.has("ra")||!q.has("dec"))return;let ra=parseFloat(q.get("ra")),de=parseFloat(q.get("dec"));if(!isFinite(ra)||!isFinite(de)||Math.abs(de)>90)return;ra=((ra%360)+360)%360;
+ if(q.get("embed")=="1")document.documentElement.classList.add("emb");
+ const lv=[1,2,3].includes(+q.get("nivel"))?+q.get("nivel"):2,vm={planeta:"p",plano:"f",ojo:"o",planisferio:"m"},vmo={video:"v",antesdespues:"a",resta:"r"},cmo={video:"v",blink:"b",antesdespues:"a",resta:"r",suma:"u",sinfijas:"s",estela:"e"};
+ ["landing","levels"].forEach(i=>$("#"+i).classList.add("hide"));$("#app").classList.remove("hide");setLv(lv);size();
+ if(vm[q.get("vista")])view(vm[q.get("vista")]);
+ const fv=parseFloat(q.get("fov"));if(fv>=1&&fv<=10)V.fov=C.fov=Math.round(fv);
+ const dt=q.get("det");if(dt=="sum")V.det=C.det="Σ";else if(/^D[1-6]$/.test(dt))V.det=C.det=dt;
+ const md=q.get("modo");if(vmo[md])V.m=vmo[md];if(cmo[md])C.m=cmo[md];
+ if(/^[0-9a-f]{6}$/i.test(q.get("color")||""))AL.c=q.get("color").toUpperCase();const sn=parseFloat(q.get("sens"));if(sn>=3&&sn<=10)AL.s=sn;
+ const i1=MS.findIndex((_,i)=>ym(i)==q.get("t1")),i2=MS.findIndex((_,i)=>ym(i)==q.get("t2"));if(i1>=0&&i2>=0){const s=[...new Set([i1,i2])].filter(has);if(s.length)C.sel=s}
+ const ob=O.find(o=>Math.abs(o.ra-ra)<.01&&Math.abs(o.dec-de)<.01)||{n:q.get("obj")||"Coordinates",t:"Sky point",ra,dec};
+ S.cx=ra;S.cy=de;S.z=4;show(ob);
+ const pe=q.get("pestana"),tabs=["visor","datos","comparar","movimiento","espectro","bandas","graficos","imagenes","alertas"];
+ if(tabs.includes(pe))tab(pe);else if(q.get("t1")||["blink","suma","sinfijas","estela"].includes(md))tab("comparar")}
+openLink();
+</script>
+<script src="config.js"></script>
+<script src="spherex-integration.js"></script>
+</body>
+</html>

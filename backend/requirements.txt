@@ -1,0 +1,7 @@
+fastapi>=0.115,<1
+uvicorn[standard]>=0.30,<1
+requests>=2.32,<3
+astropy>=6.1,<8
+
+reproject>=0.13,<1
+pillow>=10,<13

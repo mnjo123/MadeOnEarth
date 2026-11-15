@@ -1,0 +1,35 @@
+{
+  "name": "WISE 0855",
+  "ra": 133.795,
+  "dec": -7.245,
+  "radius": 0.04,
+  "track_id": "wise0855",
+  "count": 2,
+  "frames": [
+    {
+      "index": 0,
+      "date": "2025-05-06",
+      "detector": "D5",
+      "collection": "spherex_dr1",
+      "obs_id": "2025W19_1B_0181_2",
+      "quality": "warning",
+      "coverage": 0.881,
+      "noise": 0.02938,
+      "image_url": "/api/tracks/wise0855/frame_000.png"
+    },
+    {
+      "index": 1,
+      "date": "2025-11-07",
+      "detector": "D5",
+      "collection": "spherex_dr1",
+      "obs_id": "2025W45_2A_0192_2",
+      "quality": "warning",
+      "coverage": 0.885,
+      "noise": 0.024841,
+      "image_url": "/api/tracks/wise0855/frame_001.png"
+    }
+  ],
+  "warnings": [],
+  "processing": "WCS reprojection; background subtraction; shared asinh stretch per detector",
+  "source": "NASA/IPAC IRSA SPHEREx, saved locally for the demo"
+}
